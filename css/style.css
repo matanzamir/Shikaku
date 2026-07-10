@@ -1,0 +1,15 @@
+#game-block {
+    display: grid;
+    flex: 0 1 auto;
+    min-height: 0;
+    min-width: 0;
+    width: min(90vw, calc(100dvh - var(--layout-chrome)));
+    max-height: calc(100dvh - var(--layout-chrome));
+    aspect-ratio: 1 / 1;
+    background-color: var(--board-background-color);
+    opacity: 70%;
+    border-radius: var(--board-border-radius);
+    box-shadow: var(--board-box-shadow);
+    grid-template-columns: repeat(var(--grid-size), 1fr);
+    grid-template-rows: repeat(var(--grid-size), 1fr);
+}
