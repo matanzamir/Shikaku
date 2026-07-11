@@ -75,7 +75,7 @@ Shikaku/
   - [ ] **3.2 Grid Splitting Strategy:** Implement recursive direction binary splitting functions to break boundaries down into proportional matrix components.
   - [ ] **3.3 Grid Extraction Rules:** Map clue definitions out across generated clusters; hide baseline layout paths to keep source definitions fully implicit.
   - [ ] **3.4 Scale Mappings configuration:** Standardize matrix tiers: Easy (`7×7`), Medium (`10×10`), and Hard (`15×15`).
-  - [ ] **3.5 Code Cleaning: Remove the error catchers and object immutability in the createPuzzle function.
+  - [ ] **3.5 Code Cleaning:** Remove the error catchers and object immutability in the createPuzzle function.
 
 ### ⬜ Phase 4 — Game Loop Controls
 - **Status:** ⏳ PENDING
