@@ -10,7 +10,7 @@
 ## 📊 High-Level Project Roadmap
 
 - [x] Phase 1 — Foundations (Layout & Custom Design Tokens)
-- [▶️ ] Phase 2 — Core Shikaku Gameplay & Input Validation
+- [▶️] Phase 2 — Core Shikaku Gameplay & Input Validation
 - [ ] Phase 3 — Seeded Deterministic Puzzle Generator
 - [ ] Phase 4 — Game Loop Controls (Timer & Active Resets)
 - [ ] Phase 5 — System Settings (Theme Persistence & Difficulty)
@@ -60,7 +60,7 @@ Shikaku/
 - **Target Files:** `js/game.js`, `css/components.css`
 - **Goal:** Render a playable grid and write input validation rules handling non-overlapping area coordinates.
 - **Tasks:**
-  - [▶️] **2.1 Data Models:** Setup client-side immutable puzzle models (`{ rows, cols, clues: [] }`) alongside a mutable tracking array (`{ rectangles: [] }`).
+  - [x] **2.1 Data Models:** Setup client-side immutable puzzle models (`{ rows, cols, clues: [] }`) alongside a mutable tracking array (`{ rectangles: [] }`).
   - [ ] **2.2 Grid Generation:** Program dynamic DOM element injection into `#game-block` utilizing custom sizing mappings. Distinguish clue markers visually from active interactive zones.
   - [ ] **2.3 Rectangle Selection Engine:** Build corner-selection interaction coordinates (Click Cell A -> Click Cell B) logic to formulate, render, or safely slice an active region overlay.
   - [ ] **2.4 Matrix Geometry Validation:** Implement spatial verification checks. Enforce bounds rules: Ensure rectangles encapsulate exactly one clue index, validation dimensions equal specified grid areas (`width × height == value`), and coordinate lines do not intersect.
@@ -75,6 +75,7 @@ Shikaku/
   - [ ] **3.2 Grid Splitting Strategy:** Implement recursive direction binary splitting functions to break boundaries down into proportional matrix components.
   - [ ] **3.3 Grid Extraction Rules:** Map clue definitions out across generated clusters; hide baseline layout paths to keep source definitions fully implicit.
   - [ ] **3.4 Scale Mappings configuration:** Standardize matrix tiers: Easy (`7×7`), Medium (`10×10`), and Hard (`15×15`).
+  - [ ] **3.5 Code Cleaning: Remove the error catchers and object immutability in the createPuzzle function.
 
 ### ⬜ Phase 4 — Game Loop Controls
 - **Status:** ⏳ PENDING
