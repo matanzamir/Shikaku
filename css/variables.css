@@ -1,21 +1,36 @@
 :root {
+
+    /* colors and fonts */
     --primary-color: rgb(182, 73, 126);
     --secondary-color: rgb(217, 160, 188);
     --board-background-color: rgb(248, 245, 240);
     --shadow-color: rgb(0, 0, 0);
     --font-family: "Bungee Shade", monospace;
+
+    /* layout */
     --header-font-size: clamp(1.75rem, 4vw + 0.5rem, 3.75rem);
-    --board-border-radius: 20px;
-    --grid-cell-border-radius: 10px;
-    --board-box-shadow: 0px 0px 10px 0px var(--shadow-color);
-    --page-gap: clamp(0.5rem, 1.5vh, 1rem);
+    --grid-size: 5;
+    --page-gap: clamp(1rem, 2.5vh, 1.5rem);
+    --section-gap: clamp(1rem, 3vh,2.5rem);
+    --board-outer-gap: clamp(1.5rem, 4vh, 2.5rem);
     --control-bar-height: 2.5rem;
     --layout-chrome: calc(
-        var(--page-gap) * 4 +
+        var(--page-gap) * 2 +
+        var(--section-gap) * 2.5 +
         var(--header-font-size) * 1.2 +
-        var(--control-bar-height)
+        var(--control-bar-height) +
+        var(--board-outer-gap) * 2
     );
-    --grid-size: 5;
+
+    /* board */
+    --board-border-radius: 20px;
+    --board-box-shadow: 0px 0px 10px 0px var(--shadow-color);
+    --board-width: min(90vw, calc(100dvh - var(--layout-chrome)));
+    --board-max-height: calc(100dvh - var(--layout-chrome));
+
+    /* grid */
+    --grid-size-percentage: 95%;
+    --grid-corner-radius: 10px;
 }
 
 [data-theme="dark"] {

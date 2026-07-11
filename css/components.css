@@ -2,8 +2,8 @@
     flex: 0 1 auto;
     min-height: 0;
     min-width: 0;
-    width: min(90vw, calc(100dvh - var(--layout-chrome)));
-    max-height: calc(100dvh - var(--layout-chrome));
+    width: var(--board-width);
+    max-height: var(--board-max-height);
     aspect-ratio: 1 / 1;
     background-color: var(--board-background-color);
     opacity: 70%;
@@ -12,6 +12,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
 }
 
 #game-grid {
@@ -19,19 +20,35 @@
     flex: 0 1 auto;
     min-height: 0;
     min-width: 0;
-    width: 95%;
-    height: 95%;
+    width: var(--grid-size-percentage);
+    height: var(--grid-size-percentage);
+    aspect-ratio: 1 / 1;
     grid-template-columns: repeat(var(--grid-size), 1fr);
     grid-template-rows: repeat(var(--grid-size), 1fr);
 }
 
 .grid-cell {
     background-color: var(--board-background-color);
-    border-radius: var(--grid-cell-border-radius);
     outline: 1px solid black;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.grid-cell--corner-tl {
+    border-top-left-radius: var(--grid-corner-radius);
+}
+
+.grid-cell--corner-tr {
+    border-top-right-radius: var(--grid-corner-radius);
+}
+
+.grid-cell--corner-bl {
+    border-bottom-left-radius: var(--grid-corner-radius);
+}
+
+.grid-cell--corner-br {
+    border-bottom-right-radius: var(--grid-corner-radius);
 }
 
 .clue {

@@ -70,7 +70,17 @@ export function createGameGrid(puzzle) {
             cell.classList.add('grid-cell');
             cell.dataset.row = row;
             cell.dataset.col = col;
-            // if this (row,col) has a clue → add clue class + text
+
+            const isTopRow = row === 0;
+            const isBottomRow = row === puzzle.rows - 1;
+            const isLeftCol = col === 0;
+            const isRightCol = col === puzzle.cols - 1;
+
+            if (isTopRow && isLeftCol) cell.classList.add('grid-cell--corner-tl');
+            if (isTopRow && isRightCol) cell.classList.add('grid-cell--corner-tr');
+            if (isBottomRow && isLeftCol) cell.classList.add('grid-cell--corner-bl');
+            if (isBottomRow && isRightCol) cell.classList.add('grid-cell--corner-br');
+
             const clue = puzzle.clues.find((c) => c.row === row && c.col === col);
             if (clue) {
                 cell.classList.add('clue');
