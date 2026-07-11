@@ -6,6 +6,7 @@
     --font-family: "Bungee Shade", monospace;
     --header-font-size: clamp(1.75rem, 4vw + 0.5rem, 3.75rem);
     --board-border-radius: 20px;
+    --grid-cell-border-radius: 10px;
     --board-box-shadow: 0px 0px 10px 0px var(--shadow-color);
     --page-gap: clamp(0.5rem, 1.5vh, 1rem);
     --control-bar-height: 2.5rem;
@@ -14,7 +15,7 @@
         var(--header-font-size) * 1.2 +
         var(--control-bar-height)
     );
-    --grid-size: 10;
+    --grid-size: 5;
 }
 
 [data-theme="dark"] {

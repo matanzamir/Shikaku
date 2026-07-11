@@ -44,6 +44,8 @@ export function createPuzzle(rows, cols, clues) {
         cols,
         clues: Object.freeze(clues.map((clue) => Object.freeze({ ...clue }))),
     });
+
+    // function after phase 3.5: return { rows, cols, clues };
 }
 
 /**
@@ -51,6 +53,32 @@ export function createPuzzle(rows, cols, clues) {
  */
 export function createGameState() {
     return { rectangles: [] };
+}
+
+export function createGameGrid(puzzle) {
+    const gameGrid = document.getElementById('game-grid');
+
+    gameGrid.innerHTML = '';
+
+    //set the grid size
+    gameGrid.style.setProperty('--grid-size', puzzle.rows);
+
+    //create the grid cells
+    for (let row = 0; row < puzzle.rows; row++) {
+        for (let col = 0; col < puzzle.cols; col++) {
+            const cell = document.createElement('div');
+            cell.classList.add('grid-cell');
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+            // if this (row,col) has a clue → add clue class + text
+            const clue = puzzle.clues.find((c) => c.row === row && c.col === col);
+            if (clue) {
+                cell.classList.add('clue');
+                cell.textContent = clue.value;
+            }
+            gameGrid.appendChild(cell);
+        }
+    }
 }
 
 /** Hand-crafted dev puzzle until Phase 3 generator is ready. */
