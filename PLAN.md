@@ -10,7 +10,7 @@
 ## 📊 High-Level Project Roadmap
 
 - [x] Phase 1 — Foundations (Layout & Custom Design Tokens)
-- [▶️] Phase 2 — Core Shikaku Gameplay & Input Validation
+- [x] Phase 2 — Core Shikaku Gameplay & Input Validation
 - [ ] Phase 3 — Seeded Deterministic Puzzle Generator
 - [ ] Phase 4 — Game Loop Controls (Timer & Active Resets)
 - [ ] Phase 5 — System Settings (Theme Persistence & Difficulty)
@@ -56,7 +56,7 @@ Shikaku/
   - [x] **1.3 Layout Fixes:** Refactor container layouts using Flexbox/Grid. Resolve invalid syntax declarations (`grid-template-columns: 5` and `position: center`). Use CSS properties to dynamically size `#game-block` (e.g., `--grid-size`).
 
 ### 🟩 Phase 2 — Core Shikaku Gameplay
-- **Status:** ▶️ IN PROGRESS
+- **Status:** ✅ COMPLETE
 - **Target Files:** `js/game.js`, `css/components.css`
 - **Goal:** Render a playable grid and write input validation rules handling non-overlapping area coordinates.
 - **Tasks:**
@@ -64,7 +64,7 @@ Shikaku/
   - [x] **2.2 Grid Generation:** Program dynamic DOM element injection into `#game-block` utilizing custom sizing mappings. Distinguish clue markers visually from active interactive zones.
   - [x] **2.3 Rectangle Selection Engine:** Build corner-selection interaction coordinates (Click Cell A -> Click Cell B) logic to formulate, render, or safely slice an active region overlay.
   - [x] **2.4 Matrix Geometry Validation:** Implement spatial verification checks. Enforce bounds rules: Ensure rectangles encapsulate exactly one clue index, validation dimensions equal specified grid areas (`width × height == value`), and coordinate lines do not intersect.
-  - [ ] **2.5 Win Matrix Checker:** Implement full completion scanners confirming code coverage matrix contains zero grid gaps or illegal overrides. Toggle visual flags on win completion state.
+  - [x] **2.5 Win Matrix Checker:** Implement full completion scanners confirming code coverage matrix contains zero grid gaps or illegal overrides. Toggle visual flags on win completion state.
 
 ### ⬜ Phase 3 — Seeded Deterministic Puzzle Generator
 - **Status:** ⏳ PENDING

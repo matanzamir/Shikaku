@@ -50,3 +50,7 @@
 .grid-cell--corner-br {
     border-bottom-right-radius: var(--grid-corner-radius);
 }
+
+.win-overlay {
+    /*ToDo: win overlay styles*/
+}

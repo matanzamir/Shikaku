@@ -135,6 +135,12 @@ export function cellIsInsideRectangle(cell, rectangle) {
     );
 }
 
+export function validatePuzzle(rectangles, size) {
+    const sumOfAreas = rectangles.reduce((sum, rectangle) => sum + rectangle.width * rectangle.height, 0);
+    const allValidated = rectangles.every((rectangle) => rectangle.validated);
+    return sumOfAreas === size && allValidated;
+}
+
 /** Hand-crafted dev puzzle until Phase 3 generator is ready. */
 export const SAMPLE_PUZZLE = createPuzzle(5, 5, [
     { row: 0, col: 0, value: 4 },

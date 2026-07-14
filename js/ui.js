@@ -4,6 +4,7 @@ import {
     findRectangleAt,
     rectanglesOverlap,
     validateRectangle,
+    validatePuzzle,
 } from './game.js';
 
 /**
@@ -38,20 +39,20 @@ export function createGameGrid(puzzle, gameState) {
         }
     }
 
-    addGridEventListener(gameGrid, gameState, puzzle.clues);
-    paintCellStates(gameState);
+    addGridEventListener(gameGrid, gameState, puzzle);
+    
 }
 
 /**
  * @param {HTMLElement} gameGrid
  * @param {GameState} gameState
- * @param {Clue[]} clues
+ * @param {{ rows: number, cols: number, clues: Clue[] }} Puzzle
  */
-function addGridEventListener(gameGrid, gameState, clues) {
+function addGridEventListener(gameGrid, gameState, puzzle) {
     gameGrid.addEventListener('click', (event) => {
         const cell = event.target.closest('.grid-cell');
         if (!cell) return;
-        handleCellClick(cell, gameState, clues);
+        handleCellClick(cell, gameState, puzzle);
     });
 }
 
@@ -95,11 +96,12 @@ function paintCellStates(gameState) {
 /**
  * @param {HTMLElement} cell
  * @param {GameState} gameState
- * @param {Clue[]} clues
+ * @param {{ rows: number, cols: number, clues: Clue[] }} Puzzle
  */
-function handleCellClick(cell, gameState, clues) {
+function handleCellClick(cell, gameState, puzzle) {
     const row = Number(cell.dataset.row);
     const col = Number(cell.dataset.col);
+    const clues = puzzle.clues;
     const pending = gameState.pendingSelection;
 
     // Re-click pending corner → cancel selection
@@ -141,6 +143,9 @@ function handleCellClick(cell, gameState, clues) {
     }
 
     paintCellStates(gameState);
+    if (validatePuzzle(gameState.rectangles, puzzle.rows * puzzle.cols)) {
+        showWinOverlay();
+    }
 }
 
 /**
@@ -174,3 +179,10 @@ function declareGridCellCorners(cell, puzzle) {
     if (isBottomRow && isLeftCol) cell.classList.add('grid-cell--corner-bl');
     if (isBottomRow && isRightCol) cell.classList.add('grid-cell--corner-br');
 }
+
+function showWinOverlay() {
+    document.getElementById('win-overlay').hidden = false;
+  }
+  function hideWinOverlay() {
+    document.getElementById('win-overlay').hidden = true;
+  }
