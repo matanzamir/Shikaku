@@ -1,4 +1,5 @@
-import { SAMPLE_PUZZLE, createGameState, createGameGrid } from './game.js';
+import { SAMPLE_PUZZLE, createGameState } from './game.js';
+import { createGameGrid } from './ui.js';
 
 const puzzle = SAMPLE_PUZZLE;
 const gameState = createGameState();
