@@ -1,0 +1,21 @@
+.rectangle {
+    background-color: green;
+}
+
+.invalid {
+    /*ToDo: invalid animation*/
+}
+
+.clue {
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.selected {
+    background-color: yellow;
+}
+
+.validated {
+    background-color: red;
+}

@@ -50,9 +50,3 @@
 .grid-cell--corner-br {
     border-bottom-right-radius: var(--grid-corner-radius);
 }
-
-.clue {
-    font-weight: bold;
-    text-align: center;
-    font-size: 1.2rem;
-}

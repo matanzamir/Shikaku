@@ -61,8 +61,8 @@ Shikaku/
 - **Goal:** Render a playable grid and write input validation rules handling non-overlapping area coordinates.
 - **Tasks:**
   - [x] **2.1 Data Models:** Setup client-side immutable puzzle models (`{ rows, cols, clues: [] }`) alongside a mutable tracking array (`{ rectangles: [] }`).
-  - [ ] **2.2 Grid Generation:** Program dynamic DOM element injection into `#game-block` utilizing custom sizing mappings. Distinguish clue markers visually from active interactive zones.
-  - [ ] **2.3 Rectangle Selection Engine:** Build corner-selection interaction coordinates (Click Cell A -> Click Cell B) logic to formulate, render, or safely slice an active region overlay.
+  - [x] **2.2 Grid Generation:** Program dynamic DOM element injection into `#game-block` utilizing custom sizing mappings. Distinguish clue markers visually from active interactive zones.
+  - [x] **2.3 Rectangle Selection Engine:** Build corner-selection interaction coordinates (Click Cell A -> Click Cell B) logic to formulate, render, or safely slice an active region overlay.
   - [ ] **2.4 Matrix Geometry Validation:** Implement spatial verification checks. Enforce bounds rules: Ensure rectangles encapsulate exactly one clue index, validation dimensions equal specified grid areas (`width × height == value`), and coordinate lines do not intersect.
   - [ ] **2.5 Win Matrix Checker:** Implement full completion scanners confirming code coverage matrix contains zero grid gaps or illegal overrides. Toggle visual flags on win completion state.
 
