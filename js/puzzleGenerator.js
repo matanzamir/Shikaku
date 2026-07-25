@@ -78,7 +78,7 @@ export function generatePuzzle(difficulty) {
     while (!validated) {
         const rectangles = partitionRecursion({width: difficulty.size, height: difficulty.size, maxArea: difficulty.maxRectangleSize}, rand, {row: 0, col: 0})
         clues = cluePlacement(rectangles, rand)
-        // validated = validity check (clues) -> bool || boredom check (clues) -> bool
+        // validated = validity check (clues, size) -> bool || boredom check (clues) -> bool
     }
     return clues
 }
