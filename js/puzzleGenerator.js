@@ -1,4 +1,5 @@
 import { Difficulty } from './difficulties';
+import { hasUniqueSolution } from './puzzleValidator';
 
 /**
  * @typedef {import('./game.js').Rectangle} Rectangle
@@ -73,12 +74,13 @@ export function createSeededRng(date = new Date(), difficulty) {
 
 export function generatePuzzle(difficulty) {
     const rand = createSeededRng(new Date(), difficulty.difficulty);
-    const validated = false
-    const clues = []
+    let validated = false
+    let clues = []
     while (!validated) {
         const rectangles = partitionRecursion({width: difficulty.size, height: difficulty.size, maxArea: difficulty.maxRectangleSize}, rand, {row: 0, col: 0})
         clues = cluePlacement(rectangles, rand)
-        // validated = validity check (clues, size) -> bool || boredom check (clues) -> bool
+        validated = hasUniqueSolution(clues, {width: difficulty.size, height: difficulty.size})
+        // ToDo: add boredom check (clues) -> bool
     }
     return clues
 }
