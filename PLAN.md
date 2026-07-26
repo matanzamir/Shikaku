@@ -11,7 +11,7 @@
 
 - [x] Phase 1 — Foundations (Layout & Custom Design Tokens)
 - [x] Phase 2 — Core Shikaku Gameplay & Input Validation
-- [ ] Phase 3 — Seeded Deterministic Puzzle Generator
+- [x] Phase 3 — Seeded Deterministic Puzzle Generator
 - [ ] Phase 4 — Game Loop Controls (Timer & Active Resets)
 - [ ] Phase 5 — System Settings (Theme Persistence & Difficulty)
 - [ ] Phase 6 — Static Context & Instructional Drawers
@@ -33,7 +33,8 @@ Shikaku/
 │   └── themes.css       # Specialized theme overrides
 ├── js/
 │   ├── main.js          # App lifecycle and event orchestration
-│   ├── puzzleGenerator.js # Seeded mulberry32 generation pipeline
+│   ├── rngCreator.js    # Seed hashing and deterministic mulberry32 PRNG
+│   ├── puzzleGenerator.js # Seeded partition + clue extraction pipeline
 │   ├── game.js          # Grid array structures, rect drawings, bounds verification
 │   ├── ui.js            # Drawer controls, layout transitions, selection renders
 │   ├── timer.js         # Date/time interval handlers
@@ -66,16 +67,16 @@ Shikaku/
   - [x] **2.4 Matrix Geometry Validation:** Implement spatial verification checks. Enforce bounds rules: Ensure rectangles encapsulate exactly one clue index, validation dimensions equal specified grid areas (`width × height == value`), and coordinate lines do not intersect.
   - [x] **2.5 Win Matrix Checker:** Implement full completion scanners confirming code coverage matrix contains zero grid gaps or illegal overrides. Toggle visual flags on win completion state.
 
-### ⬜ Phase 3 — Seeded Deterministic Puzzle Generator
-- **Status:** ⏳ PENDING
-- **Target Files:** `js/puzzleGenerator.js`
+### ✅ Phase 3 — Seeded Deterministic Puzzle Generator
+- **Status:** ✅ COMPLETE
+- **Target Files:** `js/rngCreator.js`, `js/puzzleGenerator.js`
 - **Goal:** Build a procedural grid partition system driven by explicit date/difficulty hashes to guarantee identical daily map layouts across browsers.
 - **Tasks:**
   - [x] **3.1 PRNG Engine Setup:** Code a deterministic random engine variant (like `mulberry32`) tied directly to hashed timestamp intervals.
   - [x] **3.2 Grid Splitting Strategy:** Implement recursive direction binary splitting functions to break boundaries down into proportional matrix components.
-  - [ ] **3.3 Grid Extraction Rules:** Map clue definitions out across generated clusters; hide baseline layout paths to keep source definitions fully implicit.
-  - [ ] **3.4 Scale Mappings configuration:** Standardize matrix tiers: Easy (`7×7`), Medium (`10×10`), and Hard (`15×15`).
-  - [ ] **3.5 Code Cleaning:** Remove the error catchers and object immutability in the createPuzzle function.
+  - [x] **3.3 Grid Extraction Rules:** Map clue definitions out across generated clusters; hide baseline layout paths to keep source definitions fully implicit.
+  - [x] **3.4 Scale Mappings configuration:** Standardize matrix tiers: Easy (`7×7`), Medium (`10×10`), and Hard (`15×15`).
+  - [x] **3.5 Code Cleaning:** Remove the error catchers and object immutability in the createPuzzle function.
 
 ### ⬜ Phase 4 — Game Loop Controls
 - **Status:** ⏳ PENDING
