@@ -40,6 +40,9 @@ export function createGameGrid(puzzle, gameState) {
     }
 
     addGridEventListener(gameGrid, gameState, puzzle);
+
+    const resetBoardButton = document.getElementById('reset-board-button');
+    addResetBoardEventListener(resetBoardButton, gameState);
     
 }
 
@@ -54,6 +57,26 @@ function addGridEventListener(gameGrid, gameState, puzzle) {
         if (!cell) return;
         handleCellClick(cell, gameState, puzzle);
     });
+}
+
+/**
+ * @param {HTMLElement} resetBoardButton
+ * @param {GameState} gameState
+ */
+function addResetBoardEventListener(resetBoardButton, gameState) {
+    resetBoardButton.addEventListener('click', () => {
+        resetBoard(gameState);
+    });
+}
+
+/**
+ * @param {GameState} gameState
+ */
+function resetBoard(gameState) {
+    gameState.rectangles = [];
+    gameState.pendingSelection = null;
+    hideWinOverlay();
+    paintCellStates(gameState);
 }
 
 /**

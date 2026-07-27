@@ -37,7 +37,7 @@ function tick() {
 }
 
 export function startTimer() {
-    stopTimer();
+    resetTimer();
     startTime = Date.now();
     pauseStartedAt = 0;
     isPaused = false;
@@ -69,7 +69,7 @@ export function resumeTimer() {
     render();
 }
 
-export function stopTimer() {
+export function resetTimer() {
     if (intervalId !== null) {
         clearInterval(intervalId);
         intervalId = null;
@@ -78,10 +78,6 @@ export function stopTimer() {
     isPaused = false;
     pauseStartedAt = 0;
     pauseButton.textContent = 'Pause';
-}
-
-export function resetTimer() {
-    startTimer();
 }
 
 pauseButton.addEventListener('click', () => {
