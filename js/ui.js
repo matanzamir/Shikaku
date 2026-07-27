@@ -6,6 +6,7 @@ import {
     validateRectangle,
     validatePuzzle,
 } from './game.js';
+import { stopTimer } from './timer.js';
 
 /**
  * @typedef {import('./game.js').Puzzle} Puzzle
@@ -167,6 +168,7 @@ function handleCellClick(cell, gameState, puzzle) {
 
     paintCellStates(gameState);
     if (validatePuzzle(gameState.rectangles, puzzle.rows * puzzle.cols)) {
+        stopTimer();
         showWinOverlay();
     }
 }

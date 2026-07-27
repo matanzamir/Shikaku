@@ -55,10 +55,11 @@ export function pauseTimer() {
     pauseStartedAt = Date.now();
     pauseButton.textContent = 'Resume';
     render();
+    //ToDo: blur board
 }
 
 export function resumeTimer() {
-    if (!isPaused || startTime === 0) {
+    if (!isPaused || startTime === 0 || intervalId === null) {
         return;
     }
 
@@ -66,6 +67,25 @@ export function resumeTimer() {
     pauseStartedAt = 0;
     isPaused = false;
     pauseButton.textContent = 'Pause';
+    render();
+    //ToDo: unblur board
+}
+
+export function stopTimer() {
+    if (intervalId !== null) {
+        clearInterval(intervalId);
+        intervalId = null;
+    }
+
+    if (startTime === 0) {
+        return;
+    }
+
+    if (!isPaused) {
+        pauseStartedAt = Date.now();
+        isPaused = true;
+    }
+
     render();
 }
 

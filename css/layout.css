@@ -51,7 +51,9 @@ body {
 #control-bar {
     flex: 0 0 auto;
     min-height: var(--control-bar-height);
+    min-width: var(--board-width);
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
+    box-sizing: border-box;
 }
