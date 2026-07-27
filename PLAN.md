@@ -83,7 +83,7 @@ Shikaku/
 - **Target Files:** `js/timer.js`, `js/main.js`
 - **Goal:** Wire up session management clocks, progress tracking, and secure game state reset switches.
 - **Tasks:**
-  - [ ] **4.1 Dynamic Tracking Timer:** Build an active tracker framework tracking local environment intervals (`setInterval`/`clearInterval`). Save baseline anchor dates rather than absolute increments to prevent background tab sleep bugs.
+  - [x] **4.1 Dynamic Tracking Timer:** Build an active tracker framework tracking local environment intervals (`setInterval`/`clearInterval`). Save baseline anchor dates rather than absolute increments to prevent background tab sleep bugs.
   - [ ] **4.2 Board Purge Routine:** Bind clean reset states clearing rectangle history logs completely while keeping current active seed layout assets unchanged.
   - [ ] **4.3 Automatic Win Catchers:** Chain completion hooks to the placement pipeline to automatically intercept the exact moment of solution clearance, stopping the active timer metrics instantly.
 
