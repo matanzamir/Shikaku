@@ -1,0 +1,66 @@
+.drawer {
+    width: var(--drawer-width);
+    height: 100%;
+    background-color: var(--board-background-color);
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    transform: translateX(100%);
+    transition: transform 0.5s ease-in-out;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-top-left-radius: 12px;
+    /* keep overflow visible so the side bump isn't clipped */
+    overflow: visible;
+}
+
+.drawer-content-wrapper {
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.drawer-content-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hill bump: SVG path from tip to each base point */
+.drawer-open-close-button {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    z-index: 2;
+    transform: translate(-100%, -50%);
+    width: 2.25rem;
+    height: min(40vh, 20rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    cursor: pointer;
+    user-select: none;
+    color: inherit;
+}
+
+.drawer-bump {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: var(--board-background-color);
+    filter: drop-shadow(-2px 0 6px rgba(0, 0, 0, 0.12));
+    pointer-events: none;
+}
+
+.drawer-button {
+    position: relative;
+    z-index: 1;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.drawer.is-open {
+    transform: translateX(0);
+}

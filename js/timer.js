@@ -39,9 +39,9 @@ function tick() {
 export function startTimer() {
     resetTimer();
     startTime = Date.now();
-    pauseStartedAt = 0;
-    isPaused = false;
-    pauseButton.textContent = 'Pause';
+    isPaused = true;
+    pauseStartedAt = Date.now();
+    pauseButton.textContent = 'Resume';
     render();
     intervalId = setInterval(tick, 1000);
 }
@@ -105,5 +105,13 @@ pauseButton.addEventListener('click', () => {
         resumeTimer();
     } else {
         pauseTimer();
+    }
+});
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        if (!isPaused) {
+            pauseTimer();
+        }
     }
 });

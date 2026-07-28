@@ -6,31 +6,45 @@
         <link rel="stylesheet" href="css/layout.css">
         <link rel="stylesheet" href="css/components.css">
         <link rel="stylesheet" href="css/gameStates.css">
+        <link rel="stylesheet" href="css/drawer.css">
         <!-- <link rel="stylesheet" href="FONT"> -->
         <title>Shikaku</title>
     </head>
 
     <body>
-        <header class="top-bar">
-            <h1 class="logo" id="shikaku">SHIKAKU</h1>
-        </header>
-        <div id="game-wrapper">
-            <main class="game-area">
-                <div id="control-bar">
-                    <button id="reset-board-button">reset</button>
-                    <div id="timer">
-                        <span id="minutes">00</span>:<span id="seconds">00</span>
-                    </div>
-                    <button id="pause-button">Pause</button>
-                </div>  
-                <div id="game-block">
-                    <div id="game-grid">
+        <div id="main-container">
+            <header class="top-bar">
+                <h1 class="logo" id="shikaku">SHIKAKU</h1>
+            </header>
+            <div id="game-wrapper">
+                <main class="game-area">
+                    <div id="control-bar">
+                        <button id="reset-board-button">reset</button>
+                        <div id="timer">
+                            <span id="minutes">00</span>:<span id="seconds">00</span>
+                        </div>
+                        <button id="pause-button">Pause</button>
+                    </div>  
+                    <div id="game-block">
+                        <div id="game-grid">
 
+                        </div>
                     </div>
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
-        <aside id="settings-drawer" class="drawer" hidden></aside>
+        <aside id="settings-drawer" class="drawer">
+            <div class="drawer-open-close-button" id="drawer-button">
+                <svg class="drawer-bump" viewBox="0 0 50 100">
+                    <path d="M 50 0 C 50 42 0 40 0 50 C 0 60 50 58 50 100 Z"/>
+                </svg>
+                <span class="drawer-button">&lt;</span>
+            </div>
+            <div class="drawer-content-wrapper">
+                <div class="drawer-content">
+                </div>
+            </div>
+        </aside>
         <aside id="help-drawer" class="drawer" hidden></aside>
         <div id="win-overlay" class="win-overlay" hidden></div>
         <script type="module" src="js/main.js"></script>

@@ -92,7 +92,7 @@ Shikaku/
 - **Target Files:** `js/storage.js`, `js/ui.js`
 - **Goal:** Program modular settings menus that update UI layouts and securely save layout options via persistent storage hooks.
 - **Tasks:**
-  - [ ] **5.1 Slider Drawer Framework:** Code flyout containers using smooth hardware-accelerated transitions via CSS `transform` rules.
+  - [x] **5.1 Slider Drawer Framework:** Code flyout containers using smooth hardware-accelerated transitions via CSS `transform` rules.
   - [ ] **5.2 Theme Synchronization Switcher:** Sync dataset selectors toggling layout themes across structural target parameters cleanly without style flashing bugs.
   - [ ] **5.3 State Retention Setup:** Hook local environment key configs (`localStorage`) ensuring preferences match user configs on initialization.
   - [ ] **5.4 Intercept Risk Logic:** Insert user confirmation alerts warning players of data wipes before updating grid difficulty settings.

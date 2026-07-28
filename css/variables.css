@@ -3,7 +3,7 @@
     /* colors and fonts */
     --primary-color: rgb(182, 73, 126);
     --secondary-color: rgb(217, 160, 188);
-    --board-background-color: rgb(248, 245, 240);
+    --board-background-color: rgb(255, 255, 240);
     --shadow-color: rgb(0, 0, 0);
     --font-family: "Bungee Shade", monospace;
 
@@ -27,6 +27,9 @@
     --board-box-shadow: 0px 0px 10px 0px var(--shadow-color);
     --board-width: min(90vw, calc(100dvh - var(--layout-chrome)));
     --board-max-height: calc(100dvh - var(--layout-chrome));
+
+    /* drawer */
+    --drawer-width: min(80vw, 18rem);
 
     /* grid */
     --grid-size-percentage: 95%;
