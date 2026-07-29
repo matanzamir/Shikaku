@@ -13,7 +13,7 @@ import { hasUniqueSolution } from './puzzleValidator.js';
  * @returns {Clue[]} clues
  */
 export function generatePuzzle(difficulty) {
-    const rand = createSeededRng(new Date(), difficulty.difficulty);
+    const rand = createSeededRng(new Date(), difficulty.name);
     let validated = false
     let clues = []
     while (!validated) {

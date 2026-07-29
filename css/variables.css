@@ -36,6 +36,7 @@
     --grid-corner-radius: 10px;
 }
 
+html[data-theme="dark"],
 [data-theme="dark"] {
     --primary-color: rgb(0, 0, 126);
     --secondary-color: rgb(217, 160, 188);

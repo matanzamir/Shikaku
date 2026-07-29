@@ -7,6 +7,14 @@ import {
     validatePuzzle,
 } from './game.js';
 import { stopTimer } from './timer.js';
+import { 
+    setTheme, 
+    setActiveRectangles, 
+    clearActiveRectangles, 
+    clearTimerOffset, 
+    getDifficulty, 
+    setDifficulty } from './storage.js';
+import { Difficulty } from './difficulties.js';
 
 /**
  * @typedef {import('./game.js').Puzzle} Puzzle
@@ -76,6 +84,7 @@ function addResetBoardEventListener(resetBoardButton, gameState) {
 function resetBoard(gameState) {
     gameState.rectangles = [];
     gameState.pendingSelection = null;
+    clearActiveRectangles();
     hideWinOverlay();
     paintCellStates(gameState);
 }
@@ -84,7 +93,7 @@ function resetBoard(gameState) {
  * Syncs .selected / .rectangle / .validated classes from gameState.
  * @param {GameState} gameState
  */
-function paintCellStates(gameState) {
+export function paintCellStates(gameState) {
     const cells = document.querySelectorAll('#game-grid .grid-cell');
     const covered = new Set();
     const validatedCells = new Set();
@@ -165,10 +174,12 @@ function handleCellClick(cell, gameState, puzzle) {
         gameState.rectangles.push(candidate);
         gameState.pendingSelection = null;
     }
-
+    setActiveRectangles(gameState.rectangles);
     paintCellStates(gameState);
     if (validatePuzzle(gameState.rectangles, puzzle.rows * puzzle.cols)) {
         stopTimer();
+        clearActiveRectangles();
+        clearTimerOffset();
         showWinOverlay();
     }
 }
@@ -211,3 +222,33 @@ function showWinOverlay() {
   function hideWinOverlay() {
     document.getElementById('win-overlay').hidden = true;
   }
+
+export function handleLightDarkClick(lightDarkButton) {
+    const current = document.documentElement.dataset.theme || document.body.dataset.theme;
+    const theme = current === 'dark' ? 'light' : 'dark';
+    updateBodyTheme(theme, lightDarkButton);
+}
+
+export function updateBodyTheme(theme, button) {
+    document.documentElement.dataset.theme = theme;
+    document.body.dataset.theme = theme;
+    button.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+    setTheme(theme);
+}
+
+export function handleDifficultySelectChange(difficultySelect) {
+    const difficulty = difficultySelect.value;
+    setDifficulty(difficulty);
+}
+
+export function setDifficultySelectOptions() {
+    const difficultySelect = document.getElementById('difficulty-select');
+    difficultySelect.innerHTML = '';
+    for (const difficulty of Object.values(Difficulty)) {
+        const option = document.createElement('option');
+        option.value = difficulty.name;
+        option.textContent = difficulty.name.charAt(0).toUpperCase() + difficulty.name.slice(1);
+        difficultySelect.appendChild(option);
+    }
+    setDifficulty(getDifficulty().name);
+}

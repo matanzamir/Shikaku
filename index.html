@@ -2,6 +2,10 @@
 <html>
     <head>
         <!-- <link rel="icon" href="Resources/Images/logo.png" type="image/png"> -->
+        <script>
+            document.documentElement.dataset.theme =
+                localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+        </script>
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/layout.css">
         <link rel="stylesheet" href="css/components.css">
@@ -11,7 +15,7 @@
         <title>Shikaku</title>
     </head>
 
-    <body data-theme='light'>
+    <body>
         <div id="main-container">
             <header class="top-bar">
                 <h1 class="logo" id="shikaku">SHIKAKU</h1>
@@ -22,8 +26,10 @@
                         <button id="reset-board-button">reset</button>
                         <div id="timer">
                             <span id="minutes">00</span>:<span id="seconds">00</span>
+                            <button id="pause-button"></button>
                         </div>
-                        <button id="pause-button">Pause</button>
+                        <select id="difficulty-select">
+                        </select>
                     </div>  
                     <div id="game-block">
                         <div id="game-grid">

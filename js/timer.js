@@ -1,3 +1,5 @@
+import { getTimerOffset, setTimerOffset } from './storage.js';
+
 let startTime = 0;
 let pauseStartedAt = 0;
 let isPaused = false;
@@ -30,53 +32,57 @@ function render() {
     secondsEl.textContent = pad(seconds);
 }
 
-function tick() {
-    if (!isPaused) {
-        render();
+function clearTick() {
+    if (intervalId !== null) {
+        clearInterval(intervalId);
+        intervalId = null;
     }
 }
 
+function startTick() {
+    clearTick();
+    intervalId = setInterval(render, 1000);
+}
+
 export function startTimer() {
-    resetTimer();
-    startTime = Date.now();
+    clearTick();
+    const offset = getTimerOffset();
+    startTime = Date.now() - offset;
     isPaused = true;
     pauseStartedAt = Date.now();
-    pauseButton.textContent = 'Resume';
+    pauseButton.textContent = '▷';
     render();
-    intervalId = setInterval(tick, 1000);
 }
 
 export function pauseTimer() {
-    if (isPaused || startTime === 0 || intervalId === null) {
+    if (isPaused || startTime === 0) {
         return;
     }
 
     isPaused = true;
     pauseStartedAt = Date.now();
-    pauseButton.textContent = 'Resume';
+    clearTick();
+    setTimerOffset(getElapsedMs());
+    pauseButton.textContent = '▷';
     render();
     //ToDo: blur board
 }
 
 export function resumeTimer() {
-    if (!isPaused || startTime === 0 || intervalId === null) {
+    if (!isPaused || startTime === 0) {
         return;
     }
 
     startTime += Date.now() - pauseStartedAt;
     pauseStartedAt = 0;
     isPaused = false;
-    pauseButton.textContent = 'Pause';
+    pauseButton.textContent = '⏸';
     render();
+    startTick();
     //ToDo: unblur board
 }
 
 export function stopTimer() {
-    if (intervalId !== null) {
-        clearInterval(intervalId);
-        intervalId = null;
-    }
-
     if (startTime === 0) {
         return;
     }
@@ -86,32 +92,23 @@ export function stopTimer() {
         isPaused = true;
     }
 
+    clearTick();
+    setTimerOffset(getElapsedMs());
     render();
 }
 
-export function resetTimer() {
-    if (intervalId !== null) {
-        clearInterval(intervalId);
-        intervalId = null;
-    }
-
-    isPaused = false;
-    pauseStartedAt = 0;
-    pauseButton.textContent = 'Pause';
-}
-
-pauseButton.addEventListener('click', () => {
+export function handleTimerClick() {
     if (isPaused) {
         resumeTimer();
     } else {
         pauseTimer();
     }
-});
+}
 
-document.addEventListener('visibilitychange', () => {
+export function handleTimerVisibilityChange() {
     if (document.hidden) {
         if (!isPaused) {
             pauseTimer();
         }
     }
-});
+}
