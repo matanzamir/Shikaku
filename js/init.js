@@ -21,12 +21,12 @@ export function init(puzzle, gameState) {
     paintCellStates(gameState);
 
     startTimer();
-    addEventListeners();
+    addEventListeners(gameState);
 }
 
-function addEventListeners() {
+function addEventListeners(gameState) {
     addDrawerEventListener();
     addLightDarkEventListener();
     addTimerEventListener();
-    addDifficultySelectEventListener();
+    addDifficultySelectEventListener(gameState);
 }

@@ -27,9 +27,9 @@ export function addTimerEventListener() {
     });
 }
 
-export function addDifficultySelectEventListener() {
+export function addDifficultySelectEventListener(gameState) {
     const difficultySelect = document.getElementById('difficulty-select');
     difficultySelect.addEventListener('change', () => {
-        handleDifficultySelectChange(difficultySelect);
+        handleDifficultySelectChange(difficultySelect, gameState);
     });
 }

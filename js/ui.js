@@ -13,8 +13,10 @@ import {
     clearActiveRectangles, 
     clearTimerOffset, 
     getDifficulty, 
-    setDifficulty } from './storage.js';
+    setDifficulty,
+    getActiveRectangles } from './storage.js';
 import { Difficulty } from './difficulties.js';
+import { Message } from './messages.js';
 
 /**
  * @typedef {import('./game.js').Puzzle} Puzzle
@@ -236,8 +238,19 @@ export function updateBodyTheme(theme, button) {
     setTheme(theme);
 }
 
-export function handleDifficultySelectChange(difficultySelect) {
+export async function handleDifficultySelectChange(difficultySelect, gameState) {
+    const previousDifficulty = getDifficulty().name;
     const difficulty = difficultySelect.value;
+    difficultySelect.value = previousDifficulty;
+
+    if (getActiveRectangles().length > 0) {
+        const answer = await openAlertBox(Message.UNSAVED);
+        if (!answer) {
+            return;
+        }
+    }
+
+    resetBoard(gameState);
     setDifficulty(difficulty);
 }
 
@@ -251,4 +264,28 @@ export function setDifficultySelectOptions() {
         difficultySelect.appendChild(option);
     }
     setDifficulty(getDifficulty().name);
+}
+
+function openAlertBox(message) {
+    const alertBox = document.getElementById('alert-box');
+    document.getElementById('message').textContent = message;
+    alertBox.hidden = false;
+
+    return new Promise((resolve) => {
+        const okBtn = document.getElementById('ok-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+
+        const cleanup = (result) => {
+            alertBox.hidden = true;
+            okBtn.removeEventListener('click', onOk);
+            cancelBtn.removeEventListener('click', onCancel);
+            resolve(result);
+        };
+
+        const onOk = () => cleanup(true);
+        const onCancel = () => cleanup(false);
+
+        okBtn.addEventListener('click', onOk);
+        cancelBtn.addEventListener('click', onCancel);
+    });
 }
