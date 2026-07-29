@@ -37,7 +37,7 @@
 }
 
 [data-theme="dark"] {
-    --primary-color: rgb(182, 73, 126);
+    --primary-color: rgb(0, 0, 126);
     --secondary-color: rgb(217, 160, 188);
     --board-background-color: rgb(248, 245, 240);
     --shadow-color: rgb(0, 0, 0);

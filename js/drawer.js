@@ -3,6 +3,11 @@ export function addDrawerEventListener() {
     drawerButton.addEventListener('click', () => {
         handleClick(drawerButton);
     });
+
+    const lightDarkButton = document.getElementById('light-dark-button');
+    lightDarkButton.addEventListener('click', () => {
+        handleLightDarkClick(lightDarkButton);
+    });
 }
 
 function handleClick(drawerButton) {
@@ -14,4 +19,11 @@ function handleClick(drawerButton) {
     } else {
         label.textContent = '<';
     }
+}
+
+function handleLightDarkClick(lightDarkButton) {
+    const body = document.body;
+    body.dataset.theme = body.dataset.theme === 'dark' ? 'light' : 'dark';
+    lightDarkButton.textContent = body.dataset.theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+
 }
