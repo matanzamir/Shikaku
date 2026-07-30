@@ -14,7 +14,7 @@
 - [x] Phase 3 — Seeded Deterministic Puzzle Generator
 - [x] Phase 4 — Game Loop Controls (Timer & Active Resets)
 - [x] Phase 5 — System Settings (Theme Persistence & Difficulty)
-- [ ] Phase 6 — Static Context & Instructional Drawers
+- [ ] Phase 6 — How-to-Play Slideshow (in Settings)
 - [ ] Phase 7 — Daily Puzzle Rotation & Historical Archive
 - [ ] Phase 8 — Visual Aesthetic Polish & Mobile Responsiveness
 
@@ -97,13 +97,14 @@ Shikaku/
   - [x] **5.3 State Retention Setup:** Hook local environment key configs (`localStorage`) ensuring preferences match user configs on initialization.
   - [x] **5.4 Intercept Risk Logic:** Insert user confirmation alerts warning players of data wipes before updating grid difficulty settings.
 
-### ⬜ Phase 6 — Static Context & Instructional Drawers
+### ⬜ Phase 6 — How-to-Play Slideshow (in Settings)
 - **Status:** ⏳ PENDING
-- **Target Files:** `index.html`, `css/components.css`
-- **Goal:** Build a dry, fast instruction tray template rendering step charts, diagrams, and operational layout maps cleanly.
+- **Target Files:** `index.html`, `css/components.css` (or `css/drawer.css`), `js/ui.js` (or a small dedicated module), `assets/` (instruction images)
+- **Goal:** Add a square How-to-Play slideshow inside the existing settings drawer. Slide 1 is a lazy-load prompt; instruction images load only after the user opts in. No separate help drawer.
 - **Tasks:**
-  - [ ] **6.1 Container Layout Uniformity:** Extend the structural wrapper definitions built in Phase 5 to seamlessly scale auxiliary menu windows.
-  - [ ] **6.2 Instructional UI Matrix:** Layout micro grid schemas or ascii design documentation detailing alignment and coordinate solutions step by step.
+  - [x] **6.1 Square Slideshow Shell:** Add a How-to-Play section inside `#settings-drawer` with a **square** slide viewport (`aspect-ratio: 1 / 1`). Remove the unused `#help-drawer` placeholder. (Prev/next and step indicators deferred to 6.3 — they appear only after Instructions is pressed.)
+  - [ ] **6.2 Lazy Intro Slide:** Default first slide shows the text **"don't know how to play? click here"** and a button. Until that button is pressed, do **not** fetch/load instruction images.
+  - [ ] **6.3 Load Instructions on Demand:** On button click, load the how-to photos from `assets/`, replace/advance into the instruction slides starting at the first image slide, and show prev/next controls plus step indicators. Enable normal slide cycling; keep slideshow state local to the open drawer session.
 
 ### ⬜ Phase 7 — Daily Puzzle Rotation & Historical Archive
 - **Status:** ⏳ PENDING
