@@ -1,3 +1,27 @@
+@property --primary-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(182, 73, 126);
+}
+
+@property --secondary-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(217, 160, 188);
+}
+
+@property --board-background-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(255, 255, 240);
+}
+
+@property --shadow-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(0, 0, 0);
+}
+
 :root {
 
     /* colors and fonts */
@@ -6,6 +30,7 @@
     --board-background-color: rgb(255, 255, 240);
     --shadow-color: rgb(0, 0, 0);
     --font-family: "Bungee Shade", monospace;
+    --theme-transition: 1.2s ease-in-out;
 
     /* layout */
     --header-font-size: clamp(1.75rem, 4vw + 0.5rem, 3.75rem);
@@ -36,8 +61,23 @@
     --grid-corner-radius: 10px;
 }
 
-html[data-theme="dark"],
-[data-theme="dark"] {
+html {
+    transition:
+        --primary-color var(--theme-transition),
+        --secondary-color var(--theme-transition),
+        --board-background-color var(--theme-transition),
+        --shadow-color var(--theme-transition);
+}
+
+html[data-theme="light"] {
+    --primary-color: rgb(182, 73, 126);
+    --secondary-color: rgb(217, 160, 188);
+    --board-background-color: rgb(255, 255, 240);
+    --shadow-color: rgb(0, 0, 0);
+    --board-box-shadow: 0px 0px 10px 0px var(--shadow-color);
+}
+
+html[data-theme="dark"] {
     --primary-color: rgb(0, 0, 126);
     --secondary-color: rgb(217, 160, 188);
     --board-background-color: rgb(248, 245, 240);

@@ -82,14 +82,15 @@
     border: 1px solid black;
     border-radius: var(--board-border-radius);
     box-sizing: border-box;
+    overflow: hidden;
 }
 
-#instructions-demonstration {
+#instructions-loader {
     position: absolute;
     inset: 0;
 }
 
-#instructions-demonstration h3 {
+#instructions-loader h3 {
     position: absolute;
     left: 0;
     right: 0;
@@ -98,9 +99,111 @@
     text-align: center;
 }
 
-#instructions-button {
+#instructions-loader button {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    align-items: center;
+    justify-content: center;
+}
+
+#instructions-content {
+    --slide-inset: 0.75rem;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--slide-inset);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+#instructions-content[hidden] {
+    display: none;
+}
+
+#instructions-slide {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.instructions-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+#slide-buttons {
+    position: absolute;
+    inset: var(--slide-inset);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.slide-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--board-border-color, currentColor);
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#slide-left {
+    left: 0;
+}
+
+#slide-right {
+    right: 0;
+}
+
+#instructions-content:hover .slide-button:not([hidden]) {
+    opacity: 0.3;
+    pointer-events: auto;
+}
+
+#instructions-content:hover .slide-button:not([hidden]):hover {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.15);
+}
+
+#slide-indicators {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+    z-index: 2;
+}
+
+.slide-dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background-color: var(--board-border-color, currentColor);
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+}
+
+.slide-dot.is-active {
+    opacity: 1;
 }

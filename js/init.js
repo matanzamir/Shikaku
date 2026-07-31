@@ -3,7 +3,8 @@ import {
     addDrawerEventListener, 
     addLightDarkEventListener, 
     addTimerEventListener, 
-    addDifficultySelectEventListener } from './eventListeners.js';
+    addDifficultySelectEventListener,
+    addInstructionsButtonEventListener } from './eventListeners.js';
 import { updateBodyTheme, createGameGrid, paintCellStates, setDifficultySelectOptions } from './ui.js';
 import { getTheme, getActiveRectangles } from './storage.js';
 
@@ -24,9 +25,10 @@ export function init(puzzle, gameState) {
     addEventListeners(gameState);
 }
 
-function addEventListeners(gameState) {
+async function addEventListeners(gameState) {
     addDrawerEventListener();
     addLightDarkEventListener();
     addTimerEventListener();
     addDifficultySelectEventListener(gameState);
+    await addInstructionsButtonEventListener();
 }
