@@ -1,3 +1,4 @@
+/* ===== board card (mockup .board-card) ===== */
 #game-block {
     flex: 0 1 auto;
     min-height: 0;
@@ -6,15 +7,17 @@
     max-height: var(--board-max-height);
     aspect-ratio: 1 / 1;
     background-color: var(--board-background-color);
-    opacity: 70%;
+    border: 1.5px solid var(--surface-border-color);
     border-radius: var(--board-border-radius);
     box-shadow: var(--board-box-shadow);
+    padding: clamp(6px, 1.5%, 16px);
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
 }
 
+/* ===== board grid (mockup .board-grid) ===== */
 #game-grid {
     display: grid;
     flex: 0 1 auto;
@@ -25,14 +28,22 @@
     aspect-ratio: 1 / 1;
     grid-template-columns: repeat(var(--grid-size), 1fr);
     grid-template-rows: repeat(var(--grid-size), 1fr);
+    background-color: var(--cell-background-color);
+    border-radius: var(--grid-corner-radius);
+    overflow: hidden;
 }
 
+/* ===== individual cell (mockup .cell) ===== */
 .grid-cell {
-    background-color: var(--board-background-color);
-    outline: 1px solid black;
+    background-color: var(--cell-background-color);
+    border: 1px solid var(--grid-line-color);
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: clamp(0.6rem, 2.4vw, 1.3rem);
+    color: var(--surface-text-color);
 }
 
 .grid-cell--corner-tl {
@@ -52,7 +63,19 @@
 }
 
 .win-overlay {
-    /*ToDo: win overlay styles*/
+    /* base surface for the (currently content-less) win overlay; ToDo: win message content */
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(var(--primary-rgb), 0.35);
+    backdrop-filter: blur(3px);
+}
+
+.win-overlay[hidden] {
+    display: none;
 }
 
 .alert-box {
@@ -61,8 +84,48 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--board-background-color);
+    border: 1.5px solid var(--surface-border-color);
     border-radius: var(--board-border-radius);
     box-shadow: var(--board-box-shadow);
     padding: var(--page-gap);
     z-index: 1000;
+}
+
+.box-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--page-gap);
+    max-width: min(80vw, 22rem);
+}
+
+#message {
+    margin: 0;
+    text-align: center;
+    color: var(--surface-text-color);
+    font-family: 'Inter', sans-serif;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.modal-buttons button {
+    padding: 10px 22px;
+    border-radius: 999px;
+    font: 600 14px 'Inter', sans-serif;
+    cursor: pointer;
+    border: 1.5px solid var(--surface-border-strong-color);
+}
+
+#ok-btn {
+    background: var(--primary-color);
+    color: var(--on-primary-color);
+    border-color: var(--primary-color);
+}
+
+#cancel-btn {
+    background: var(--board-background-color);
+    color: var(--surface-text-color);
 }

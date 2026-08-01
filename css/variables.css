@@ -32,6 +32,18 @@
     --font-family: "Bungee Shade", monospace;
     --theme-transition: 1.2s ease-in-out;
 
+    /* === shikaku-light-v3 design tokens (theme-agnostic) === */
+    --primary-deep-color: rgb(90, 35, 57);       /* deeper accent: validated-rectangle borders */
+    --on-primary-color: rgb(251, 241, 244);      /* text/icon color on top of a primary-filled surface */
+    --surface-text-color: rgb(42, 24, 38);       /* text sitting on the (always-light) surface/pill/board — stays constant across themes, unlike --text-color which is for text on the backdrop gradient */
+    --surface-border-color: rgb(227, 199, 208);  /* thin card/panel border */
+    --surface-border-strong-color: rgb(215, 171, 187); /* pill/icon-button border */
+    --cell-background-color: rgb(244, 232, 236); /* empty grid-cell fill */
+    --grid-line-color: rgb(233, 214, 222);       /* hairline between empty cells */
+    --muted-text-color: rgb(122, 85, 104);       /* secondary/soft text (icons, captions) */
+    --primary-rgb: 122, 51, 80;                  /* raw triplet for rgba() tinting; matches --primary-color */
+    --shadow-tight: 0 4px 10px rgba(96, 25, 58, 0.14); /* small shadow for pill/icon buttons */
+
     /* layout */
     --header-font-size: clamp(1.75rem, 4vw + 0.5rem, 3.75rem);
     --grid-size: 5;
@@ -48,7 +60,7 @@
     );
 
     /* board */
-    --board-border-radius: 20px;
+    --board-border-radius: 22px;
     --board-box-shadow: 0px 0px 10px 0px var(--shadow-color);
     --board-width: min(90vw, calc(100dvh - var(--layout-chrome)));
     --board-max-height: calc(100dvh - var(--layout-chrome));
@@ -58,7 +70,7 @@
 
     /* grid */
     --grid-size-percentage: 95%;
-    --grid-corner-radius: 10px;
+    --grid-corner-radius: 14px;
 }
 
 html {
@@ -70,17 +82,26 @@ html {
 }
 
 html[data-theme="light"] {
-    --primary-color: rgb(182, 73, 126);
-    --secondary-color: rgb(217, 160, 188);
-    --board-background-color: rgb(255, 255, 240);
-    --shadow-color: rgb(0, 0, 0);
-    --board-box-shadow: 0px 0px 10px 0px var(--shadow-color);
+    /* accent stays constant across themes; only the ambient backdrop shifts */
+    --primary-color: rgb(122, 51, 80);
+    --secondary-color: rgb(236, 210, 220);
+    --board-background-color: rgb(251, 244, 242);
+    --shadow-color: rgba(96, 25, 58, 0.16);
+    --board-box-shadow: 0 14px 30px var(--shadow-color);
+    --text-color: rgb(42, 24, 38);
+
+    --gradient-mid-color: rgb(207, 109, 151);
+    --title-accent-color: rgb(122, 51, 80);
 }
 
 html[data-theme="dark"] {
-    --primary-color: rgb(0, 0, 126);
-    --secondary-color: rgb(217, 160, 188);
-    --board-background-color: rgb(248, 245, 240);
-    --shadow-color: rgb(0, 0, 0);
-    --board-box-shadow: 0px 0px 10px 0px var(--shadow-color);
+    --text-color: rgb(245, 235, 240);
+    --primary-color: rgb(122, 51, 80);
+    --secondary-color: rgb(26, 14, 20);
+    --board-background-color: rgb(248, 243, 240);
+    --shadow-color: rgba(0, 0, 0, 0.45);
+    --board-box-shadow: 0 14px 30px var(--shadow-color);
+
+    --gradient-mid-color: rgb(46, 19, 32);
+    --title-accent-color: rgb(224, 148, 179);
 }

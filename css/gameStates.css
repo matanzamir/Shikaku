@@ -1,21 +1,96 @@
+/* ============================================================
+   GAME STATE STYLES (shikaku-light-v3 mockup)
+
+   Rectangles are drawn as inset shapes: cells belonging to the
+   same rectangle stay flush (no border/gap between them), while
+   the rectangle's true outer edges get a margin + colored border
+   + rounded corner. js/ui.js's paintCellStates() tags each covered
+   cell with edge-top/edge-bottom/edge-left/edge-right so this file
+   can target only the true outer sides of every rectangle.
+   ============================================================ */
+
+.clue {
+    font-weight: 700;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Placed rectangle, not yet confirmed correct: mockup's "invalid"
+   treatment — outline only, no fill, no default grid hairline. */
 .rectangle {
-    background-color: green;
+    border: none;
+    background-color: var(--cell-background-color);
+    color: var(--surface-text-color);
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.rectangle.edge-top {
+    margin-top: 6px;
+    border-top: 2px solid var(--primary-color);
+}
+
+.rectangle.edge-bottom {
+    margin-bottom: 6px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.rectangle.edge-left {
+    margin-left: 6px;
+    border-left: 2px solid var(--primary-color);
+}
+
+.rectangle.edge-right {
+    margin-right: 6px;
+    border-right: 2px solid var(--primary-color);
+}
+
+.rectangle.edge-top.edge-left {
+    border-top-left-radius: var(--grid-corner-radius);
+}
+
+.rectangle.edge-top.edge-right {
+    border-top-right-radius: var(--grid-corner-radius);
+}
+
+.rectangle.edge-bottom.edge-left {
+    border-bottom-left-radius: var(--grid-corner-radius);
+}
+
+.rectangle.edge-bottom.edge-right {
+    border-bottom-right-radius: var(--grid-corner-radius);
 }
 
 .invalid {
     /*ToDo: invalid selection animation*/
 }
 
-.clue {
-    font-weight: bold;
-    text-align: center;
-    font-size: 1.2rem;
-}
-
-.selected {
-    background-color: yellow;
-}
-
+/* Rectangle confirmed correct (locked): mockup's "valid" treatment —
+   filled solid + solid border in the deeper accent shade. */
 .validated {
-    background-color: red;
+    background-color: var(--primary-color);
+    color: var(--on-primary-color);
+}
+
+.validated.edge-top {
+    border-top-color: var(--primary-deep-color);
+}
+
+.validated.edge-bottom {
+    border-bottom-color: var(--primary-deep-color);
+}
+
+.validated.edge-left {
+    border-left-color: var(--primary-deep-color);
+}
+
+.validated.edge-right {
+    border-right-color: var(--primary-deep-color);
+}
+
+/* Pending first-corner selection: dashed outline + faint tint. */
+.selected {
+    margin: 6px;
+    border: 2px dashed var(--primary-color);
+    border-radius: var(--grid-corner-radius);
+    background-color: rgba(var(--primary-rgb), 0.12);
 }

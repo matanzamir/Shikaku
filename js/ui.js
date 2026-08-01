@@ -97,17 +97,22 @@ function resetBoard(gameState) {
  */
 export function paintCellStates(gameState) {
     const cells = document.querySelectorAll('#game-grid .grid-cell');
-    const covered = new Set();
-    const validatedCells = new Set();
+    // Map of "row,col" -> per-cell visual info derived from the rectangle
+    // that covers it (a cell is covered by at most one rectangle, since
+    // overlapping rectangles are never kept in gameState.rectangles).
+    const cellInfo = new Map();
 
     for (const rect of gameState.rectangles) {
         for (let r = rect.row; r < rect.row + rect.height; r++) {
             for (let c = rect.col; c < rect.col + rect.width; c++) {
                 const key = `${r},${c}`;
-                covered.add(key);
-                if (rect.validated) {
-                    validatedCells.add(key);
-                }
+                cellInfo.set(key, {
+                    validated: Boolean(rect.validated),
+                    edgeTop: r === rect.row,
+                    edgeBottom: r === rect.row + rect.height - 1,
+                    edgeLeft: c === rect.col,
+                    edgeRight: c === rect.col + rect.width - 1,
+                });
             }
         }
     }
@@ -118,9 +123,14 @@ export function paintCellStates(gameState) {
         const row = Number(cell.dataset.row);
         const col = Number(cell.dataset.col);
         const key = `${row},${col}`;
+        const info = cellInfo.get(key);
 
-        cell.classList.toggle(CellClass.RECTANGLE, covered.has(key));
-        cell.classList.toggle(CellClass.VALIDATED, validatedCells.has(key));
+        cell.classList.toggle(CellClass.RECTANGLE, Boolean(info));
+        cell.classList.toggle(CellClass.VALIDATED, Boolean(info?.validated));
+        cell.classList.toggle(CellClass.EDGE_TOP, Boolean(info?.edgeTop));
+        cell.classList.toggle(CellClass.EDGE_BOTTOM, Boolean(info?.edgeBottom));
+        cell.classList.toggle(CellClass.EDGE_LEFT, Boolean(info?.edgeLeft));
+        cell.classList.toggle(CellClass.EDGE_RIGHT, Boolean(info?.edgeRight));
         cell.classList.toggle(
             CellClass.SELECTED,
             pending !== null && pending.row === row && pending.col === col

@@ -7,4 +7,11 @@ export const CellClass = Object.freeze({
     RECTANGLE: 'rectangle',
     SELECTED: 'selected',
     VALIDATED: 'validated',
+    // Purely visual hooks (see paintCellStates): mark which sides of a
+    // covered cell sit on its rectangle's true outer edge, so CSS can
+    // draw a border/rounded-corner only there and stay flush elsewhere.
+    EDGE_TOP: 'edge-top',
+    EDGE_BOTTOM: 'edge-bottom',
+    EDGE_LEFT: 'edge-left',
+    EDGE_RIGHT: 'edge-right',
 });
