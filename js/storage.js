@@ -66,5 +66,8 @@ export function getDifficulty() {
 
 export function setDifficulty(difficulty) {
     localStorage.setItem(DIFFICULTY_KEY, difficulty);
-    document.getElementById('difficulty-select').value = difficulty;
+    const currentShape = document.querySelector('#difficulty-button .difficulty-shape');
+    if (currentShape) {
+        currentShape.dataset.difficulty = String(difficulty).toLowerCase();
+    }
 }

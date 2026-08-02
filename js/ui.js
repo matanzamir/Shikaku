@@ -6,7 +6,7 @@ import {
     validateRectangle,
     validatePuzzle,
 } from './game.js';
-import { stopTimer } from './timer.js';
+import { resumeTimer, stopTimer } from './timer.js';
 import { 
     setTheme, 
     setActiveRectangles, 
@@ -174,6 +174,7 @@ function handleCellClick(cell, gameState, puzzle) {
 
         // Reject if the new region touches any validated (locked) rectangle
         if (overlapping.some((rect) => rect.validated)) {
+            flashInvalidSelection(pending);
             return;
         }
 
@@ -248,32 +249,96 @@ export function updateBodyTheme(theme, button) {
     setTheme(theme);
 }
 
-export async function handleDifficultySelectChange(difficultySelect, gameState) {
-    const previousDifficulty = getDifficulty().name;
-    const difficulty = difficultySelect.value;
-    difficultySelect.value = previousDifficulty;
+/**
+ * Briefly flash the pending corner red to signal an invalid second pick.
+ * @param {{ row: number, col: number }} pending
+ */
+function flashInvalidSelection(pending) {
+    const cell = document.querySelector(
+        `#game-grid .grid-cell[data-row="${pending.row}"][data-col="${pending.col}"]`
+    );
+    if (!cell) return;
+
+    cell.classList.remove(CellClass.INVALID);
+    void cell.offsetWidth;
+    cell.classList.add(CellClass.INVALID);
+    cell.addEventListener(
+        'animationend',
+        () => cell.classList.remove(CellClass.INVALID),
+        { once: true }
+    );
+}
+
+export async function handleDifficultyChange(difficultyName, gameState) {
+    if (difficultyName === getDifficulty().name) {
+        closeDifficultyMenu();
+        return;
+    }
 
     if (getActiveRectangles().length > 0) {
         const answer = await openAlertBox(Message.UNSAVED);
         if (!answer) {
+            closeDifficultyMenu();
             return;
         }
     }
 
     resetBoard(gameState);
-    setDifficulty(difficulty);
+    setDifficulty(difficultyName);
+    refreshDifficultyMenu();
+    closeDifficultyMenu();
 }
 
 export function setDifficultySelectOptions() {
-    const difficultySelect = document.getElementById('difficulty-select');
-    difficultySelect.innerHTML = '';
-    for (const difficulty of Object.values(Difficulty)) {
-        const option = document.createElement('option');
-        option.value = difficulty.name;
-        option.textContent = difficulty.name.charAt(0).toUpperCase() + difficulty.name.slice(1);
-        difficultySelect.appendChild(option);
-    }
     setDifficulty(getDifficulty().name);
+    refreshDifficultyMenu();
+}
+
+export function toggleDifficultyMenu() {
+    const menu = document.getElementById('difficulty-menu');
+    const button = document.getElementById('difficulty-button');
+    const willOpen = menu.hidden;
+    menu.hidden = !willOpen;
+    button.setAttribute('aria-expanded', String(willOpen));
+}
+
+export function closeDifficultyMenu() {
+    const menu = document.getElementById('difficulty-menu');
+    const button = document.getElementById('difficulty-button');
+    menu.hidden = true;
+    button.setAttribute('aria-expanded', 'false');
+}
+
+function refreshDifficultyMenu() {
+    const menu = document.getElementById('difficulty-menu');
+    const current = getDifficulty().name;
+    const currentShape = document.querySelector('#difficulty-button .difficulty-shape');
+    if (currentShape) {
+        currentShape.dataset.difficulty = current.toLowerCase();
+    }
+
+    menu.replaceChildren();
+    for (const difficulty of Object.values(Difficulty)) {
+        if (difficulty.name === current) continue;
+
+        const item = document.createElement('li');
+        item.setAttribute('role', 'option');
+
+        const optionButton = document.createElement('button');
+        optionButton.type = 'button';
+        optionButton.className = 'difficulty-option';
+        optionButton.dataset.difficulty = difficulty.name;
+        optionButton.setAttribute('aria-label', difficulty.name);
+
+        const shape = document.createElement('span');
+        shape.className = 'difficulty-shape';
+        shape.dataset.difficulty = difficulty.name.toLowerCase();
+        shape.setAttribute('aria-hidden', 'true');
+
+        optionButton.appendChild(shape);
+        item.appendChild(optionButton);
+        menu.appendChild(item);
+    }
 }
 
 function openAlertBox(message) {
@@ -298,4 +363,8 @@ function openAlertBox(message) {
         okBtn.addEventListener('click', onOk);
         cancelBtn.addEventListener('click', onCancel);
     });
+}
+
+export function handleGameInactiveOverlayClick() {
+    resumeTimer();
 }

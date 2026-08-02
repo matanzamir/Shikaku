@@ -65,7 +65,7 @@ export function pauseTimer() {
     setTimerOffset(getElapsedMs());
     pauseButton.textContent = '▷';
     render();
-    //ToDo: blur board
+    document.getElementById('game-inactive-overlay').hidden = false;
 }
 
 export function resumeTimer() {
@@ -79,7 +79,7 @@ export function resumeTimer() {
     pauseButton.textContent = '⏸';
     render();
     startTick();
-    //ToDo: unblur board
+    document.getElementById('game-inactive-overlay').hidden = true;
 }
 
 export function stopTimer() {

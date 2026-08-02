@@ -12,10 +12,9 @@ body {
     margin: 0;
     height: 100dvh;
     /* dark-mode/light-mode aware radial backdrop, replaces the old 2-stop linear gradient */
-    background: radial-gradient(ellipse 1400px 900px at 50% -5%,
-        var(--secondary-color) 0%,
-        var(--gradient-mid-color) 48%,
-        var(--primary-color) 100%);
+    background: linear-gradient(to bottom,
+        var(--secondary-color),
+        var(--primary-color));
     font-family: 'Inter', sans-serif;
     display: flex;
     flex-direction: column;
@@ -46,8 +45,9 @@ body {
 /* ===== theme toggle: circular icon button (mockup .theme-toggle) =====
    ui.js keeps setting this button's textContent to "Dark Mode"/"Light Mode"
    (for accessible label + no-JS fallback); we visually collapse that text
-   to zero size and render a sun/moon glyph via ::before driven purely by
-   html[data-theme], so no JS needed to change the icon. */
+   to zero size and render sun (::before) + moon (::after) via mask-image
+   so the icon is recolored with plain CSS (var(--primary-color)). Both
+   icons stay layered and crossfade/rotate on theme change. */
 #light-dark-button {
     position: absolute;
     top: var(--page-gap);
@@ -59,7 +59,6 @@ body {
     border: 1.5px solid var(--surface-border-strong-color);
     background: var(--board-background-color);
     box-shadow: var(--shadow-tight);
-    color: var(--primary-color);
     cursor: pointer;
     font-size: 0;
     line-height: 1;
@@ -68,13 +67,46 @@ body {
     justify-content: center;
 }
 
+#light-dark-button::before,
+#light-dark-button::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: var(--primary-color);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    transition:
+        opacity 0.45s ease,
+        transform 0.45s ease;
+}
+
 #light-dark-button::before {
-    content: "\1F319"; /* crescent moon: shown in light mode, click to go dark */
-    font-size: 1.2rem;
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='4.2'/><path d='M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='4.2'/><path d='M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7'/></svg>");
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+#light-dark-button::after {
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><path d='M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'><path d='M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z'/></svg>");
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.4);
 }
 
 html[data-theme="dark"] #light-dark-button::before {
-    content: "\2600\FE0F"; /* sun: shown in dark mode, click to go light */
+    opacity: 0;
+    transform: rotate(90deg) scale(0.4);
+}
+
+html[data-theme="dark"] #light-dark-button::after {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
 }
 
 /* ===== title (mockup .title) ===== */
@@ -131,8 +163,8 @@ html[data-theme="dark"] #light-dark-button::before {
 
 /* ---- reset button: circular icon button (mockup .btn-icon) ---- */
 #reset-board-button {
-    width: 40px;
-    height: 40px;
+    width: 46px;
+    height: 46px;
     padding: 0;
     border-radius: 50%;
     border: 1.5px solid var(--surface-border-strong-color);
@@ -146,8 +178,8 @@ html[data-theme="dark"] #light-dark-button::before {
 }
 
 #reset-board-button svg {
-    width: 17px;
-    height: 17px;
+    width: 20px;
+    height: 20px;
 }
 
 /* ---- timer: pill chip (mockup .timer-chip) ---- */
@@ -188,47 +220,87 @@ html[data-theme="dark"] #light-dark-button::before {
     box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.4);
 }
 
-/* ---- difficulty pill (mockup .difficulty); wraps the untouched
-   #difficulty-select so the native element keeps its id/value/events ---- */
+/* ---- difficulty pill: current level shown as a shape; menu lists
+   the other levels as matching shape buttons (swap .dot styles later
+   per data-difficulty when unique icons exist). */
 .difficulty-pill {
     position: relative;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 11px 34px 11px 18px;
-    border-radius: 999px;
+    width: 46px;
+    height: 46px;
+}
+
+#difficulty-button {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border-radius: 50%;
     border: 1.5px solid var(--surface-border-strong-color);
     background: var(--board-background-color);
     box-shadow: var(--shadow-tight);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
-.difficulty-pill .dot {
-    width: 8px;
-    height: 8px;
+.difficulty-shape {
+    width: 10px;
+    height: 10px;
     border-radius: 2px;
     background: var(--primary-color);
     transform: rotate(45deg);
     flex: 0 0 auto;
-}
-
-.difficulty-pill::after {
-    content: "\25BE";
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--muted-text-color);
-    font-size: 0.75rem;
     pointer-events: none;
 }
 
-#difficulty-select {
-    appearance: none;
-    -webkit-appearance: none;
-    border: none;
-    background: transparent;
-    font: 600 14px 'Inter', sans-serif;
-    color: var(--surface-text-color);
-    cursor: pointer;
+#difficulty-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-radius: 999px;
+    border: 1.5px solid var(--surface-border-strong-color);
+    background: var(--board-background-color);
+    box-shadow: var(--shadow-tight);
+    z-index: 5;
+}
+
+#difficulty-menu[hidden] {
+    display: none;
+}
+
+.difficulty-option {
+    width: 34px;
+    height: 34px;
     padding: 0;
+    border-radius: 50%;
+    border: 1.5px solid var(--surface-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.difficulty-option:hover {
+    border-color: var(--primary-color);
+}
+
+#game-inactive-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 2;
+    cursor: pointer;
+}
+
+#game-inactive-overlay[hidden] {
+    display: none;
 }

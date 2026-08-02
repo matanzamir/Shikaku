@@ -25,22 +25,22 @@
 }
 
 .rectangle.edge-top {
-    margin-top: 6px;
+    margin-top: 4px;
     border-top: 2px solid var(--primary-color);
 }
 
 .rectangle.edge-bottom {
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     border-bottom: 2px solid var(--primary-color);
 }
 
 .rectangle.edge-left {
-    margin-left: 6px;
+    margin-left: 4px;
     border-left: 2px solid var(--primary-color);
 }
 
 .rectangle.edge-right {
-    margin-right: 6px;
+    margin-right: 4px;
     border-right: 2px solid var(--primary-color);
 }
 
@@ -60,8 +60,20 @@
     border-bottom-right-radius: var(--grid-corner-radius);
 }
 
+@keyframes flash-invalid {
+    0%,
+    100% {
+        background-color: rgba(var(--primary-rgb), 0.12);
+        border-color: var(--primary-color);
+    }
+    50% {
+        background-color: rgba(200, 50, 70, 0.45);
+        border-color: rgb(200, 50, 70);
+    }
+}
+
 .invalid {
-    /*ToDo: invalid selection animation*/
+    animation: flash-invalid 300ms ease;
 }
 
 /* Rectangle confirmed correct (locked): mockup's "valid" treatment —
@@ -89,7 +101,7 @@
 
 /* Pending first-corner selection: dashed outline + faint tint. */
 .selected {
-    margin: 6px;
+    margin: 4px;
     border: 2px dashed var(--primary-color);
     border-radius: var(--grid-corner-radius);
     background-color: rgba(var(--primary-rgb), 0.12);

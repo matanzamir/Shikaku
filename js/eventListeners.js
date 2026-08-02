@@ -1,5 +1,11 @@
 import { handleDrawerClick } from './drawer.js';
-import { handleLightDarkClick, handleDifficultySelectChange } from './ui.js';
+import {
+    handleLightDarkClick,
+    handleDifficultyChange,
+    toggleDifficultyMenu,
+    closeDifficultyMenu,
+    handleGameInactiveOverlayClick,
+} from './ui.js';
 import { handleTimerClick, handleTimerVisibilityChange } from './timer.js';
 import { handleInstructionsButtonClick, handleSlideLeftButtonClick, handleSlideRightButtonClick } from './drawer.js';
 
@@ -29,9 +35,23 @@ export function addTimerEventListener() {
 }
 
 export function addDifficultySelectEventListener(gameState) {
-    const difficultySelect = document.getElementById('difficulty-select');
-    difficultySelect.addEventListener('change', () => {
-        handleDifficultySelectChange(difficultySelect, gameState);
+    const difficultyButton = document.getElementById('difficulty-button');
+    const difficultyMenu = document.getElementById('difficulty-menu');
+
+    difficultyButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        toggleDifficultyMenu();
+    });
+
+    difficultyMenu.addEventListener('click', (event) => {
+        const option = event.target.closest('.difficulty-option');
+        if (!option) return;
+        handleDifficultyChange(option.dataset.difficulty, gameState);
+    });
+
+    document.addEventListener('click', (event) => {
+        if (event.target.closest('.difficulty-pill')) return;
+        closeDifficultyMenu();
     });
 }
 
@@ -69,5 +89,12 @@ function getMaxImageIndex() {
         }
 
         probeNext();
+    });
+}
+
+export function addGameInactiveOverlayEventListener() {
+    const gameInactiveOverlay = document.getElementById('game-inactive-overlay');
+    gameInactiveOverlay.addEventListener('click', () => {
+        handleGameInactiveOverlayClick();
     });
 }

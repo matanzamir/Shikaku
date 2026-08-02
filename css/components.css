@@ -1,5 +1,6 @@
 /* ===== board card (mockup .board-card) ===== */
 #game-block {
+    position: relative;
     flex: 0 1 auto;
     min-height: 0;
     min-width: 0;
@@ -10,7 +11,7 @@
     border: 1.5px solid var(--surface-border-color);
     border-radius: var(--board-border-radius);
     box-shadow: var(--board-box-shadow);
-    padding: clamp(6px, 1.5%, 16px);
+    padding: 6px;
     display: flex;
     align-items: center;
     justify-content: center;

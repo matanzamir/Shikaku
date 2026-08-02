@@ -37,15 +37,17 @@
                             <button id="pause-button"></button>
                         </div>
                         <div class="difficulty-pill">
-                            <span class="dot" aria-hidden="true"></span>
-                            <select id="difficulty-select">
-                            </select>
+                            <button id="difficulty-button" type="button" aria-label="Change difficulty" aria-haspopup="listbox" aria-expanded="false">
+                                <span class="difficulty-shape" aria-hidden="true"></span>
+                            </button>
+                            <ul id="difficulty-menu" hidden role="listbox" aria-label="Difficulty options"></ul>
                         </div>
                     </div>  
                     <div id="game-block">
                         <div id="game-grid">
 
                         </div>
+                        <div id="game-inactive-overlay"></div>
                     </div>
                 </main>
             </div>

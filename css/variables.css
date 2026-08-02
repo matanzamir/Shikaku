@@ -62,15 +62,15 @@
     /* board */
     --board-border-radius: 22px;
     --board-box-shadow: 0px 0px 10px 0px var(--shadow-color);
-    --board-width: min(90vw, calc(100dvh - var(--layout-chrome)));
+    --board-width: min(100vw, calc(100dvh - var(--layout-chrome)));
     --board-max-height: calc(100dvh - var(--layout-chrome));
 
     /* drawer */
     --drawer-width: min(80vw, 18rem);
 
     /* grid */
-    --grid-size-percentage: 95%;
-    --grid-corner-radius: 14px;
+    --grid-size-percentage: 100%;
+    --grid-corner-radius: 13px;
 }
 
 html {
@@ -83,25 +83,22 @@ html {
 
 html[data-theme="light"] {
     /* accent stays constant across themes; only the ambient backdrop shifts */
-    --primary-color: rgb(122, 51, 80);
-    --secondary-color: rgb(236, 210, 220);
+    --primary-color: rgb(182, 73, 126);
+    --secondary-color: rgb(217, 160, 188);
     --board-background-color: rgb(251, 244, 242);
     --shadow-color: rgba(96, 25, 58, 0.16);
     --board-box-shadow: 0 14px 30px var(--shadow-color);
     --text-color: rgb(42, 24, 38);
 
-    --gradient-mid-color: rgb(207, 109, 151);
     --title-accent-color: rgb(122, 51, 80);
 }
 
 html[data-theme="dark"] {
     --text-color: rgb(245, 235, 240);
-    --primary-color: rgb(122, 51, 80);
-    --secondary-color: rgb(26, 14, 20);
+    --primary-color: rgb(130, 48, 92);
+    --secondary-color: rgb(54, 18, 36);
     --board-background-color: rgb(248, 243, 240);
     --shadow-color: rgba(0, 0, 0, 0.45);
     --board-box-shadow: 0 14px 30px var(--shadow-color);
-
-    --gradient-mid-color: rgb(46, 19, 32);
     --title-accent-color: rgb(224, 148, 179);
 }

@@ -96,26 +96,28 @@
 #instructions-loader {
     position: absolute;
     inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+/* display:flex above overrides the UA [hidden] { display:none } rule */
+#instructions-loader[hidden] {
+    display: none;
 }
 
 #instructions-loader h3 {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 50%;
-    margin: 1rem;
+    margin: 0;
     text-align: center;
     color: var(--surface-text-color);
     font-family: 'Inter', sans-serif;
 }
 
 #instructions-loader button {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    align-items: center;
-    justify-content: center;
     padding: 10px 22px;
     border-radius: 999px;
     border: 1.5px solid var(--surface-border-strong-color);
