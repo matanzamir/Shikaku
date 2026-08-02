@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Todo List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-deep: #0f1c18;
+      --bg-mid: #163028;
+      --bg-surface: #1c3a30;
+      --bg-elevated: #244a3d;
+      --ink: #e8f2ec;
+      --ink-muted: #9bb5a8;
+      --ink-faint: #6a8679;
+      --accent: #3ecf8e;
+      --accent-hover: #55db9e;
+      --accent-ink: #062416;
+      --warn: #e6b35c;
+      --danger: #e07a6a;
+      --info: #6eb8d8;
+      --line: rgba(232, 242, 236, 0.1);
+      --shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+      --radius: 14px;
+      --font-body: "DM Sans", sans-serif;
+      --font-display: "Fraunces", Georgia, serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(62, 207, 142, 0.18), transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, rgba(110, 184, 216, 0.12), transparent 50%),
+        linear-gradient(165deg, var(--bg-deep), var(--bg-mid) 45%, #12241e);
+      background-attachment: fixed;
+    }
+
+    .page {
+      width: min(640px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2.5rem 0 4rem;
+    }
+
+    header {
+      margin-bottom: 1.75rem;
+      animation: rise 0.55s ease both;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.35rem;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--ink-muted);
+      font-size: 0.98rem;
+    }
+
+    .progress {
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(232, 242, 236, 0.08);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      border-radius: inherit;
+      transition: width 0.35s ease;
+    }
+
+    .progress-label {
+      font-size: 0.85rem;
+      color: var(--ink-faint);
+      white-space: nowrap;
+    }
+
+    .panel {
+      background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 1rem;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      animation: rise 0.65s ease both;
+      animation-delay: 0.05s;
+    }
+
+    .composer {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 0.9rem;
+    }
+
+    input[type="text"],
+    select {
+      font: inherit;
+      color: var(--ink);
+      background: var(--bg-elevated);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+      box-shadow: 0 0 0 3px rgba(62, 207, 142, 0.15);
+    }
+
+    #new-todo {
+      flex: 1;
+      min-width: 0;
+      padding: 0.75rem 0.9rem;
+    }
+
+    button {
+      font: inherit;
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: transform 0.15s ease, background 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+      font-weight: 600;
+      padding: 0.75rem 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink-muted);
+      padding: 0.45rem 0.7rem;
+      border: 1px solid transparent;
+    }
+
+    .btn-ghost:hover {
+      color: var(--ink);
+      border-color: var(--line);
+      background: rgba(232, 242, 236, 0.04);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      align-items: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .toolbar label {
+      color: var(--ink-muted);
+      font-size: 0.88rem;
+    }
+
+    #filter {
+      padding: 0.45rem 0.65rem;
+      min-width: 10rem;
+    }
+
+    .toolbar .spacer {
+      flex: 1;
+    }
+
+    #todo-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .todo-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.65rem 0.75rem;
+      align-items: center;
+      padding: 0.8rem 0.85rem;
+      border-radius: 12px;
+      background: rgba(15, 28, 24, 0.45);
+      border: 1px solid var(--line);
+      animation: item-in 0.28s ease both;
+    }
+
+    .todo-item.completed .todo-name {
+      text-decoration: line-through;
+      color: var(--ink-faint);
+    }
+
+    .todo-item.cancelled .todo-name {
+      color: var(--ink-faint);
+    }
+
+    .status-pill {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: rgba(232, 242, 236, 0.05);
+      color: var(--ink-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.55rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .status-pill:hover {
+      border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+      color: var(--ink);
+    }
+
+    .status-pill[data-status="pending"] { color: var(--ink-muted); }
+    .status-pill[data-status="in_progress"] {
+      color: var(--info);
+      border-color: color-mix(in srgb, var(--info) 40%, var(--line));
+    }
+    .status-pill[data-status="completed"] {
+      color: var(--accent);
+      border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+    }
+    .status-pill[data-status="cancelled"] {
+      color: var(--warn);
+      border-color: color-mix(in srgb, var(--warn) 40%, var(--line));
+    }
+
+    .todo-name {
+      font-size: 0.98rem;
+      line-height: 1.35;
+      word-break: break-word;
+      min-width: 0;
+    }
+
+    .todo-name-input {
+      width: 100%;
+      padding: 0.45rem 0.6rem;
+    }
+
+    .todo-actions {
+      display: flex;
+      gap: 0.25rem;
+      align-items: center;
+    }
+
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: inline-grid;
+      place-items: center;
+      background: transparent;
+      color: var(--ink-muted);
+      border-radius: 8px;
+      padding: 0;
+    }
+
+    .icon-btn:hover {
+      background: rgba(232, 242, 236, 0.07);
+      color: var(--ink);
+    }
+
+    .icon-btn.danger:hover {
+      color: var(--danger);
+      background: rgba(224, 122, 106, 0.12);
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--ink-faint);
+      padding: 2.25rem 1rem;
+      font-size: 0.95rem;
+    }
+
+    .status-select {
+      padding: 0.35rem 0.45rem;
+      font-size: 0.8rem;
+      max-width: 8.5rem;
+    }
+
+    @media (max-width: 560px) {
+      .todo-item {
+        grid-template-columns: auto 1fr;
+      }
+
+      .todo-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
+      }
+
+      .composer {
+        flex-direction: column;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes item-in {
+      from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.99);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>Todo List</h1>
+      <p class="subtitle">Add tasks, cycle status, edit, filter, and clear completed.</p>
+      <div class="progress" aria-live="polite">
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="progress-label" id="progress-label">0 / 0 done</span>
+      </div>
+    </header>
+
+    <section class="panel">
+      <form class="composer" id="composer">
+        <input
+          id="new-todo"
+          type="text"
+          placeholder="New task..."
+          autocomplete="off"
+          aria-label="New task"
+        />
+        <button class="btn-primary" type="submit">Add</button>
+      </form>
+
+      <div class="toolbar">
+        <label for="filter">Show</label>
+        <select id="filter">
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+        <span class="spacer"></span>
+        <button class="btn-ghost" type="button" id="clear-completed" hidden>
+          Clear completed
+        </button>
+      </div>
+
+      <ul id="todo-list" aria-label="Tasks"></ul>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "interactive-todo-list-v1";
+    const STATUS_CYCLE = {
+      pending: "in_progress",
+      in_progress: "completed",
+      completed: "pending",
+      cancelled: "pending",
+    };
+    const STATUS_LABELS = {
+      pending: "Pending",
+      in_progress: "In Progress",
+      completed: "Completed",
+      cancelled: "Cancelled",
+    };
+
+    const listEl = document.getElementById("todo-list");
+    const composer = document.getElementById("composer");
+    const newTodoInput = document.getElementById("new-todo");
+    const filterSelect = document.getElementById("filter");
+    const clearCompletedBtn = document.getElementById("clear-completed");
+    const progressFill = document.getElementById("progress-fill");
+    const progressLabel = document.getElementById("progress-label");
+
+    let todos = loadTodos();
+    let filter = "all";
+    let editingId = null;
+
+    function loadTodos() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveTodos() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    }
+
+    function uid() {
+      return Math.random().toString(36).slice(2, 10);
+    }
+
+    function icon(paths) {
+      return `
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          ${paths}
+        </svg>
+      `;
+    }
+
+    function render() {
+      const filtered =
+        filter === "all" ? todos : todos.filter((t) => t.status === filter);
+      const completedCount = todos.filter((t) => t.status === "completed").length;
+      const total = todos.length;
+      const pct = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+
+      progressFill.style.width = `${pct}%`;
+      progressLabel.textContent = `${completedCount} / ${total} done`;
+      clearCompletedBtn.hidden = completedCount === 0;
+      clearCompletedBtn.textContent = `Clear completed (${completedCount})`;
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `
+          <li class="empty">
+            ${todos.length === 0 ? "No tasks yet. Add one above." : "No tasks match this filter."}
+          </li>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = filtered
+        .map((todo) => {
+          const isEditing = editingId === todo.id;
+          const nameHtml = isEditing
+            ? `<input class="todo-name-input" type="text" data-action="edit-input" data-id="${todo.id}" value="${escapeAttr(todo.content)}" />`
+            : `<span class="todo-name">${escapeHtml(todo.content)}</span>`;
+
+          const actionsHtml = isEditing
+            ? `
+              <button class="icon-btn" type="button" data-action="save" data-id="${todo.id}" title="Save" aria-label="Save">
+                ${icon('<path d="M2 7l3.5 3.5L12 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />')}
+              </button>
+              <button class="icon-btn" type="button" data-action="cancel-edit" title="Cancel" aria-label="Cancel edit">
+                ${icon('<path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />')}
+              </button>
+            `
+            : `
+              <select class="status-select" data-action="set-status" data-id="${todo.id}" aria-label="Set status">
+                ${Object.entries(STATUS_LABELS)
+                  .map(
+                    ([value, label]) =>
+                      `<option value="${value}" ${value === todo.status ? "selected" : ""}>${label}</option>`
+                  )
+                  .join("")}
+              </select>
+              <button class="icon-btn" type="button" data-action="edit" data-id="${todo.id}" title="Edit" aria-label="Edit">
+                ${icon('<path d="M9 1.5l2.5 2.5L4 11.5H1.5V9z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />')}
+              </button>
+              <button class="icon-btn danger" type="button" data-action="delete" data-id="${todo.id}" title="Delete" aria-label="Delete">
+                ${icon('<path d="M2 3.5h9M5 3.5V2.5h3v1M5.5 6v3.5M7.5 6v3.5M3.5 3.5l.5 7h5l.5-7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />')}
+              </button>
+            `;
+
+          return `
+            <li class="todo-item ${todo.status}" data-id="${todo.id}">
+              <button
+                class="status-pill"
+                type="button"
+                data-action="cycle"
+                data-id="${todo.id}"
+                data-status="${todo.status}"
+                title="Click to advance status"
+              >
+                ${STATUS_LABELS[todo.status]}
+              </button>
+              ${nameHtml}
+              <div class="todo-actions">${actionsHtml}</div>
+            </li>
+          `;
+        })
+        .join("");
+
+      if (editingId) {
+        const input = listEl.querySelector(".todo-name-input");
+        if (input) {
+          input.focus();
+          input.setSelectionRange(input.value.length, input.value.length);
+        }
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replaceAll("'", "&#39;");
+    }
+
+    composer.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const content = newTodoInput.value.trim();
+      if (!content) return;
+      todos = [
+        ...todos,
+        { id: uid(), content, status: "pending" },
+      ];
+      newTodoInput.value = "";
+      saveTodos();
+      render();
+    });
+
+    filterSelect.addEventListener("change", () => {
+      filter = filterSelect.value;
+      render();
+    });
+
+    clearCompletedBtn.addEventListener("click", () => {
+      todos = todos.filter((t) => t.status !== "completed");
+      saveTodos();
+      render();
+    });
+
+    listEl.addEventListener("click", (event) => {
+      const target = event.target.closest("[data-action]");
+      if (!target) return;
+      const { action, id } = target.dataset;
+
+      if (action === "cycle") {
+        todos = todos.map((t) =>
+          t.id === id ? { ...t, status: STATUS_CYCLE[t.status] } : t
+        );
+        saveTodos();
+        render();
+        return;
+      }
+
+      if (action === "edit") {
+        editingId = id;
+        render();
+        return;
+      }
+
+      if (action === "cancel-edit") {
+        editingId = null;
+        render();
+        return;
+      }
+
+      if (action === "save") {
+        const input = listEl.querySelector(`.todo-name-input[data-id="${id}"]`);
+        const next = input?.value.trim();
+        if (next) {
+          todos = todos.map((t) => (t.id === id ? { ...t, content: next } : t));
+          saveTodos();
+        }
+        editingId = null;
+        render();
+        return;
+      }
+
+      if (action === "delete") {
+        todos = todos.filter((t) => t.id !== id);
+        if (editingId === id) editingId = null;
+        saveTodos();
+        render();
+      }
+    });
+
+    listEl.addEventListener("change", (event) => {
+      const target = event.target.closest('[data-action="set-status"]');
+      if (!target) return;
+      const { id } = target.dataset;
+      todos = todos.map((t) =>
+        t.id === id ? { ...t, status: target.value } : t
+      );
+      saveTodos();
+      render();
+    });
+
+    listEl.addEventListener("keydown", (event) => {
+      const input = event.target.closest(".todo-name-input");
+      if (!input) return;
+      if (event.key === "Enter") {
+        event.preventDefault();
+        input
+          .closest(".todo-item")
+          ?.querySelector('[data-action="save"]')
+          ?.click();
+      }
+      if (event.key === "Escape") {
+        editingId = null;
+        render();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
