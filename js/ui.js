@@ -348,7 +348,7 @@ function refreshDifficultyMenu() {
     }
 }
 
-function openAlertBox(message) {
+export function openAlertBox(message) {
     const alertBox = document.getElementById('alert-box');
     document.getElementById('message').textContent = message;
     alertBox.hidden = false;
