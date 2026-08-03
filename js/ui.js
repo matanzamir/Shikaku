@@ -1,6 +1,7 @@
 import { CellClass } from './cellClasses.js';
 import {
     buildRectangle,
+    createPuzzle,
     findRectangleAt,
     rectanglesOverlap,
     validateRectangle,
@@ -15,15 +16,20 @@ import {
     setDifficulty,
     getActiveRectangles,
     setScoreText,
-    showStoredScore } from './storage.js';
+    showStoredScore,
+    getPlayDateKey } from './storage.js';
 import { Difficulty } from './difficulties.js';
 import { Message } from './messages.js';
+import { generatePuzzle } from './puzzleGenerator.js';
 
 /**
  * @typedef {import('./game.js').Puzzle} Puzzle
  * @typedef {import('./game.js').GameState} GameState
  * @typedef {import('./game.js').Clue} Clue
  */
+
+/** @type {AbortController | null} */
+let gridListenersAbort = null;
 
 /**
  * @param {Puzzle} puzzle
@@ -51,34 +57,37 @@ export function createGameGrid(puzzle, gameState) {
         }
     }
 
-    addGridEventListener(gameGrid, gameState, puzzle);
-
-    const resetBoardButton = document.getElementById('reset-board-button');
-    addResetBoardEventListener(resetBoardButton, gameState);
-    
+    bindGridListeners(gameGrid, gameState, puzzle);
 }
 
 /**
+ * (Re)bind grid + reset handlers so puzzle reloads do not stack listeners.
  * @param {HTMLElement} gameGrid
  * @param {GameState} gameState
- * @param {{ rows: number, cols: number, clues: Clue[] }} Puzzle
+ * @param {Puzzle} puzzle
  */
-function addGridEventListener(gameGrid, gameState, puzzle) {
-    gameGrid.addEventListener('click', (event) => {
-        const cell = event.target.closest('.grid-cell');
-        if (!cell) return;
-        handleCellClick(cell, gameState, puzzle);
-    });
-}
+function bindGridListeners(gameGrid, gameState, puzzle) {
+    gridListenersAbort?.abort();
+    gridListenersAbort = new AbortController();
+    const { signal } = gridListenersAbort;
 
-/**
- * @param {HTMLElement} resetBoardButton
- * @param {GameState} gameState
- */
-function addResetBoardEventListener(resetBoardButton, gameState) {
-    resetBoardButton.addEventListener('click', () => {
-        resetBoard(gameState);
-    });
+    gameGrid.addEventListener(
+        'click',
+        (event) => {
+            const cell = event.target.closest('.grid-cell');
+            if (!cell) return;
+            handleCellClick(cell, gameState, puzzle);
+        },
+        { signal }
+    );
+
+    document.getElementById('reset-board-button').addEventListener(
+        'click',
+        () => {
+            resetBoard(gameState);
+        },
+        { signal }
+    );
 }
 
 /**
@@ -293,9 +302,31 @@ export async function handleDifficultyChange(difficultyName, gameState) {
     startTimer();
     resetBoard(gameState);
     setDifficulty(difficultyName);
+    loadCorrectPuzzle(difficultyName, gameState);
     showStoredScore();
     refreshDifficultyMenu();
     closeDifficultyMenu();
+}
+
+/**
+ * Update the URL and rebuild the board for the new difficulty without a full reload.
+ * `pushState` only changes the address bar — the grid must be regenerated here.
+ * @param {string} difficultyName
+ * @param {GameState} gameState
+ */
+function loadCorrectPuzzle(difficultyName, gameState) {
+    const difficultyConfig = Difficulty[difficultyName.toUpperCase()] ?? Difficulty.EASY;
+    const date = getPlayDateKey();
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('difficulty', difficultyConfig.name);
+    url.searchParams.set('date', date);
+    window.history.pushState({}, '', url);
+
+    const clues = generatePuzzle(difficultyConfig, date);
+    const puzzle = createPuzzle(difficultyConfig.size, difficultyConfig.size, clues);
+    createGameGrid(puzzle, gameState);
+    paintCellStates(gameState);
 }
 
 export function setDifficultySelectOptions() {
