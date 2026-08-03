@@ -9,6 +9,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/layout.css">
         <link rel="stylesheet" href="css/components.css">
@@ -18,7 +19,7 @@
     </head>
 
     <body>
-        <button id="light-dark-button" type="button">Dark Mode</button>
+        <button id="light-dark-button" type="button"><span>Dark Mode</span></button>
         <div id="main-container">
             <header class="top-bar">
                 <h1 class="logo" id="shikaku">SHIK<span>AKU</span></h1>
@@ -26,7 +27,7 @@
             <div id="game-wrapper">
                 <main class="game-area">
                     <div id="control-bar">
-                        <button id="reset-board-button" type="button" aria-label="Reset puzzle" title="Reset puzzle">
+                        <button id="reset-board-button" type="button" title="Reset puzzle">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 12a9 9 0 1 1-2.8-6.5"/>
                                 <path d="M21 3.5V9h-5.5"/>
@@ -37,10 +38,10 @@
                             <button id="pause-button"></button>
                         </div>
                         <div class="difficulty-pill">
-                            <button id="difficulty-button" type="button" aria-label="Change difficulty" aria-haspopup="listbox" aria-expanded="false">
-                                <span class="difficulty-shape" aria-hidden="true"></span>
+                            <button id="difficulty-button" type="button">
+                                <span class="difficulty-shape"></span>
                             </button>
-                            <ul id="difficulty-menu" hidden role="listbox" aria-label="Difficulty options"></ul>
+                            <ul id="difficulty-menu" hidden></ul>
                         </div>
                     </div>  
                     <div id="game-block">

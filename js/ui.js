@@ -303,17 +303,13 @@ export function setDifficultySelectOptions() {
 
 export function toggleDifficultyMenu() {
     const menu = document.getElementById('difficulty-menu');
-    const button = document.getElementById('difficulty-button');
     const willOpen = menu.hidden;
     menu.hidden = !willOpen;
-    button.setAttribute('aria-expanded', String(willOpen));
 }
 
 export function closeDifficultyMenu() {
     const menu = document.getElementById('difficulty-menu');
-    const button = document.getElementById('difficulty-button');
     menu.hidden = true;
-    button.setAttribute('aria-expanded', 'false');
 }
 
 function refreshDifficultyMenu() {
@@ -329,18 +325,15 @@ function refreshDifficultyMenu() {
         if (difficulty.name === current) continue;
 
         const item = document.createElement('li');
-        item.setAttribute('role', 'option');
 
         const optionButton = document.createElement('button');
         optionButton.type = 'button';
         optionButton.className = 'difficulty-option';
         optionButton.dataset.difficulty = difficulty.name;
-        optionButton.setAttribute('aria-label', difficulty.name);
 
         const shape = document.createElement('span');
         shape.className = 'difficulty-shape';
         shape.dataset.difficulty = difficulty.name.toLowerCase();
-        shape.setAttribute('aria-hidden', 'true');
 
         optionButton.appendChild(shape);
         item.appendChild(optionButton);

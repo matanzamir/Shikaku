@@ -1,6 +1,8 @@
 /* ===== base reset (shikaku-light-v3 mockup) ===== */
 * {
     box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 button,
@@ -42,37 +44,59 @@ body {
     box-sizing: border-box;
 }
 
-/* ===== theme toggle: circular icon button (mockup .theme-toggle) =====
-   ui.js keeps setting this button's textContent to "Dark Mode"/"Light Mode"
-   (for accessible label + no-JS fallback); we visually collapse that text
-   to zero size and render sun (::before) + moon (::after) via mask-image
-   so the icon is recolored with plain CSS (var(--primary-color)). Both
-   icons stay layered and crossfade/rotate on theme change. */
+/* ===== theme toggle: circular icon button that expands left on hover =====
+   Label text ("Dark Mode"/"Light Mode") is set by ui.js to the theme
+   that would apply if pressed. Icons are sun (::before) + moon (::after). */
 #light-dark-button {
     position: absolute;
     top: var(--page-gap);
     right: var(--page-gap);
-    width: 46px;
+    z-index: 10;
     height: 46px;
-    padding: 0;
+    width: 46px;
+    padding: 0 46px 0 0;
     border-radius: 50%;
     border: 1.5px solid var(--surface-border-strong-color);
     background: var(--board-background-color);
     box-shadow: var(--shadow-tight);
     cursor: pointer;
-    font-size: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: transparent;
     line-height: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    transition:
+        width 0.3s ease,
+        border-radius 0.3s ease,
+        padding 0.3s ease,
+        color 0.25s ease;
+}
+
+#light-dark-button:hover,
+#light-dark-button:focus-visible {
+    width: 8.5rem;
+    border-radius: 999px;
+    padding-left: 1rem;
+    color: var(--surface-text-color);
+    outline: none;
 }
 
 #light-dark-button::before,
 #light-dark-button::after {
     content: "";
     position: absolute;
+    top: 50%;
+    right: 13px;
     width: 20px;
     height: 20px;
+    margin-top: -10px;
     background-color: var(--primary-color);
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
@@ -111,7 +135,7 @@ html[data-theme="dark"] #light-dark-button::after {
 
 /* ===== title (mockup .title) ===== */
 #shikaku {
-    font-family: var(--font-family);
+    font-family: 'Bungee Shade', monospace;
     color: var(--text-color);
     font-size: var(--header-font-size);
     font-weight: 700;
@@ -243,7 +267,26 @@ html[data-theme="dark"] #light-dark-button::after {
     cursor: pointer;
 }
 
-.difficulty-shape {
+.difficulty-shape[data-difficulty="easy"] {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 12px solid green;
+    flex: 0 0 auto;
+    pointer-events: none;
+}
+
+.difficulty-shape[data-difficulty="medium"] {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: #007fff;
+    flex: 0 0 auto;
+    pointer-events: none;
+}
+
+.difficulty-shape[data-difficulty="hard"] {
     width: 10px;
     height: 10px;
     border-radius: 2px;
@@ -297,7 +340,7 @@ html[data-theme="dark"] #light-dark-button::after {
     border-radius: inherit;
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
-    z-index: 2;
+    z-index: 1;
     cursor: pointer;
 }
 

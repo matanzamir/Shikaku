@@ -19,6 +19,7 @@ export function handleInstructionsButtonClick(maxImageIndex) {
     const img = document.createElement('img');
     img.src = 'assets/instruction-images/1.png';
     img.classList.add('instructions-image');
+    img.draggable = false;
     slide.replaceChildren(img);
     buildSlideIndicators(maxImageIndex);
     updateSlideControls(1, maxImageIndex);
@@ -44,6 +45,7 @@ function changeImage(newImageIndex, instructionsslide, currentImage, maxImageInd
     const newImage = document.createElement('img');
     newImage.src = `assets/instruction-images/${newImageIndex}.png`;
     newImage.classList.add('instructions-image');
+    newImage.draggable = false;
     instructionsslide.replaceChildren(newImage);
     updateSlideControls(newImageIndex, maxImageIndex);
 }
