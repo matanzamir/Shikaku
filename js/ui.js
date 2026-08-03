@@ -6,15 +6,17 @@ import {
     validateRectangle,
     validatePuzzle,
 } from './game.js';
-import { resumeTimer, stopTimer } from './timer.js';
+import { resumeTimer, stopTimer, getElapsedMs } from './timer.js';
 import { 
     setTheme, 
     setActiveRectangles, 
     clearActiveRectangles, 
-    clearTimerOffset, 
     getDifficulty, 
     setDifficulty,
-    getActiveRectangles } from './storage.js';
+    getActiveRectangles,
+    getScore,
+    setScoreText,
+    showStoredScore } from './storage.js';
 import { Difficulty } from './difficulties.js';
 import { Message } from './messages.js';
 
@@ -192,8 +194,12 @@ function handleCellClick(cell, gameState, puzzle) {
     if (validatePuzzle(gameState.rectangles, puzzle.rows * puzzle.cols)) {
         stopTimer();
         clearActiveRectangles();
-        clearTimerOffset();
         showWinOverlay();
+        const score = getElapsedMs() / 1000;
+        const best = getScore();
+        if (best === null || score < best) {
+            setScoreText(score);
+        }
     }
 }
 
@@ -285,6 +291,7 @@ export async function handleDifficultyChange(difficultyName, gameState) {
 
     resetBoard(gameState);
     setDifficulty(difficultyName);
+    showStoredScore();
     refreshDifficultyMenu();
     closeDifficultyMenu();
 }

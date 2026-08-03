@@ -7,7 +7,7 @@ import {
     addInstructionsButtonEventListener,
     addGameInactiveOverlayEventListener } from './eventListeners.js';
 import { updateBodyTheme, createGameGrid, paintCellStates, setDifficultySelectOptions } from './ui.js';
-import { getTheme, getActiveRectangles } from './storage.js';
+import { getTheme, getActiveRectangles, showStoredScore } from './storage.js';
 
 export function init(puzzle, gameState) {
     const theme = getTheme();
@@ -21,6 +21,8 @@ export function init(puzzle, gameState) {
 
     gameState.rectangles = getActiveRectangles();
     paintCellStates(gameState);
+
+    showStoredScore();
 
     startTimer();
     addEventListeners(gameState);

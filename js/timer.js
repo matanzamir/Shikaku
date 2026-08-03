@@ -1,9 +1,8 @@
-import { getTimerOffset, setTimerOffset } from './storage.js';
-
 let startTime = 0;
 let pauseStartedAt = 0;
 let isPaused = false;
 let intervalId = null;
+let timerOffset = 0;
 
 const minutesEl = document.getElementById('minutes');
 const secondsEl = document.getElementById('seconds');
@@ -13,7 +12,7 @@ function pad(value) {
     return String(value).padStart(2, '0');
 }
 
-function getElapsedMs() {
+export function getElapsedMs() {
     if (startTime === 0) {
         return 0;
     }
@@ -46,8 +45,7 @@ function startTick() {
 
 export function startTimer() {
     clearTick();
-    const offset = getTimerOffset();
-    startTime = Date.now() - offset;
+    startTime = Date.now() - timerOffset;
     isPaused = true;
     pauseStartedAt = Date.now();
     pauseButton.textContent = '▷';
@@ -62,7 +60,7 @@ export function pauseTimer() {
     isPaused = true;
     pauseStartedAt = Date.now();
     clearTick();
-    setTimerOffset(getElapsedMs());
+    timerOffset = getElapsedMs();
     pauseButton.textContent = '▷';
     render();
     document.getElementById('game-inactive-overlay').hidden = false;
@@ -93,7 +91,7 @@ export function stopTimer() {
     }
 
     clearTick();
-    setTimerOffset(getElapsedMs());
+    timerOffset = getElapsedMs();
     render();
 }
 
