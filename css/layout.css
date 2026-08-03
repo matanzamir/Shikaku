@@ -51,7 +51,7 @@ body {
     position: absolute;
     top: var(--page-gap);
     right: var(--page-gap);
-    z-index: 10;
+    z-index: 1;
     height: 46px;
     width: 46px;
     padding: 0 46px 0 0;
