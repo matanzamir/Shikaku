@@ -44,9 +44,9 @@
     left: 0;
     top: 50%;
     z-index: 2;
-    transform: translate(-100%, -50%);
-    width: 2.25rem;
-    height: min(40vh, 20rem);
+    transform: translate(-98.5%, -50%);
+    width: 25px;
+    height: min(30vh, 15rem);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -62,7 +62,7 @@
     width: 100%;
     height: 100%;
     fill: var(--board-background-color);
-    stroke: var(--surface-border-strong-color);
+    stroke: var(--surface-border-color);
     stroke-width: 1.5px;
     filter: drop-shadow(-2px 0 6px rgba(0, 0, 0, 0.12));
     pointer-events: none;
