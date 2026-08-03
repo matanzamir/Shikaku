@@ -14,7 +14,6 @@ import {
     getDifficulty, 
     setDifficulty,
     getActiveRectangles,
-    getScore,
     setScoreText,
     showStoredScore } from './storage.js';
 import { Difficulty } from './difficulties.js';
@@ -198,11 +197,7 @@ function handleCellClick(cell, gameState, puzzle) {
         clearActiveRectangles();
         showWinOverlay();
         document.getElementById('game-won-overlay').hidden = false;
-        const score = getElapsedMs() / 1000;
-        const best = getScore();
-        if (best === null || score < best) {
-            setScoreText(score);
-        }
+        setScoreText(getElapsedMs() / 1000);
     }
 }
 
