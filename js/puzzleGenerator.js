@@ -10,10 +10,11 @@ import { hasUniqueSolution } from './puzzleValidator.js';
 /**
  * Generate a puzzle of the given size.
  * @param {Difficulty[keyof Difficulty]} difficulty
+ * @param {Date} date
  * @returns {Clue[]} clues
  */
-export function generatePuzzle(difficulty) {
-    const rand = createSeededRng(new Date(), difficulty.name);
+export function generatePuzzle(difficulty, date) {
+    const rand = createSeededRng(date, difficulty.name);
     let validated = false
     let clues = []
     while (!validated) {
