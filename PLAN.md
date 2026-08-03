@@ -1,6 +1,7 @@
 # 🗺️ Shikaku Website — Professional Learning Roadmap
 
 > **Rules for Cursor:**
+>
 > 1. Focus ONLY on the step or task explicitly requested by the user. Do not write ahead or implement code for future steps.
 > 2. Update the checklist markers (`[ ]` to `[x]`) and status labels of the active step when it is fully completed and verified.
 > 3. Ensure all JavaScript implementations stay modular, clean, and follow the specified Target Folder Structure.
@@ -20,7 +21,10 @@
 
 ---
 
+
+
 ## 📂 Target Folder Structure
+
 *Grow the workspace into this layout gradually. Split modules when files exceed ~150 lines.*
 
 ```text
@@ -45,9 +49,14 @@ Shikaku/
 
 ---
 
+
+
 ## 🛠️ Detailed Breakdown by Phase
 
+
+
 ### 🟩 Phase 1 — Foundations
+
 - **Status:** ✅ COMPLETE
 - **Target Files:** `index.html`, `css/variables.css`, `css/layout.css`
 - **Goal:** Set up a clean semantic layout, resolve the current CSS alignment/column bugs, and implement standard CSS design tokens.
@@ -56,7 +65,10 @@ Shikaku/
   - [x] **1.2 Design Tokens:** Build `css/variables.css` using `:root` custom properties for easy variable mapping and prepare `[data-theme="dark"]` structural mappings.
   - [x] **1.3 Layout Fixes:** Refactor container layouts using Flexbox/Grid. Resolve invalid syntax declarations (`grid-template-columns: 5` and `position: center`). Use CSS properties to dynamically size `#game-block` (e.g., `--grid-size`).
 
+
+
 ### 🟩 Phase 2 — Core Shikaku Gameplay
+
 - **Status:** ✅ COMPLETE
 - **Target Files:** `js/game.js`, `css/components.css`
 - **Goal:** Render a playable grid and write input validation rules handling non-overlapping area coordinates.
@@ -67,7 +79,10 @@ Shikaku/
   - [x] **2.4 Matrix Geometry Validation:** Implement spatial verification checks. Enforce bounds rules: Ensure rectangles encapsulate exactly one clue index, validation dimensions equal specified grid areas (`width × height == value`), and coordinate lines do not intersect.
   - [x] **2.5 Win Matrix Checker:** Implement full completion scanners confirming code coverage matrix contains zero grid gaps or illegal overrides. Toggle visual flags on win completion state.
 
+
+
 ### ✅ Phase 3 — Seeded Deterministic Puzzle Generator
+
 - **Status:** ✅ COMPLETE
 - **Target Files:** `js/rngCreator.js`, `js/puzzleGenerator.js`
 - **Goal:** Build a procedural grid partition system driven by explicit date/difficulty hashes to guarantee identical daily map layouts across browsers.
@@ -78,7 +93,10 @@ Shikaku/
   - [x] **3.4 Scale Mappings configuration:** Standardize matrix tiers: Easy (`7×7`), Medium (`10×10`), and Hard (`15×15`).
   - [x] **3.5 Code Cleaning:** Remove the error catchers and object immutability in the createPuzzle function.
 
+
+
 ### ✅ Phase 4 — Game Loop Controls
+
 - **Status:** ✅ COMPLETE
 - **Target Files:** `js/timer.js`, `js/main.js`
 - **Goal:** Wire up session management clocks, progress tracking, and secure game state reset switches.
@@ -87,7 +105,10 @@ Shikaku/
   - [x] **4.2 Board Purge Routine:** Bind clean reset states clearing rectangle history logs completely while keeping current active seed layout assets unchanged.
   - [x] **4.3 Automatic Win Catchers:** Chain completion hooks to the placement pipeline to automatically intercept the exact moment of solution clearance, stopping the active timer metrics instantly.
 
+
+
 ### ✅ Phase 5 — System Settings
+
 - **Status:** ✅ COMPLETE
 - **Target Files:** `js/storage.js`, `js/ui.js`
 - **Goal:** Program modular settings menus that update UI layouts and securely save layout options via persistent storage hooks.
@@ -97,7 +118,10 @@ Shikaku/
   - [x] **5.3 State Retention Setup:** Hook local environment key configs (`localStorage`) ensuring preferences match user configs on initialization.
   - [x] **5.4 Intercept Risk Logic:** Insert user confirmation alerts warning players of data wipes before updating grid difficulty settings.
 
+
+
 ### ✅ Phase 6 — How-to-Play Slideshow (in Settings)
+
 - **Status:** ✅ COMPLETE
 - **Target Files:** `index.html`, `css/components.css` (or `css/drawer.css`), `js/ui.js` (or a small dedicated module), `assets/` (instruction images)
 - **Goal:** Add a square How-to-Play slideshow inside the existing settings drawer with instruction images and slide controls. No separate help drawer. (Skipped the opt-in lazy-load intro — only 4–6 photos.)
@@ -106,7 +130,10 @@ Shikaku/
   - [x] **6.2 Lazy Intro Slide:** ~~Skipped~~ — not worth the friction for 4–6 instruction photos; load images as part of 6.3 instead.
   - [x] **6.3 Load Instructions & Controls:** Load the how-to photos from `assets/`, show them as instruction slides, and add prev/next controls plus step indicators. Enable normal slide cycling; keep slideshow state local to the open drawer session.
 
+
+
 ### ⬜ Phase 7 — Daily Puzzle Rotation & Historical Archive
+
 - **Status:** ⏳ PENDING
 - **Target Files:** `js/storage.js`, `js/main.js`
 - **Goal:** Build date-seeded map hooks parsing timeline configurations to manage chronological archiving loops.
@@ -115,12 +142,15 @@ Shikaku/
   - [ ] **7.2 Historical Grid Loaders:** Inject timeline parameters dynamically using structured URL inputs (e.g., `?date=YYYY-MM-DD`) or clean calendar layout overlays.
   - [ ] **7.3 Achievement Retention Trackers:** Append timeline clearance metadata to localized browser memory banks to mark completed dates on historical trackers.
 
-### 🟩 Phase 8 — Visual Aesthetic Polish & Mobile Responsiveness
-- **Status:** ✅ COMPLETE
+
+
+### ⬜ Phase 8 — Visual Aesthetic Polish & Mobile Responsiveness
+
+- **Status:** ⏳ PENDING
 - **Target Files:** Entire codebase
 - **Goal:** Elevate layout interfaces to clean consumer-grade specifications through smooth interaction styling, animations, and fluid view transformations.
 - **Tasks:**
-  - [ ] **8.1 Active Element UI Tuning:** ~~Skipped~~ — micro-interaction press scaling not required for current scope.
+  - [x] **8.1 Active Element UI Tuning:** Implement smooth micro-interaction behaviors on tap/click inputs via scaling matrix rules (`transform: scale(0.98)`).
   - [x] **8.2 Grid Feedback Visuals:** Build clean alert classes flashing error components red for 300ms when bounding calculations breach constraint targets.
-  - [ ] **8.3 Fluid Boundary View Scaling:** ~~Skipped~~ — dedicated mobile transform/boundary handlers not required for current scope.
+  - [ ] **8.3 Fluid Boundary View Scaling:** Integrate scaling handlers (like `max-width: 90vw` or specialized transform maps) ensuring complex layouts fit mobile screens nicely.
   - [x] **8.4 Fonts Architecture Refactoring:** Inject systemic Google Typography links (like *Bungee Shade*) across runtime setup modules to stabilize visual style targets.

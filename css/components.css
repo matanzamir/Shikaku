@@ -79,7 +79,6 @@
 .win-overlay img {
     max-height: 100vh;
     max-width: 100vw;
-    animation: win-gif-pop 1s ease-in-out forwards;
 }
 
 .win-overlay[hidden] {
