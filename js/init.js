@@ -5,7 +5,8 @@ import {
     addTimerEventListener, 
     addDifficultySelectEventListener,
     addInstructionsButtonEventListener,
-    addGameInactiveOverlayEventListener } from './eventListeners.js';
+    addGameInactiveOverlayEventListener,
+    addGameWonOverlayEventListener } from './eventListeners.js';
 import { updateBodyTheme, createGameGrid, paintCellStates, setDifficultySelectOptions } from './ui.js';
 import { getTheme, getActiveRectangles, showStoredScore } from './storage.js';
 
@@ -35,4 +36,5 @@ async function addEventListeners(gameState) {
     addDifficultySelectEventListener(gameState);
     await addInstructionsButtonEventListener();
     addGameInactiveOverlayEventListener();
+    addGameWonOverlayEventListener(gameState);
 }

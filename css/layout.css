@@ -268,18 +268,24 @@ html[data-theme="dark"] #light-dark-button::after {
 }
 
 .difficulty-shape[data-difficulty="easy"] {
-    width: 0;
-    height: 0;
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-bottom: 12px solid green;
-    flex: 0 0 auto;
-    pointer-events: none;
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    background-color: green;
+    
+    /* Use the SVG as a stencil mask */
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='12' height='10' viewBox='0 0 12 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.84261 0.966004L0.656931 7.59332C0.236382 8.25919 0.714864 9.12732 1.50242 9.12732H5.68809H9.87377C10.6613 9.12732 11.1398 8.25919 10.7193 7.59332L6.53358 0.966006C6.14116 0.344664 5.23503 0.344662 4.84261 0.966004Z' fill='black'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg width='12' height='10' viewBox='0 0 12 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.84261 0.966004L0.656931 7.59332C0.236382 8.25919 0.714864 9.12732 1.50242 9.12732H5.68809H9.87377C10.6613 9.12732 11.1398 8.25919 10.7193 7.59332L6.53358 0.966006C6.14116 0.344664 5.23503 0.344662 4.84261 0.966004Z' fill='black'/%3E%3C/svg%3E");
+    
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
 }
 
 .difficulty-shape[data-difficulty="medium"] {
-    width: 10px;
-    height: 10px;
+    width: 11px;
+    height: 11px;
     border-radius: 2px;
     background: #007fff;
     flex: 0 0 auto;
@@ -287,8 +293,8 @@ html[data-theme="dark"] #light-dark-button::after {
 }
 
 .difficulty-shape[data-difficulty="hard"] {
-    width: 10px;
-    height: 10px;
+    width: 11px;
+    height: 11px;
     border-radius: 2px;
     background: var(--primary-color);
     transform: rotate(45deg);
@@ -345,5 +351,17 @@ html[data-theme="dark"] #light-dark-button::after {
 }
 
 #game-inactive-overlay[hidden] {
+    display: none;
+}
+
+#game-won-overlay {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    z-index: 2;
+    cursor: pointer;
+}
+
+#game-won-overlay[hidden] {
     display: none;
 }

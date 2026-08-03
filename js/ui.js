@@ -6,7 +6,7 @@ import {
     validateRectangle,
     validatePuzzle,
 } from './game.js';
-import { resumeTimer, stopTimer, getElapsedMs } from './timer.js';
+import { resumeTimer, getElapsedMs, startTimer, pauseTimer } from './timer.js';
 import { 
     setTheme, 
     setActiveRectangles, 
@@ -90,6 +90,7 @@ function resetBoard(gameState) {
     gameState.pendingSelection = null;
     clearActiveRectangles();
     hideWinOverlay();
+    document.getElementById('game-won-overlay').hidden = true;
     paintCellStates(gameState);
 }
 
@@ -192,9 +193,11 @@ function handleCellClick(cell, gameState, puzzle) {
     setActiveRectangles(gameState.rectangles);
     paintCellStates(gameState);
     if (validatePuzzle(gameState.rectangles, puzzle.rows * puzzle.cols)) {
-        stopTimer();
+        pauseTimer();
+        document.getElementById('game-inactive-overlay').hidden = true;
         clearActiveRectangles();
         showWinOverlay();
+        document.getElementById('game-won-overlay').hidden = false;
         const score = getElapsedMs() / 1000;
         const best = getScore();
         if (best === null || score < best) {
@@ -237,10 +240,11 @@ function declareGridCellCorners(cell, puzzle) {
 
 function showWinOverlay() {
     document.getElementById('win-overlay').hidden = false;
-  }
-  function hideWinOverlay() {
+}
+
+function hideWinOverlay() {
     document.getElementById('win-overlay').hidden = true;
-  }
+}
 
 export function handleLightDarkClick(lightDarkButton) {
     const current = document.documentElement.dataset.theme || document.body.dataset.theme;
@@ -282,6 +286,7 @@ export async function handleDifficultyChange(difficultyName, gameState) {
     }
 
     if (getActiveRectangles().length > 0) {
+        pauseTimer();
         const answer = await openAlertBox(Message.UNSAVED);
         if (!answer) {
             closeDifficultyMenu();
@@ -289,6 +294,8 @@ export async function handleDifficultyChange(difficultyName, gameState) {
         }
     }
 
+    pauseTimer();
+    startTimer();
     resetBoard(gameState);
     setDifficulty(difficultyName);
     showStoredScore();
@@ -367,4 +374,11 @@ function openAlertBox(message) {
 
 export function handleGameInactiveOverlayClick() {
     resumeTimer();
+}
+
+export function handleGameWonOverlayClick(gameState) {
+    resetBoard(gameState);
+    startTimer();
+    document.getElementById('game-won-overlay').hidden = true;
+    document.getElementById('game-inactive-overlay').hidden = true;
 }

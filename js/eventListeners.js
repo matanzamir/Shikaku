@@ -5,6 +5,7 @@ import {
     toggleDifficultyMenu,
     closeDifficultyMenu,
     handleGameInactiveOverlayClick,
+    handleGameWonOverlayClick,
 } from './ui.js';
 import { handleTimerClick, handleTimerVisibilityChange } from './timer.js';
 import { handleInstructionsButtonClick, handleSlideLeftButtonClick, handleSlideRightButtonClick } from './drawer.js';
@@ -96,5 +97,12 @@ export function addGameInactiveOverlayEventListener() {
     const gameInactiveOverlay = document.getElementById('game-inactive-overlay');
     gameInactiveOverlay.addEventListener('click', () => {
         handleGameInactiveOverlayClick();
+    });
+}
+
+export function addGameWonOverlayEventListener(gameState) {
+    const gameWonOverlay = document.getElementById('game-won-overlay');
+    gameWonOverlay.addEventListener('click', () => {
+        handleGameWonOverlayClick(gameState);
     });
 }

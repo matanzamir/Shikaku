@@ -45,6 +45,7 @@ function startTick() {
 
 export function startTimer() {
     clearTick();
+    timerOffset = 0;
     startTime = Date.now() - timerOffset;
     isPaused = true;
     pauseStartedAt = Date.now();
@@ -70,7 +71,6 @@ export function resumeTimer() {
     if (!isPaused || startTime === 0) {
         return;
     }
-
     startTime += Date.now() - pauseStartedAt;
     pauseStartedAt = 0;
     isPaused = false;
@@ -78,21 +78,6 @@ export function resumeTimer() {
     render();
     startTick();
     document.getElementById('game-inactive-overlay').hidden = true;
-}
-
-export function stopTimer() {
-    if (startTime === 0) {
-        return;
-    }
-
-    if (!isPaused) {
-        pauseStartedAt = Date.now();
-        isPaused = true;
-    }
-
-    clearTick();
-    timerOffset = getElapsedMs();
-    render();
 }
 
 export function handleTimerClick() {
