@@ -40,7 +40,8 @@ export function createGameGrid(puzzle, gameState) {
 
     gameGrid.innerHTML = '';
 
-    gameGrid.style.setProperty('--grid-size', puzzle.rows);
+    /* On :root so density tokens (--cell-size, chrome compress, etc.) recompute with the board. */
+    document.documentElement.style.setProperty('--grid-size', String(puzzle.rows));
 
     for (let row = 0; row < puzzle.rows; row++) {
         for (let col = 0; col < puzzle.cols; col++) {
