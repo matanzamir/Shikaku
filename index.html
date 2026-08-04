@@ -23,6 +23,7 @@
         <div id="main-container">
             <header class="top-bar">
                 <h1 class="logo" id="shikaku">SHIK<span>AKU</span></h1>
+                <h2 class="date" id="date"></h2>
             </header>
             <div id="game-wrapper">
                 <main class="game-area">
@@ -44,22 +45,26 @@
                             <ul id="difficulty-menu" hidden></ul>
                         </div>
                     </div>  
-                    <div id="game-block">
-                        <div id="game-grid">
+                    <div id="board-stage">
+                        <div id="score">Good Luck!</div>
+                        <div id="game-block">
+                            <div id="game-grid">
 
+                            </div>
+                            <div id="game-inactive-overlay"></div>
+                            <div id="game-won-overlay" hidden></div>
                         </div>
-                        <div id="game-inactive-overlay"></div>
-                        <div id="game-won-overlay" hidden></div>
                     </div>
-                    <div id="score">Good Luck!</div>
                 </main>
             </div>
         </div>
         <aside id="settings-drawer" class="drawer">
             <div class="drawer-open-close-button" id="drawer-button">
-                <svg class="drawer-bump" width="25" height="160" viewBox="0 0 25 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M24.0003 160C24.0003 105 0.5 105 0.5 80C0.5 55 24.0004 55 24.0003 6.96424e-06"/>
-                    </svg>
+                <svg class="drawer-bump" width="25" height="160" viewBox="0 0 25 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Tab fills only the curved bulb (no rectangular slab behind it) -->
+                    <path class="drawer-bump-fill" d="M25 0C25 55 1 55 1 80C1 105 25 105 25 160V0Z"/>
+                    <path class="drawer-bump-stroke" d="M25 0C25 55 1 55 1 80C1 105 25 105 25 160" fill="none"/>
+                </svg>
                 <span class="drawer-button">&lt;</span>
             </div>
             <div class="drawer-content-wrapper">

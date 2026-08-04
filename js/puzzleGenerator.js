@@ -90,7 +90,7 @@ export function partitionRecursion(size, rand, position) {
     const mustSplit = area > size.maxArea;
 
     // Soft stop: keep as-is when area is valid and we are not forced to split.
-    if (!mustSplit && area >= MIN_RECTANGLE_AREA && (!canSplit || rand() < 0.5)) {
+    if (!mustSplit && area >= MIN_RECTANGLE_AREA && (!canSplit || rand() < 0.35)) {
         return asLeaf(size, position);
     }
 

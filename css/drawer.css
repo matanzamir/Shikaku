@@ -38,19 +38,23 @@
     box-sizing: border-box;
 }
 
-/* Hill bump: SVG path from tip to each base point */
+/* Tab host: transparent hit target — only the SVG bump paints */
 .drawer-open-close-button {
     position: absolute;
     left: 0;
     top: 50%;
     z-index: 2;
-    transform: translate(-98.5%, -50%);
+    /* tuck right edge under the drawer so the tab color runs into the panel */
+    transform: translate(-103%, -50%);
     width: 25px;
     height: min(30vh, 15rem);
     display: flex;
     align-items: center;
     justify-content: center;
     background: transparent;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
     cursor: pointer;
     user-select: none;
     color: inherit;
@@ -61,11 +65,21 @@
     inset: 0;
     width: 100%;
     height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.drawer-bump-fill {
     fill: var(--board-background-color);
+    stroke: none;
+}
+
+.drawer-bump-stroke {
+    fill: none;
     stroke: var(--surface-border-color);
     stroke-width: 1.5px;
-    filter: drop-shadow(-2px 0 6px rgba(0, 0, 0, 0.12));
-    pointer-events: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .drawer-button {

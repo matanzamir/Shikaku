@@ -37,11 +37,12 @@ body {
     flex: 0 0 auto;
     width: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: var(--page-gap);
-    padding-bottom: 0;
+    padding: 0.2rem var(--page-gap) 0;
     box-sizing: border-box;
+    gap: 0;
 }
 
 /* ===== theme toggle: circular icon button that expands left on hover =====
@@ -141,7 +142,7 @@ html[data-theme="dark"] #light-dark-button::after {
     font-weight: 700;
     letter-spacing: 0.08em;
     margin: 0;
-    line-height: 1.2;
+    line-height: 1;
     text-align: center;
     transition: color var(--theme-transition);
 }
@@ -150,13 +151,26 @@ html[data-theme="dark"] #light-dark-button::after {
     color: var(--title-accent-color);
 }
 
+#date {
+    margin-top: 5px;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    line-height: 1.1;
+    color: var(--text-color);
+    opacity: 0.75;
+    text-align: center;
+}
+
 #game-wrapper {
     flex: 1 1 auto;
     min-height: 0;
     width: 100%;
     display: flex;
     flex-direction: column;
-    padding: var(--page-gap) var(--page-gap) var(--board-outer-gap);
+    padding: 0.35rem var(--page-gap) var(--board-outer-gap);
     box-sizing: border-box;
 }
 
@@ -170,6 +184,70 @@ html[data-theme="dark"] #light-dark-button::after {
     justify-content: center;
     gap: var(--section-gap);
     outline: none;
+}
+
+/* Board stays centered; score sits in the free space to its left */
+#board-stage {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex: 0 1 auto;
+    min-height: 0;
+    min-width: 0;
+}
+
+#score {
+    position: fixed;
+    left: 0;
+    /* Right edge of this box = left edge of the board (board is centered) */
+    right: calc(50% + var(--board-width) / 2);
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    padding: 0 0.5rem;
+    text-align: center;
+    white-space: pre-line;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(1rem, 2.2vw, 1.35rem);
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--text-color);
+    max-height: 100dvh;
+    overflow: hidden;
+    box-sizing: border-box;
+    z-index: 1;
+    pointer-events: none;
+}
+
+@media (max-width: 720px) {
+    :root {
+        --layout-chrome: calc(
+            var(--page-gap) * 1.25 +
+            var(--section-gap) * 2.25 +
+            var(--header-font-size) * 1 +
+            1.1rem +
+            var(--control-bar-height) +
+            var(--board-outer-gap) * 2
+        );
+    }
+
+    #score {
+        position: static;
+        transform: none;
+        right: auto;
+        left: auto;
+        top: auto;
+        text-align: center;
+        max-width: var(--board-width);
+        order: 1;
+    }
+
+    #board-stage {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
 }
 
 /* ===== control bar (mockup .controls row) ===== */

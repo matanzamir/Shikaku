@@ -91,6 +91,7 @@ let playDateKey = toDateKey();
  */
 export function setPlayDateKey(dateKey) {
     playDateKey = dateKey;
+    document.getElementById('date').textContent = `${dateKey.split('-').slice(0, 3).reverse().join('/')}`;
 }
 
 /**
@@ -219,7 +220,7 @@ export function returnAsMinuteString(scoreSeconds) {
  * @param {number} scoreSeconds
  */
 function formatScoreText(difficultyName, scoreSeconds) {
-    return `You've completed the ${difficultyName} difficulty in ${returnAsMinuteString(scoreSeconds)}!`;
+    return `${difficultyName}\ncompleted in ${returnAsMinuteString(scoreSeconds)}`;
 }
 
 /**
