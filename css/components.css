@@ -128,7 +128,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: var(--board-background-color);
+    background: radial-gradient(circle, var(--secondary-color) 15%, var(--primary-color) 100%);
     border: 1.5px solid var(--surface-border-color);
     border-radius: var(--surface-radius);
     box-shadow: var(--board-box-shadow);
@@ -147,7 +147,7 @@
 #message {
     margin: 0;
     text-align: center;
-    color: var(--surface-text-color);
+    color: var(--on-primary-color);
     font-family: 'Inter', sans-serif;
 }
 
@@ -167,7 +167,7 @@
 #ok-btn {
     background: var(--primary-color);
     color: var(--on-primary-color);
-    border-color: var(--primary-color);
+    border-color: var(--surface-border-strong-color);
 }
 
 #cancel-btn {
