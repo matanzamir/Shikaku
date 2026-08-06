@@ -328,6 +328,7 @@ function loadCorrectPuzzle(difficultyName, gameState) {
     const puzzle = createPuzzle(difficultyConfig.size, difficultyConfig.size, clues);
     createGameGrid(puzzle, gameState);
     paintCellStates(gameState);
+    document.getElementById('game-inactive-overlay').hidden = false;
 }
 
 export function setDifficultySelectOptions() {
