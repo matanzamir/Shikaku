@@ -379,6 +379,7 @@ function refreshDifficultyMenu() {
 export function openAlertBox(message) {
     const alertBox = document.getElementById('alert-box');
     document.getElementById('message').textContent = message;
+    message === Message.INVALID_QUERY ? document.getElementById('cancel-btn').hidden = true : document.getElementById('cancel-btn').hidden = false;
     alertBox.hidden = false;
 
     return new Promise((resolve) => {
