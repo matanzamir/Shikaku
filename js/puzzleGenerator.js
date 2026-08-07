@@ -1,5 +1,6 @@
 import { createSeededRng } from './rngCreator.js';
 import { hasUniqueSolution } from './puzzleValidator.js';
+import { isBoring } from './boredomCheck.js';
 
 /**
  * @typedef {import('./game.js').Rectangle} Rectangle
@@ -20,8 +21,7 @@ export function generatePuzzle(difficulty, date) {
     while (!validated) {
         const rectangles = partitionRecursion({width: difficulty.size, height: difficulty.size, maxArea: difficulty.maxRectangleSize}, rand, {row: 0, col: 0})
         clues = cluePlacement(rectangles, rand)
-        validated = hasUniqueSolution(clues, {width: difficulty.size, height: difficulty.size})
-        // ToDo: add boredom check (clues) -> bool
+        validated = hasUniqueSolution(clues, {width: difficulty.size, height: difficulty.size}) && !isBoring(rectangles, difficulty.size)
     }
     return clues
 }
