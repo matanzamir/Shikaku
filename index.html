@@ -19,7 +19,15 @@
     </head>
 
     <body>
-        <button id="light-dark-button" type="button"><span>Dark Mode</span></button>
+        <div id="button-container">
+            <button id="light-dark-button" class="button" type="button"><span>Dark Mode</span></button>
+            <div id="selection-mode-switch" class="button" data-mode="drag">
+                <span class="selection-mode-label"></span>
+                <div class="selection-mode-track">
+                    <div class="selection-mode-thumb"></div>
+                </div>
+            </div>
+        </div>
         <div id="main-container">
             <header class="top-bar">
                 <h1 class="logo" id="shikaku">SHIK<span>AKU</span></h1>

@@ -44,18 +44,20 @@ body {
     box-sizing: border-box;
 }
 
-/* ===== theme toggle: circular icon button that expands left on hover =====
-   Label text ("Dark Mode"/"Light Mode") is set by ui.js to the theme
-   that would apply if pressed. Icons are sun (::before) + moon (::after). */
-#light-dark-button {
+#button-container {
     position: absolute;
     top: var(--page-gap);
     right: var(--page-gap);
-    z-index: 10;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.button {
     height: 46px;
-    width: 46px;
-    padding: 0 46px 0 0;
-    border-radius: 50%;
+    border-radius: 999px;
     border: 1.5px solid var(--surface-border-strong-color);
     background: var(--board-background-color);
     box-shadow: var(--shadow-tight);
@@ -77,6 +79,16 @@ body {
         border-radius 0.3s ease,
         padding 0.3s ease,
         color 0.25s ease;
+    margin: 0;
+    position: relative;
+}
+
+/* ===== theme toggle: circular icon button that expands left on hover =====
+   Label text ("Dark Mode"/"Light Mode") is set by ui.js to the theme
+   that would apply if pressed. Icons are sun (::before) + moon (::after). */
+#light-dark-button {
+    width: 46px;
+    padding: 0 46px 0 0;
 }
 
 #light-dark-button:hover,
@@ -131,6 +143,130 @@ html[data-theme="dark"] #light-dark-button::before {
 html[data-theme="dark"] #light-dark-button::after {
     opacity: 1;
     transform: rotate(0deg) scale(1);
+}
+
+/* ===== selection mode switch: pill track + sliding primary thumb =====
+   data-mode: corners (left) | both (middle) | drag (right).
+   Collapsed = track only; hover expands left and reveals current mode label. */
+#selection-mode-switch {
+    --selection-inset: 2px;
+    --selection-track-width: 72px;
+    /* border-box: track + equal insets + outer 1.5px border on each side */
+    width: calc(var(--selection-track-width) + 2 * var(--selection-inset) + 3px);
+    /* Horizontal inset only — vertical pad would clip glyph descenders */
+    padding: 0 var(--selection-inset);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+#selection-mode-switch:hover,
+#selection-mode-switch:focus-visible {
+    width: 8.5rem;
+    padding-left: 1rem;
+    color: var(--surface-text-color);
+    outline: none;
+}
+
+.selection-mode-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: left;
+    overflow: hidden;
+    line-height: 1.25;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+}
+
+.selection-mode-label::before {
+    content: "Drag";
+}
+
+#selection-mode-switch[data-mode="corners"] .selection-mode-label::before {
+    content: "Corners";
+}
+
+#selection-mode-switch[data-mode="both"] .selection-mode-label::before {
+    content: "Both";
+}
+
+#selection-mode-switch[data-mode="drag"] .selection-mode-label::before {
+    content: "Drag";
+}
+
+.selection-mode-track {
+    position: relative;
+    flex: 0 0 var(--selection-track-width);
+    width: var(--selection-track-width);
+    height: calc(100% - 2 * var(--selection-inset));
+    border-radius: 999px;
+    border: 1.5px solid var(--secondary-color);
+    box-sizing: border-box;
+    align-self: center;
+}
+
+.selection-mode-thumb {
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    width: 30px;
+    height: 30px;
+    margin-top: -15px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.35);
+    transition: left 0.3s ease;
+}
+
+/* logo inside the thumb (mask swaps per data-mode) */
+.selection-mode-thumb::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 16px;
+    height: 16px;
+    background-color: var(--on-primary-color);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-image: url("../assets/icons/drag.svg");
+    mask-image: url("../assets/icons/drag.svg");
+    transition: opacity 0.2s ease;
+}
+
+#selection-mode-switch[data-mode="corners"] .selection-mode-thumb {
+    left: 2px;
+}
+
+#selection-mode-switch[data-mode="corners"] .selection-mode-thumb::before {
+    -webkit-mask-image: url("../assets/icons/corners.svg");
+    mask-image: url("../assets/icons/corners.svg");
+}
+
+#selection-mode-switch[data-mode="both"] .selection-mode-thumb {
+    left: calc(50% - 15px);
+}
+
+#selection-mode-switch[data-mode="both"] .selection-mode-thumb::before {
+    -webkit-mask-image: url("../assets/icons/both.svg");
+    mask-image: url("../assets/icons/both.svg");
+}
+
+#selection-mode-switch[data-mode="drag"] .selection-mode-thumb {
+    left: calc(100% - 32px);
+}
+
+#selection-mode-switch[data-mode="drag"] .selection-mode-thumb::before {
+    -webkit-mask-image: url("../assets/icons/drag.svg");
+    mask-image: url("../assets/icons/drag.svg");
 }
 
 /* ===== title (mockup .title) ===== */

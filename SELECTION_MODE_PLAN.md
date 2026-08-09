@@ -11,7 +11,7 @@
 
 ## 📊 High-Level Feature Roadmap
 
-- [ ] Stage 1 — Preference Model & Persistence
+- [x] Stage 1 — Preference Model & Persistence
 - [ ] Stage 2 — Three-Option Switch UI (below light/dark)
 - [ ] Stage 3 — Wire Switch to Preference Storage
 - [ ] Stage 4 — Drag-Select Input Engine
@@ -60,15 +60,15 @@ Shikaku/
 
 ## 🛠️ Detailed Breakdown by Stage
 
-### ⬜ Stage 1 — Preference Model & Persistence
+### ✅ Stage 1 — Preference Model & Persistence
 
-- **Status:** ⏳ PENDING
-- **Target Files:** `js/storage.js`
+- **Status:** ✅ DONE
+- **Target Files:** `js/storage.js`, `js/selectionModes.js`
 - **Goal:** Define the selection-mode values and load/save them with `localStorage`, matching the existing theme/difficulty pattern.
 - **Tasks:**
-  - [ ] **1.1 Mode constants:** Choose a small set of string IDs (e.g. `corners` | `drag` | `both`) and document defaults (`corners` recommended for backward compatibility).
-  - [ ] **1.2 Storage API:** Add `getSelectionMode()` / `setSelectionMode(mode)` next to theme helpers; reject unknown values by falling back to default.
-  - [ ] **1.3 Optional early apply:** If useful later, expose the mode on a single source of truth (function only is enough; no need for a global event bus yet).
+  - [x] **1.1 Mode constants:** Choose a small set of string IDs (e.g. `corners` | `drag` | `both`) and document defaults (`corners` recommended for backward compatibility).
+  - [x] **1.2 Storage API:** Add `getSelectionMode()` / `setSelectionMode(mode)` next to theme helpers; reject unknown values by falling back to default.
+  - [x] **1.3 Optional early apply:** If useful later, expose the mode on a single source of truth (function only is enough; no need for a global event bus yet).
 
 **Tools you will use**
 
