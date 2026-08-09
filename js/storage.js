@@ -1,6 +1,8 @@
 import { Difficulty } from './difficulties.js';
 import { toDateKey } from './rngCreator.js';
+import { SelectionMode } from './selectionModes.js';
 
+const SELECTION_MODE_KEY = 'selectionMode';
 const THEME_KEY = 'theme';
 const ACTIVE_RECTANGLES_KEY = 'activeRectangles';
 /** Local YYYY-MM-DD the in-progress rectangles belong to */
@@ -253,4 +255,12 @@ export function showStoredScore() {
     }
 
     scoreEl.textContent = formatScoreText(difficultyName, score);
+}
+
+export function getSelectionMode() {
+    return localStorage.getItem(SELECTION_MODE_KEY) ?? SelectionMode.DRAG;
+}
+
+export function setSelectionMode(selectionMode) {
+    localStorage.setItem(SELECTION_MODE_KEY, selectionMode);
 }
