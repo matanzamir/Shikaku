@@ -6,17 +6,27 @@ import {
     addDifficultySelectEventListener,
     addInstructionsButtonEventListener,
     addGameInactiveOverlayEventListener,
-    addGameWonOverlayEventListener } from './eventListeners.js';
+    addGameWonOverlayEventListener,
+    addSelectionModeSwitchEventListener } from './eventListeners.js';
 import { updateBodyTheme, createGameGrid, paintCellStates, setDifficultySelectOptions } from './ui.js';
-import { getTheme, getActiveRectangles, showStoredScore } from './storage.js';
+import { getTheme, 
+        getActiveRectangles, 
+        showStoredScore, 
+        getSelectionMode } from './storage.js';
 
 export function init(puzzle, gameState) {
+    const selectionModeSwitch = document.getElementById('selection-mode-switch');
+    const selectionMode = getSelectionMode();
+    selectionModeSwitch.dataset.mode = selectionMode;
+    // Enable thumb slide after first paint so boot mode apply does not animate
+    requestAnimationFrame(() => {
+        selectionModeSwitch.classList.add('selection-mode-ready');
+    });
+
     const theme = getTheme();
     updateBodyTheme(theme, document.getElementById('light-dark-button'));
 
     setDifficultySelectOptions();
-
-    // ToDo: create puzzle and removing it from variables list
     
     createGameGrid(puzzle, gameState);
 
@@ -37,4 +47,5 @@ async function addEventListeners(gameState) {
     await addInstructionsButtonEventListener();
     addGameInactiveOverlayEventListener();
     addGameWonOverlayEventListener(gameState);
+    addSelectionModeSwitchEventListener(gameState);
 }

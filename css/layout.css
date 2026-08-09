@@ -148,10 +148,13 @@ html[data-theme="dark"] #light-dark-button::after {
 
 /* ===== selection mode switch: pill track + sliding primary thumb =====
    data-mode: corners (left) | both (middle) | drag (right).
-   Collapsed = track only; hover expands left and reveals current mode label. */
+   Collapsed = track only; hover expands left and reveals current mode label.
+   Expanded width is a real length (per mode) so hover AND click width changes ease. */
 #selection-mode-switch {
     --selection-inset: 2px;
     --selection-track-width: 72px;
+    /* Approximate label measure; overridden per data-mode */
+    --selection-label-width: 2.75em;
     /* border-box: track + equal insets + outer 1.5px border on each side */
     width: calc(var(--selection-track-width) + 2 * var(--selection-inset) + 3px);
     /* Horizontal inset only — vertical pad would clip glyph descenders */
@@ -162,11 +165,35 @@ html[data-theme="dark"] #light-dark-button::after {
     gap: 0.5rem;
     cursor: pointer;
     overflow: hidden;
+    transition:
+        width 0.3s ease-in-out,
+        padding 0.3s ease-in-out,
+        color 0.25s ease-in-out;
+}
+
+#selection-mode-switch[data-mode="corners"] {
+    --selection-label-width: 4.75em;
+}
+
+#selection-mode-switch[data-mode="both"] {
+    --selection-label-width: 2.6em;
+}
+
+#selection-mode-switch[data-mode="drag"] {
+    --selection-label-width: 2.6em;
 }
 
 #selection-mode-switch:hover,
 #selection-mode-switch:focus-visible {
-    width: 8.5rem;
+    /* left pad + gap + label + track + right inset + outer borders */
+    width: calc(
+        1rem
+        + 0.5rem
+        + var(--selection-label-width)
+        + var(--selection-track-width)
+        + var(--selection-inset)
+        + 3px
+    );
     padding-left: 1rem;
     color: var(--surface-text-color);
     outline: none;
@@ -175,7 +202,6 @@ html[data-theme="dark"] #light-dark-button::after {
 .selection-mode-label {
     flex: 1 1 auto;
     min-width: 0;
-    text-align: left;
     overflow: hidden;
     line-height: 1.25;
     display: flex;
@@ -183,19 +209,28 @@ html[data-theme="dark"] #light-dark-button::after {
     align-self: stretch;
 }
 
-.selection-mode-label::before {
+.selection-mode-label-text {
+    overflow: hidden;
+    min-width: 0;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+}
+
+.selection-mode-label-text::before {
     content: "Drag";
 }
 
-#selection-mode-switch[data-mode="corners"] .selection-mode-label::before {
+#selection-mode-switch[data-mode="corners"] .selection-mode-label-text::before {
     content: "Corners";
 }
 
-#selection-mode-switch[data-mode="both"] .selection-mode-label::before {
+#selection-mode-switch[data-mode="both"] .selection-mode-label-text::before {
     content: "Both";
 }
 
-#selection-mode-switch[data-mode="drag"] .selection-mode-label::before {
+#selection-mode-switch[data-mode="drag"] .selection-mode-label-text::before {
     content: "Drag";
 }
 
@@ -213,13 +248,18 @@ html[data-theme="dark"] #light-dark-button::after {
 .selection-mode-thumb {
     position: absolute;
     top: 50%;
-    left: 2px;
+    /* default: drag (matches HTML + storage default; mode rules below override) */
+    left: 37px;
     width: 30px;
     height: 30px;
     margin-top: -15px;
     border-radius: 50%;
     background: var(--primary-color);
     box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.35);
+    /* no transition until JS marks ready — avoids boot animation from wrong position */
+}
+
+#selection-mode-switch.selection-mode-ready .selection-mode-thumb {
     transition: left 0.3s ease;
 }
 
@@ -243,6 +283,7 @@ html[data-theme="dark"] #light-dark-button::after {
     transition: opacity 0.2s ease;
 }
 
+/* 72px track, 30px thumb: left / center / right */
 #selection-mode-switch[data-mode="corners"] .selection-mode-thumb {
     left: 2px;
 }
@@ -253,7 +294,7 @@ html[data-theme="dark"] #light-dark-button::after {
 }
 
 #selection-mode-switch[data-mode="both"] .selection-mode-thumb {
-    left: calc(50% - 15px);
+    left: 20px;
 }
 
 #selection-mode-switch[data-mode="both"] .selection-mode-thumb::before {
@@ -262,7 +303,7 @@ html[data-theme="dark"] #light-dark-button::after {
 }
 
 #selection-mode-switch[data-mode="drag"] .selection-mode-thumb {
-    left: calc(100% - 32px);
+    left: 37px;
 }
 
 #selection-mode-switch[data-mode="drag"] .selection-mode-thumb::before {

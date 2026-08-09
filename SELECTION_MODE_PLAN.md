@@ -9,11 +9,13 @@
 
 ---
 
+
+
 ## 📊 High-Level Feature Roadmap
 
 - [x] Stage 1 — Preference Model & Persistence
-- [ ] Stage 2 — Three-Option Switch UI (below light/dark)
-- [ ] Stage 3 — Wire Switch to Preference Storage
+- [x] Stage 2 — Three-Option Switch UI (below light/dark)
+- [x] Stage 3 — Wire Switch to Preference Storage
 - [ ] Stage 4 — Drag-Select Input Engine
 - [ ] Stage 5 — Mode Gating (corners / drag / both)
 - [ ] Stage 6 — Live Drag Preview & Invalid Feedback
@@ -22,21 +24,27 @@
 
 ---
 
+
+
 ## 🎯 Feature Summary
 
 Today the board only supports **corner selection** (tap cell A, then cell B). This feature lets the player choose how rectangles are drawn:
 
-| Mode | Behavior |
-|------|----------|
-| **Corners** | Existing flow: tap first corner, tap second corner |
-| **Drag** | Pointer down on start cell, drag to end cell, release to commit |
-| **Both** | Corners and drag are active at the same time |
+
+| Mode        | Behavior                                                        |
+| ----------- | --------------------------------------------------------------- |
+| **Corners** | Existing flow: tap first corner, tap second corner              |
+| **Drag**    | Pointer down on start cell, drag to end cell, release to commit |
+| **Both**    | Corners and drag are active at the same time                    |
+
 
 A **3-option switch** sits directly under the existing light/dark mode control. The choice is persisted so it survives reloads.
 
 Shared outcome for all modes: build a candidate rectangle with `buildRectangle`, run the same overlap / validate / paint / win checks already used by corner selection in `js/ui.js`.
 
 ---
+
+
 
 ## 📂 Files Likely Touched
 
@@ -58,7 +66,11 @@ Shikaku/
 
 ---
 
+
+
 ## 🛠️ Detailed Breakdown by Stage
+
+
 
 ### ✅ Stage 1 — Preference Model & Persistence
 
@@ -72,13 +84,17 @@ Shikaku/
 
 **Tools you will use**
 
-| Tool | Why on this stage |
-|------|-------------------|
-| **Browser DevTools → Application → Local Storage** | Confirm the key is written and reloaded correctly without any UI yet. |
-| **Browser Console** | Manually call `getSelectionMode` / `setSelectionMode` after a temporary import test, or set the raw key and verify defaulting logic. |
-| **`localStorage` API** (in code) | Same persistence approach as `THEME_KEY` / `DIFFICULTY_KEY` in `storage.js`. |
+
+| Tool                                               | Why on this stage                                                                                                                    |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **Browser DevTools → Application → Local Storage** | Confirm the key is written and reloaded correctly without any UI yet.                                                                |
+| **Browser Console**                                | Manually call `getSelectionMode` / `setSelectionMode` after a temporary import test, or set the raw key and verify defaulting logic. |
+| `localStorage` **API** (in code)                   | Same persistence approach as `THEME_KEY` / `DIFFICULTY_KEY` in `storage.js`.                                                         |
+
 
 ---
+
+
 
 ### ⬜ Stage 2 — Three-Option Switch UI (below light/dark)
 
@@ -86,41 +102,49 @@ Shikaku/
 - **Target Files:** `index.html`, `css/layout.css` (optional: small icons under `assets/icons/`)
 - **Goal:** Place a compact 3-option control **directly under** `#light-dark-button`, visually related to the theme control but not competing with the board.
 - **Tasks:**
-  - [ ] **2.1 Markup:** Add a container (e.g. `#selection-mode-switch`) with three mutually exclusive options (buttons or a radio group styled as a segmented control). Label options clearly: Corners / Drag / Both.
-  - [ ] **2.2 Layout:** Position under the light/dark button (`top` offset past the 46px theme button + gap). Keep `z-index` consistent so it sits above the board but does not block the drawer.
-  - [ ] **2.3 Visual states:** Active option uses primary/surface tokens from `variables.css`; inactive options stay subdued. Match board chrome (border, shadow, radius language of the theme button / control bar).
-  - [ ] **2.4 Responsive note:** On narrow viewports, ensure the switch does not overlap the logo or timer; adjust top/right offsets if needed.
+  - [x] **2.1 Markup:** Add a container (e.g. `#selection-mode-switch`) with three mutually exclusive options (buttons or a radio group styled as a segmented control). Label options clearly: Corners / Drag / Both.
+  - [x] **2.2 Layout:** Position under the light/dark button (`top` offset past the 46px theme button + gap). Keep `z-index` consistent so it sits above the board but does not block the drawer.
+  - [x] **2.3 Visual states:** Active option uses primary/surface tokens from `variables.css`; inactive options stay subdued. Match board chrome (border, shadow, radius language of the theme button / control bar).
+  - [x] **2.4 Responsive note:** On narrow viewports, ensure the switch does not overlap the logo or timer; adjust top/right offsets if needed.
 
 **Tools you will use**
 
-| Tool | Why on this stage |
-|------|-------------------|
-| **Browser DevTools → Elements + Styles** | Live-tweak position under `#light-dark-button` and check box model / stacking. |
-| **Device / responsive mode** | Verify the switch does not collide with the title or control bar on small screens. |
+
+| Tool                                            | Why on this stage                                                                         |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **Browser DevTools → Elements + Styles**        | Live-tweak position under `#light-dark-button` and check box model / stacking.            |
+| **Device / responsive mode**                    | Verify the switch does not collide with the title or control bar on small screens.        |
 | **SVG / existing mask-icon pattern** (optional) | If you use icons, follow the same CSS mask technique as sun/moon on `#light-dark-button`. |
+
 
 ---
 
-### ⬜ Stage 3 — Wire Switch to Preference Storage
 
-- **Status:** ⏳ PENDING
+
+### ✅ Stage 3 — Wire Switch to Preference Storage
+
+- **Status:** ✅ DONE
 - **Target Files:** `js/eventListeners.js`, `js/ui.js`, `js/init.js`, `js/storage.js`
 - **Goal:** Clicking an option updates UI immediately and persists; on startup the switch reflects the stored mode.
 - **Tasks:**
-  - [ ] **3.1 Handler:** On option click/change, call `setSelectionMode`, update active class / `aria-pressed` / `aria-checked` on the three options.
-  - [ ] **3.2 Boot sync:** In `init`, read `getSelectionMode()` and paint the switch before or with theme restore.
-  - [ ] **3.3 Listener registration:** `addSelectionModeEventListener()` (or similar) from `eventListeners.js`, registered in `init.js` like the light/dark listener.
-  - [ ] **3.4 Changing mode mid-game:** Clear `pendingSelection` (and any drag preview state once it exists) so a half-finished corners pick cannot conflict with drag after a mode flip.
+  - [x] **3.1 Handler:** On option click/change, call `setSelectionMode`, update active class / `aria-pressed` / `aria-checked` on the three options.
+  - [x] **3.2 Boot sync:** In `init`, read `getSelectionMode()` and paint the switch before or with theme restore.
+  - [x] **3.3 Listener registration:** `addSelectionModeEventListener()` (or similar) from `eventListeners.js`, registered in `init.js` like the light/dark listener.
+  - [x] **3.4 Changing mode mid-game:** Clear `pendingSelection` (and any drag preview state once it exists) so a half-finished corners pick cannot conflict with drag after a mode flip.
 
 **Tools you will use**
 
-| Tool | Why on this stage |
-|------|-------------------|
-| **Chrome DevTools → Event Listeners panel** | Confirm only one listener is bound and that the correct option fires. |
-| **Application → Local Storage** | Toggle each of the three options and confirm the stored value flips every time. |
-| **Hard refresh / new tab** | Prove persistence survives full reload. |
+
+| Tool                                        | Why on this stage                                                               |
+| ------------------------------------------- | ------------------------------------------------------------------------------- |
+| **Chrome DevTools → Event Listeners panel** | Confirm only one listener is bound and that the correct option fires.           |
+| **Application → Local Storage**             | Toggle each of the three options and confirm the stored value flips every time. |
+| **Hard refresh / new tab**                  | Prove persistence survives full reload.                                         |
+
 
 ---
+
+
 
 ### ⬜ Stage 4 — Drag-Select Input Engine
 
@@ -136,14 +160,18 @@ Shikaku/
 
 **Tools you will use**
 
-| Tool | Why on this stage |
-|------|-------------------|
+
+| Tool                                                                        | Why on this stage                                                                 |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
 | **Pointer Events API** (`pointerdown` / `move` / `up`, `setPointerCapture`) | Unified mouse + touch + pen path; prefer this over separate mouse + touch stacks. |
-| **`elementFromPoint` / `getBoundingClientRect`** | Resolve which grid cell is under the finger/cursor while dragging. |
-| **DevTools → Performance or Event Listener breakpoints** | Diagnose missed `pointerup` / capture issues. |
-| **Real touch device or DevTools device mode + force touch simulation** | Mouse-only testing is not enough for drag comfort and `touch-action`. |
+| `elementFromPoint` **/** `getBoundingClientRect`                            | Resolve which grid cell is under the finger/cursor while dragging.                |
+| **DevTools → Performance or Event Listener breakpoints**                    | Diagnose missed `pointerup` / capture issues.                                     |
+| **Real touch device or DevTools device mode + force touch simulation**      | Mouse-only testing is not enough for drag comfort and `touch-action`.             |
+
 
 ---
+
+
 
 ### ⬜ Stage 5 — Mode Gating (corners / drag / both)
 
@@ -158,13 +186,17 @@ Shikaku/
 
 **Tools you will use**
 
-| Tool | Why on this stage |
-|------|-------------------|
-| **Mode matrix test checklist** (manual table: mode × action) | Systematically confirm each mode only allows intended inputs. |
-| **Breakpoint in `handleCellClick` / drag handlers** | Verify corners handlers are skipped in drag-only and vice versa. |
-| **Movement threshold constant** | Small pixel/delta check to separate tap from drag when mode is `both`. |
+
+| Tool                                                         | Why on this stage                                                      |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| **Mode matrix test checklist** (manual table: mode × action) | Systematically confirm each mode only allows intended inputs.          |
+| **Breakpoint in** `handleCellClick` **/ drag handlers**      | Verify corners handlers are skipped in drag-only and vice versa.       |
+| **Movement threshold constant**                              | Small pixel/delta check to separate tap from drag when mode is `both`. |
+
 
 ---
+
+
 
 ### ⬜ Stage 6 — Live Drag Preview & Invalid Feedback
 
@@ -178,13 +210,17 @@ Shikaku/
 
 **Tools you will use**
 
-| Tool | Why on this stage |
-|------|-------------------|
-| **CSS animation inspection in DevTools** | Confirm invalid flash duration matches existing 300ms-style feedback without lingering classes. |
-| **`paintCellStates` style debugging** | Compare class toggles for selected / rectangle / preview layers so preview does not permanently look like a locked rect. |
-| **Forced `pointercancel` testing** | e.g. open the pause overlay or switch tabs mid-drag to ensure no stuck highlight. |
+
+| Tool                                     | Why on this stage                                                                                                        |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **CSS animation inspection in DevTools** | Confirm invalid flash duration matches existing 300ms-style feedback without lingering classes.                          |
+| `paintCellStates` **style debugging**    | Compare class toggles for selected / rectangle / preview layers so preview does not permanently look like a locked rect. |
+| **Forced** `pointercancel` **testing**   | e.g. open the pause overlay or switch tabs mid-drag to ensure no stuck highlight.                                        |
+
 
 ---
+
+
 
 ### ⬜ Stage 7 — Conflict Handling & Edge Cases
 
@@ -200,13 +236,17 @@ Shikaku/
 
 **Tools you will use**
 
-| Tool | Why on this stage |
-|------|-------------------|
-| **Edge-case checklist** | Outside-grid, multi-touch, pause mid-drag, win mid-gesture. |
-| **Regression: complete a full easy puzzle** | After drag work, ensure Phase 2 win pipeline still fires. |
-| **`localStorage` progress keys** | Confirm drag-placed rectangles still persist via `setActiveRectangles`. |
+
+| Tool                                        | Why on this stage                                                       |
+| ------------------------------------------- | ----------------------------------------------------------------------- |
+| **Edge-case checklist**                     | Outside-grid, multi-touch, pause mid-drag, win mid-gesture.             |
+| **Regression: complete a full easy puzzle** | After drag work, ensure Phase 2 win pipeline still fires.               |
+| `localStorage` **progress keys**            | Confirm drag-placed rectangles still persist via `setActiveRectangles`. |
+
 
 ---
+
+
 
 ### ⬜ Stage 8 — Polish, Accessibility & Manual QA
 
@@ -221,14 +261,18 @@ Shikaku/
 
 **Tools you will use**
 
-| Tool | Why on this stage |
-|------|-------------------|
-| **Keyboard-only navigation** | Tab/arrow through the radiogroup without a mouse. |
-| **Screen reader spot-check** (Narrator / VoiceOver / NVDA) | Confirm the group and selected option are announced. |
-| **`prefers-reduced-motion` (optional)** | Soften preview transitions if you add motion heavy enough to matter. |
-| **Manual QA checklist** | Final gate before merging to `main`. |
+
+| Tool                                                       | Why on this stage                                                    |
+| ---------------------------------------------------------- | -------------------------------------------------------------------- |
+| **Keyboard-only navigation**                               | Tab/arrow through the radiogroup without a mouse.                    |
+| **Screen reader spot-check** (Narrator / VoiceOver / NVDA) | Confirm the group and selected option are announced.                 |
+| `prefers-reduced-motion` **(optional)**                    | Soften preview transitions if you add motion heavy enough to matter. |
+| **Manual QA checklist**                                    | Final gate before merging to `main`.                                 |
+
 
 ---
+
+
 
 ## ✅ Suggested Implementation Order (Cursor sessions)
 
@@ -243,17 +287,23 @@ Do not jump to drag logic before the preference API and switch exist unless you 
 
 ---
 
+
+
 ## 🔗 Relationship to Existing Code
 
-| Existing piece | Role in this feature |
-|----------------|----------------------|
-| `handleCellClick` in `ui.js` | Current corners engine; becomes mode-gated and shares placement with drag |
-| `buildRectangle` / `validateRectangle` in `game.js` | Unchanged geometry + rules, used by both modes |
-| `paintCellStates` | Extend for pending corner + drag preview |
-| `getTheme` / `setTheme` in `storage.js` | Template for selection-mode getters/setters |
-| `#light-dark-button` layout in `layout.css` | Anchor for positioning the new control underneath |
+
+| Existing piece                                      | Role in this feature                                                      |
+| --------------------------------------------------- | ------------------------------------------------------------------------- |
+| `handleCellClick` in `ui.js`                        | Current corners engine; becomes mode-gated and shares placement with drag |
+| `buildRectangle` / `validateRectangle` in `game.js` | Unchanged geometry + rules, used by both modes                            |
+| `paintCellStates`                                   | Extend for pending corner + drag preview                                  |
+| `getTheme` / `setTheme` in `storage.js`             | Template for selection-mode getters/setters                               |
+| `#light-dark-button` layout in `layout.css`         | Anchor for positioning the new control underneath                         |
+
 
 ---
+
+
 
 ## 📝 Notes / Decisions to Confirm During Build
 
@@ -261,3 +311,4 @@ Do not jump to drag logic before the preference API and switch exist unless you 
 - **Both-mode threshold:** Pick a small pixel threshold (e.g. 6–10px) or a “left original cell” rule for tap vs drag.
 - **Erase interaction in drag-only:** Match corners (tap/press existing free rectangle to remove) so rules stay consistent.
 - **Icons vs text:** Segmented text labels are clearer on first ship; icons can follow if the control feels crowded.
+

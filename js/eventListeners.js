@@ -6,6 +6,7 @@ import {
     closeDifficultyMenu,
     handleGameInactiveOverlayClick,
     handleGameWonOverlayClick,
+    handleSelectionModeSwitchClick,
 } from './ui.js';
 import { handleTimerClick, handleTimerVisibilityChange } from './timer.js';
 import { handleInstructionsButtonClick, handleSlideLeftButtonClick, handleSlideRightButtonClick } from './drawer.js';
@@ -104,5 +105,12 @@ export function addGameWonOverlayEventListener(gameState) {
     const gameWonOverlay = document.getElementById('game-won-overlay');
     gameWonOverlay.addEventListener('click', () => {
         handleGameWonOverlayClick(gameState);
+    });
+}
+
+export function addSelectionModeSwitchEventListener(gameState) {
+    const selectionModeSwitch = document.getElementById('selection-mode-switch');
+    selectionModeSwitch.addEventListener('click', () => {
+        handleSelectionModeSwitchClick(selectionModeSwitch, gameState);
     });
 }

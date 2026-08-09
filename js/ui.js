@@ -1,4 +1,5 @@
 import { CellClass } from './cellClasses.js';
+import { SelectionMode } from './selectionModes.js';
 import {
     buildRectangle,
     createPuzzle,
@@ -17,7 +18,8 @@ import {
     getActiveRectangles,
     setScoreText,
     showStoredScore,
-    getPlayDateKey } from './storage.js';
+    getPlayDateKey,
+    setSelectionMode } from './storage.js';
 import { Difficulty } from './difficulties.js';
 import { Message } from './messages.js';
 import { generatePuzzle } from './puzzleGenerator.js';
@@ -410,4 +412,16 @@ export function handleGameWonOverlayClick(gameState) {
     startTimer();
     document.getElementById('game-won-overlay').hidden = true;
     document.getElementById('game-inactive-overlay').hidden = true;
+}
+
+export function handleSelectionModeSwitchClick(selectionModeSwitch, gameState) {
+    const mode = selectionModeSwitch.dataset.mode;
+    const newMode = mode === SelectionMode.CORNERS ? SelectionMode.BOTH : (mode === SelectionMode.BOTH ? SelectionMode.DRAG : SelectionMode.CORNERS);
+    selectionModeSwitch.dataset.mode = newMode;
+    setSelectionMode(newMode);
+    if (gameState.pendingSelection && newMode === SelectionMode.DRAG) {
+        flashInvalidSelection(gameState.pendingSelection);
+        gameState.pendingSelection = null;
+    }
+    paintCellStates(gameState);
 }
