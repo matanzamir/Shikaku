@@ -84,15 +84,20 @@ export function setDifficulty(difficulty) {
     }
 }
 
+const PLAY_DATE_KEY = 'playDate';
+
 /** @type {string} local YYYY-MM-DD for the puzzle currently loaded */
-let playDateKey = toDateKey();
+let playDateKey = localStorage.getItem(PLAY_DATE_KEY) ?? toDateKey();
 
 /**
  * Bind score/clearance reads and writes to the active puzzle day (from `?date=` or today).
+ * Persists so an invalid URL edit can restore the previous day.
  * @param {string} dateKey YYYY-MM-DD
  */
 export function setPlayDateKey(dateKey) {
     playDateKey = dateKey;
+    localStorage.setItem(PLAY_DATE_KEY, dateKey);
+    document.getElementById('date').textContent = `${dateKey.split('-').slice(0, 3).reverse().join('/')}`;
 }
 
 /**
@@ -221,7 +226,7 @@ export function returnAsMinuteString(scoreSeconds) {
  * @param {number} scoreSeconds
  */
 function formatScoreText(difficultyName, scoreSeconds) {
-    return `You've completed the ${difficultyName} difficulty in ${returnAsMinuteString(scoreSeconds)}!`;
+    return `${difficultyName}\ncompleted in ${returnAsMinuteString(scoreSeconds)}`;
 }
 
 /**

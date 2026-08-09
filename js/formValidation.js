@@ -1,5 +1,6 @@
 import { toDateKey } from './rngCreator.js';
 import { Difficulty } from './difficulties.js';
+import { getDifficulty, getPlayDateKey } from './storage.js';
 
 /** Earliest local puzzle day (YYYY-MM-DD). */
 export const MIN_DATE_KEY = '2026-08-03';
@@ -138,8 +139,17 @@ function redirectToQuery(date, difficulty) {
 }
 
 /**
- * Parse URL query, correcting invalid values to today's Easy puzzle.
- * On invalid insertion: updates the address bar and flags `wasInvalid` for an alert.
+ * Previous play date + difficulty from storage (what the player was on before a bad URL edit).
+ * @returns {{ date: string, difficulty: string }}
+ */
+function getPreviousQuery() {
+    const previousDate = getPlayDateKey();
+    const date = isValidDateKey(previousDate) ? previousDate : toDateKey();
+    return { date, difficulty: getDifficulty().name };
+}
+
+/**
+ * Parse URL query. Invalid values restore the previous query instead of forcing today/Easy.
  * @returns {{ date: string, difficulty: string, wasInvalid: boolean }}
  */
 export function resolveQuery() {
@@ -147,8 +157,7 @@ export function resolveQuery() {
     const wasInvalid = hasInvalidQueryValues(urlParams);
 
     if (wasInvalid) {
-        const date = toDateKey();
-        const difficulty = Difficulty.EASY.name;
+        const { date, difficulty } = getPreviousQuery();
         redirectToQuery(date, difficulty);
         return { date, difficulty, wasInvalid: true };
     }

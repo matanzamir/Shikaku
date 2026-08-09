@@ -25,23 +25,23 @@
 }
 
 .rectangle.edge-top {
-    margin-top: 4px;
-    border-top: 2px solid var(--primary-color);
+    margin-top: var(--rect-edge-inset);
+    border-top: var(--rect-border-width) solid var(--primary-color);
 }
 
 .rectangle.edge-bottom {
-    margin-bottom: 4px;
-    border-bottom: 2px solid var(--primary-color);
+    margin-bottom: var(--rect-edge-inset);
+    border-bottom: var(--rect-border-width) solid var(--primary-color);
 }
 
 .rectangle.edge-left {
-    margin-left: 4px;
-    border-left: 2px solid var(--primary-color);
+    margin-left: var(--rect-edge-inset);
+    border-left: var(--rect-border-width) solid var(--primary-color);
 }
 
 .rectangle.edge-right {
-    margin-right: 4px;
-    border-right: 2px solid var(--primary-color);
+    margin-right: var(--rect-edge-inset);
+    border-right: var(--rect-border-width) solid var(--primary-color);
 }
 
 .rectangle.edge-top.edge-left {
@@ -101,8 +101,8 @@
 
 /* Pending first-corner selection: dashed outline + faint tint. */
 .selected {
-    margin: 4px;
-    border: 2px dashed var(--primary-color);
+    margin: var(--rect-edge-inset);
+    border: var(--rect-border-width) dashed var(--primary-color);
     border-radius: var(--grid-corner-radius);
     background-color: rgba(var(--primary-rgb), 0.12);
 }
