@@ -19,7 +19,7 @@
 - [x] Stage 4 — Drag-Select Input Engine
 - [x] Stage 5 — Mode Gating (corners / drag / both)
 - [x] Stage 6 — Live Drag Preview & Invalid Feedback
-- [ ] Stage 7 — Conflict Handling & Edge Cases
+- [x] Stage 7 — Conflict Handling & Edge Cases
 - [ ] Stage 8 — Polish, Accessibility & Manual QA
 
 ---
@@ -224,17 +224,17 @@ Shikaku/
 
 
 
-### ⬜ Stage 7 — Conflict Handling & Edge Cases
+### ✅ Stage 7 — Conflict Handling & Edge Cases
 
-- **Status:** ⏳ PENDING
+- **Status:** ✅ DONE
 - **Target Files:** `js/ui.js`, possibly `js/game.js` for pure helpers
 - **Goal:** Drag and corners share one placement policy so progress save, overlaps, and win detection stay correct.
 - **Tasks:**
-  - [ ] **7.1 Shared placement:** One function for “accept or reject candidate rectangle” used by both input styles (validated overlap rejection, non-validated overlap replacement, `setActiveRectangles`, win → timer pause + overlays).
-  - [ ] **7.2 Outside grid:** Drag leaving the board cancels or clamps (pick one; clamping to last valid cell is usually better UX).
-  - [ ] **7.3 Multi-pointer:** Ignore secondary fingers; only the capturing pointer owns the gesture.
-  - [ ] **7.4 Overlays:** While `#game-inactive-overlay` or win overlay is visible, selection inputs must not place rectangles.
-  - [ ] **7.5 Same-cell drag:** Down and up on the same cell without drag — either cancel, treat as delete/select depending on mode policy, but never place a 1×1 unless that is intentional for a clue of 1.
+  - [x] **7.1 Shared placement:** One function for “accept or reject candidate rectangle” used by both input styles (validated overlap rejection, non-validated overlap replacement, `setActiveRectangles`, win → timer pause + overlays).
+  - [x] **7.2 Outside grid:** Drag leaving the board cancels or clamps (pick one; clamping to last valid cell is usually better UX).
+  - [x] **7.3 Multi-pointer:** Ignore secondary fingers; only the capturing pointer owns the gesture.
+  - [x] **7.4 Overlays:** While `#game-inactive-overlay` or win overlay is visible, selection inputs must not place rectangles.
+  - [x] **7.5 Same-cell drag:** Down and up on the same cell without drag — either cancel, treat as delete/select depending on mode policy, but never place a 1×1 unless that is intentional for a clue of 1.
 
 **Tools you will use**
 

@@ -749,6 +749,8 @@ function updateDragFromEvent(event, drag) {
 export function handlePointerDown(event, gameState) {
     if (!selectionAllowsDrag()) return;
     if (event.button !== 0) return;
+    // Only the first/capturing pointer owns the gesture (ignore secondary fingers).
+    if (activeDrag) return;
 
     const cell =
         event.target.closest?.('.grid-cell') ??
