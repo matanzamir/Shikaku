@@ -17,8 +17,8 @@
 - [x] Stage 2 — Three-Option Switch UI (below light/dark)
 - [x] Stage 3 — Wire Switch to Preference Storage
 - [x] Stage 4 — Drag-Select Input Engine
-- [ ] Stage 5 — Mode Gating (corners / drag / both)
-- [ ] Stage 6 — Live Drag Preview & Invalid Feedback
+- [x] Stage 5 — Mode Gating (corners / drag / both)
+- [x] Stage 6 — Live Drag Preview & Invalid Feedback
 - [ ] Stage 7 — Conflict Handling & Edge Cases
 - [ ] Stage 8 — Polish, Accessibility & Manual QA
 
@@ -175,16 +175,16 @@ Shikaku/
 
 
 
-### ⬜ Stage 5 — Mode Gating (corners / drag / both)
+### ✅ Stage 5 — Mode Gating (corners / drag / both)
 
-- **Status:** ⏳ PENDING
+- **Status:** ✅ DONE
 - **Target Files:** `js/ui.js`, `js/eventListeners.js` if listeners are split by mode
 - **Goal:** Only enable the input methods required by the current preference.
 - **Tasks:**
-  - [ ] **5.1 Corners-only:** Keep click / tap corner flow; do not start a drag commit (ignore short pointer moves as click if needed).
-  - [ ] **5.2 Drag-only:** Disable pending two-tap corner selection; ensure clicks do not leave a stuck `pendingSelection` unless you intentionally map click-to-cancel.
-  - [ ] **5.3 Both:** Allow corner taps and drag commits; define the disambiguation rule (e.g. movement past a small threshold = drag; otherwise treat as corner click).
-  - [ ] **5.4 Live rebinding:** When mode changes, re-read preference inside handlers (or re-attach listeners) so the next interaction follows the new mode without reload.
+  - [x] **5.1 Corners-only:** Keep click / tap corner flow; do not start a drag commit (ignore short pointer moves as click if needed).
+  - [x] **5.2 Drag-only:** Disable pending two-tap corner selection; ensure clicks do not leave a stuck `pendingSelection` unless you intentionally map click-to-cancel.
+  - [x] **5.3 Both:** Allow corner taps and drag commits; define the disambiguation rule (e.g. movement past a small threshold = drag; otherwise treat as corner click).
+  - [x] **5.4 Live rebinding:** When mode changes, re-read preference inside handlers (or re-attach listeners) so the next interaction follows the new mode without reload.
 
 **Tools you will use**
 
@@ -200,15 +200,15 @@ Shikaku/
 
 
 
-### ⬜ Stage 6 — Live Drag Preview & Invalid Feedback
+### ✅ Stage 6 — Live Drag Preview & Invalid Feedback
 
-- **Status:** ⏳ PENDING
+- **Status:** ✅ DONE
 - **Target Files:** `js/ui.js`, `css/gameStates.css`, `js/cellClasses.js` if new classes are needed
 - **Goal:** While dragging, show the provisional rectangle; on invalid commit (e.g. colliding with a validated region), flash feedback and do not leave a bad preview stuck on the board.
 - **Tasks:**
-  - [ ] **6.1 Preview state:** Track `dragOrigin` + `dragCurrent` (or a preview rect) and extend `paintCellStates` (or a sibling painter) to highlight the preview region.
-  - [ ] **6.2 Invalid flash:** Reuse or extend `flashInvalidSelection` / `.invalid` animation for drag failures.
-  - [ ] **6.3 Cleanup:** On `pointercancel`, blur, pause overlay open, or mode change, clear preview + capture.
+  - [x] **6.1 Preview state:** Track `dragOrigin` + `dragCurrent` (or a preview rect) and extend `paintCellStates` (or a sibling painter) to highlight the preview region.
+  - [x] **6.2 Invalid feedback:** Live overlay `blocked` / `valid` / `outline` states; invalid commit rejects without flash (intentional — no commit-time flash).
+  - [x] **6.3 Cleanup:** On `pointercancel` / mode change / drag end, clear preview + capture via `clearActiveDrag` (does not pause the game).
 
 **Tools you will use**
 

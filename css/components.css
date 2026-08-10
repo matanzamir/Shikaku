@@ -55,6 +55,13 @@
     background-color: rgba(var(--primary-rgb), 0.1);
     opacity: 0;
     transform: translate(0, 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--cell-font-size);
+    font-weight: 600;
+    color: var(--primary-deep-color);
+    line-height: 1;
     /* Geometry eases only while the band is shown; hide is forced instant in JS
        so a filled/"valid" preview never fades to dark over the board. */
     transition:
@@ -74,11 +81,13 @@
     /* Tint only — keep semi-transparent so clue numbers stay readable. */
     background-color: rgba(var(--primary-rgb), 0.7);
     border-color: var(--primary-deep-color);
+    color: var(--on-primary-color);
 }
 
 #drag-preview[data-state="blocked"] {
     background-color: rgba(200, 50, 70, 0.16);
     border-color: rgb(200, 50, 70);
+    color: rgb(160, 40, 55);
 }
 
 #drag-preview[data-state="outline"] {

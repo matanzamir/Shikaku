@@ -289,6 +289,7 @@ function syncDragPreviewOverlay(preview, blocked, valid) {
 
     overlay.hidden = false;
     overlay.dataset.state = state;
+    overlay.textContent = String(preview.width * preview.height);
     overlay.style.width = `${width}px`;
     overlay.style.height = `${height}px`;
     overlay.style.transform = `translate(${left}px, ${top}px)`;
@@ -313,6 +314,7 @@ function hideDragPreviewOverlay(overlay = document.getElementById('drag-preview'
     overlay.classList.remove('is-visible');
     overlay.hidden = true;
     overlay.removeAttribute('data-state');
+    overlay.textContent = '';
     void overlay.offsetWidth;
     overlay.style.transition = '';
 }
