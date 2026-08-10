@@ -16,7 +16,7 @@
 - [x] Stage 1 — Preference Model & Persistence
 - [x] Stage 2 — Three-Option Switch UI (below light/dark)
 - [x] Stage 3 — Wire Switch to Preference Storage
-- [ ] Stage 4 — Drag-Select Input Engine
+- [x] Stage 4 — Drag-Select Input Engine
 - [ ] Stage 5 — Mode Gating (corners / drag / both)
 - [ ] Stage 6 — Live Drag Preview & Invalid Feedback
 - [ ] Stage 7 — Conflict Handling & Edge Cases
@@ -146,17 +146,19 @@ Shikaku/
 
 
 
-### ⬜ Stage 4 — Drag-Select Input Engine
+### ✅ Stage 4 — Drag-Select Input Engine
 
-- **Status:** ⏳ PENDING
+- **Status:** ✅ COMPLETED
 - **Target Files:** `js/ui.js` (primary), possibly a small helper extract if `addGridEventListener` grows too large
 - **Goal:** Support “pointer down → move → up” rectangle selection on the grid, reusing `buildRectangle`, validation, overlap removal, paint, and win checks.
 - **Tasks:**
-  - [ ] **4.1 Pointer lifecycle:** On the grid (or cells), handle `pointerdown` (capture start cell + `setPointerCapture` if useful), `pointermove` (resolve cell under pointer), `pointerup` / `pointercancel` (commit or cancel).
-  - [ ] **4.2 Hit testing:** Map client coordinates to a `.grid-cell` via `elementFromPoint` or cell rect math so dragging across cells still resolves `row`/`col`.
-  - [ ] **4.3 Commit path:** On successful release with start ≠ cancelled, build the rectangle and share one internal `placeRectangle(start, end)` used also by corners (refactor of the second-corner branch in `handleCellClick` is ideal).
-  - [ ] **4.4 Delete existing rect:** Decide drag-on-existing behavior (recommended: pointer down on a rectangle without meaningful drag removes it, mirroring first-tap erase in corners mode—document the choice when implementing).
-  - [ ] **4.5 Scrolling / page gestures:** With `user-select: none` already set, still prevent accidental page pan on touch if needed (`touch-action: none` on `#game-grid` during active drag).
+  - [x] **4.1 Pointer lifecycle:** On the grid (or cells), handle `pointerdown` (capture start cell + `setPointerCapture` if useful), `pointermove` (resolve cell under pointer), `pointerup` / `pointercancel` (commit or cancel).
+  - [x] **4.2 Hit testing:** Map client coordinates to a `.grid-cell` via `elementFromPoint` or cell rect math so dragging across cells still resolves `row`/`col`.
+  - [x] **4.3 Commit path:** On successful release with start ≠ cancelled, build the rectangle and share one internal `placeRectangle(start, end)` used also by corners (refactor of the second-corner branch in `handleCellClick` is ideal).
+  - [x] **4.4 Delete existing rect:** Decide drag-on-existing behavior (recommended: pointer down on a rectangle without meaningful drag removes it, mirroring first-tap erase in corners mode—document the choice when implementing).
+  - [x] **4.5 Scrolling / page gestures:** With `user-select: none` already set, still prevent accidental page pan on touch if needed (`touch-action: none` on `#game-grid` during active drag).
+
+**4.4 policy (implemented):** In drag-only mode, a press that never leaves the start cell (below drag threshold) removes the rectangle under that cell if any; it never places a 1×1. In both mode, the same tap is left to the click / corners path.
 
 **Tools you will use**
 

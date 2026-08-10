@@ -7,7 +7,8 @@ import {
     addInstructionsButtonEventListener,
     addGameInactiveOverlayEventListener,
     addGameWonOverlayEventListener,
-    addSelectionModeSwitchEventListener } from './eventListeners.js';
+    addSelectionModeSwitchEventListener,
+} from './eventListeners.js';
 import { updateBodyTheme, createGameGrid, paintCellStates, setDifficultySelectOptions } from './ui.js';
 import { getTheme, 
         getActiveRectangles, 

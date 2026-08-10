@@ -21,7 +21,6 @@
     border: none;
     background-color: var(--cell-background-color);
     color: var(--surface-text-color);
-    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .rectangle.edge-top {
@@ -58,6 +57,23 @@
 
 .rectangle.edge-bottom.edge-right {
     border-bottom-right-radius: var(--grid-corner-radius);
+}
+
+/* Soft settle when a rectangle is committed onto the board.
+   Keep cells fully opaque — semi-transparency reveals the page gradient
+   (reads as a black/dark flash), especially on remove / re-paint. */
+@keyframes rect-appear {
+    0% {
+        transform: scale(0.96);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.rect-appear {
+    animation: rect-appear 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+    z-index: 1;
 }
 
 @keyframes flash-invalid {
@@ -106,3 +122,27 @@
     border-radius: var(--grid-corner-radius);
     background-color: rgba(var(--primary-rgb), 0.12);
 }
+
+/* Legacy cell-level drag preview blocked look (overlay is primary now). */
+.rectangle.preview-blocked {
+    background-color: rgba(200, 50, 70, 0.12);
+    color: var(--surface-text-color);
+}
+
+.rectangle.preview-blocked.edge-top {
+    border-top-color: rgb(200, 50, 70);
+}
+
+.rectangle.preview-blocked.edge-bottom {
+    border-bottom-color: rgb(200, 50, 70);
+}
+
+.rectangle.preview-blocked.edge-left {
+    border-left-color: rgb(200, 50, 70);
+}
+
+.rectangle.preview-blocked.edge-right {
+    border-right-color: rgb(200, 50, 70);
+}
+
+

@@ -19,7 +19,9 @@ import {
     setScoreText,
     showStoredScore,
     getPlayDateKey,
-    setSelectionMode } from './storage.js';
+    setSelectionMode,
+    getSelectionMode,
+} from './storage.js';
 import { Difficulty } from './difficulties.js';
 import { Message } from './messages.js';
 import { generatePuzzle } from './puzzleGenerator.js';
@@ -28,10 +30,35 @@ import { generatePuzzle } from './puzzleGenerator.js';
  * @typedef {import('./game.js').Puzzle} Puzzle
  * @typedef {import('./game.js').GameState} GameState
  * @typedef {import('./game.js').Clue} Clue
+ * @typedef {import('./game.js').Rectangle} Rectangle
+ * @typedef {{ row: number, col: number }} CellPos
+ * @typedef {{
+ *   origin: CellPos,
+ *   current: CellPos,
+ *   pointerId: number,
+ *   didDrag: boolean,
+ *   startClientX: number,
+ *   startClientY: number,
+ * }} ActiveDrag
  */
+
+/** Pixel movement before a press counts as a drag (not a corner tap). */
+const DRAG_THRESHOLD_PX = 8;
 
 /** @type {AbortController | null} */
 let gridListenersAbort = null;
+
+/** @type {ActiveDrag | null} */
+let activeDrag = null;
+
+/** @type {Clue[] | null} */
+let activePuzzleClues = null;
+
+/** After a completed drag commit, ignore the synthetic click that follows. */
+let suppressClickAfterDrag = false;
+
+/** Whether the drag rubber-band is currently shown (for first-frame jump skip). */
+let dragPreviewVisible = false;
 
 /**
  * @param {Puzzle} puzzle
@@ -41,6 +68,7 @@ export function createGameGrid(puzzle, gameState) {
     const gameGrid = document.getElementById('game-grid');
 
     gameGrid.innerHTML = '';
+    activePuzzleClues = puzzle.clues;
 
     /* On :root so density tokens (--cell-size, chrome compress, etc.) recompute with the board. */
     document.documentElement.style.setProperty('--grid-size', String(puzzle.rows));
@@ -73,11 +101,17 @@ function bindGridListeners(gameGrid, gameState, puzzle) {
     gridListenersAbort?.abort();
     gridListenersAbort = new AbortController();
     const { signal } = gridListenersAbort;
+    clearActiveDrag();
 
     gameGrid.addEventListener(
         'click',
         (event) => {
-            const cell = event.target.closest('.grid-cell');
+            if (suppressClickAfterDrag) return;
+            if (!selectionAllowsCorners()) return;
+            // After pointer capture, click target is often #game-grid — resolve by point.
+            const cell =
+                event.target.closest?.('.grid-cell') ??
+                cellFromPoint(event.clientX, event.clientY);
             if (!cell) return;
             handleCellClick(cell, gameState, puzzle);
         },
@@ -91,6 +125,38 @@ function bindGridListeners(gameGrid, gameState, puzzle) {
         },
         { signal }
     );
+
+    gameGrid.addEventListener(
+        'pointerdown',
+        (event) => {
+            handlePointerDown(event, gameState);
+        },
+        { signal }
+    );
+
+    gameGrid.addEventListener(
+        'pointermove',
+        (event) => {
+            handlePointerMove(event, gameState);
+        },
+        { signal }
+    );
+
+    gameGrid.addEventListener(
+        'pointerup',
+        (event) => {
+            handlePointerUp(event, gameState, puzzle);
+        },
+        { signal }
+    );
+
+    gameGrid.addEventListener(
+        'pointercancel',
+        (event) => {
+            handlePointerCancel(event, gameState);
+        },
+        { signal }
+    );
 }
 
 /**
@@ -99,6 +165,7 @@ function bindGridListeners(gameGrid, gameState, puzzle) {
 function resetBoard(gameState) {
     gameState.rectangles = [];
     gameState.pendingSelection = null;
+    clearActiveDrag();
     clearActiveRectangles();
     hideWinOverlay();
     document.getElementById('game-won-overlay').hidden = true;
@@ -107,6 +174,7 @@ function resetBoard(gameState) {
 
 /**
  * Syncs .selected / .rectangle / .validated classes from gameState.
+ * Live drag uses a separate eased overlay (#drag-preview).
  * @param {GameState} gameState
  */
 export function paintCellStates(gameState) {
@@ -132,24 +200,144 @@ export function paintCellStates(gameState) {
     }
 
     const pending = gameState.pendingSelection;
+    const preview =
+        activeDrag !== null && activeDrag.didDrag
+            ? buildRectangle(activeDrag.origin, activeDrag.current)
+            : null;
+
+    let previewBlocked = false;
+    let previewValid = false;
+    if (preview) {
+        previewBlocked = gameState.rectangles.some(
+            (rect) => rect.validated && rectanglesOverlap(preview, rect)
+        );
+        previewValid =
+            !previewBlocked &&
+            activePuzzleClues !== null &&
+            validateRectangle(preview, activePuzzleClues);
+    }
+
+    syncDragPreviewOverlay(preview, previewBlocked, previewValid);
 
     cells.forEach((cell) => {
         const row = Number(cell.dataset.row);
         const col = Number(cell.dataset.col);
         const key = `${row},${col}`;
-        const info = cellInfo.get(key);
+        const visual = cellInfo.get(key);
+        const isPendingCorner =
+            pending !== null && pending.row === row && pending.col === col;
 
-        cell.classList.toggle(CellClass.RECTANGLE, Boolean(info));
-        cell.classList.toggle(CellClass.VALIDATED, Boolean(info?.validated));
-        cell.classList.toggle(CellClass.EDGE_TOP, Boolean(info?.edgeTop));
-        cell.classList.toggle(CellClass.EDGE_BOTTOM, Boolean(info?.edgeBottom));
-        cell.classList.toggle(CellClass.EDGE_LEFT, Boolean(info?.edgeLeft));
-        cell.classList.toggle(CellClass.EDGE_RIGHT, Boolean(info?.edgeRight));
-        cell.classList.toggle(
-            CellClass.SELECTED,
-            pending !== null && pending.row === row && pending.col === col
-        );
+        cell.classList.toggle(CellClass.RECTANGLE, Boolean(visual));
+        cell.classList.toggle(CellClass.VALIDATED, Boolean(visual?.validated));
+        cell.classList.toggle(CellClass.EDGE_TOP, Boolean(visual?.edgeTop));
+        cell.classList.toggle(CellClass.EDGE_BOTTOM, Boolean(visual?.edgeBottom));
+        cell.classList.toggle(CellClass.EDGE_LEFT, Boolean(visual?.edgeLeft));
+        cell.classList.toggle(CellClass.EDGE_RIGHT, Boolean(visual?.edgeRight));
+        cell.classList.toggle(CellClass.PREVIEW_BLOCKED, false);
+        cell.classList.toggle(CellClass.SELECTED, isPendingCorner);
     });
+}
+
+/**
+ * Positions the live-drag rubber-band over the candidate rectangle.
+ * Geometry eases via CSS so resizing does not jump cell-by-cell.
+ * @param {import('./game.js').Rectangle | null} preview
+ * @param {boolean} blocked
+ * @param {boolean} valid
+ */
+function syncDragPreviewOverlay(preview, blocked, valid) {
+    const overlay = document.getElementById('drag-preview');
+    const block = document.getElementById('game-block');
+    if (!overlay || !block) return;
+
+    if (!preview) {
+        hideDragPreviewOverlay(overlay);
+        return;
+    }
+
+    const topLeft = document.querySelector(
+        `#game-grid .grid-cell[data-row="${preview.row}"][data-col="${preview.col}"]`
+    );
+    const bottomRight = document.querySelector(
+        `#game-grid .grid-cell[data-row="${preview.row + preview.height - 1}"][data-col="${preview.col + preview.width - 1}"]`
+    );
+    if (!topLeft || !bottomRight) {
+        hideDragPreviewOverlay(overlay);
+        return;
+    }
+
+    // Absolute coords are relative to #game-block's padding box.
+    const blockRect = block.getBoundingClientRect();
+    const blockStyle = getComputedStyle(block);
+    const originX = blockRect.left + (parseFloat(blockStyle.borderLeftWidth) || 0);
+    const originY = blockRect.top + (parseFloat(blockStyle.borderTopWidth) || 0);
+
+    const a = topLeft.getBoundingClientRect();
+    const b = bottomRight.getBoundingClientRect();
+    const left = a.left - originX;
+    const top = a.top - originY;
+    const width = b.right - a.left;
+    const height = b.bottom - a.top;
+
+    const state = blocked ? 'blocked' : valid ? 'valid' : 'outline';
+    const wasHidden = !dragPreviewVisible;
+
+    if (wasHidden) {
+        // Jump to starting size with no transition so the first frame does not ease from 0×0.
+        overlay.style.transition = 'none';
+    }
+
+    overlay.hidden = false;
+    overlay.dataset.state = state;
+    overlay.style.width = `${width}px`;
+    overlay.style.height = `${height}px`;
+    overlay.style.transform = `translate(${left}px, ${top}px)`;
+    overlay.classList.add('is-visible');
+
+    if (wasHidden) {
+        void overlay.offsetWidth;
+        overlay.style.transition = '';
+    }
+
+    dragPreviewVisible = true;
+}
+
+/**
+ * @param {HTMLElement | null} [overlay]
+ */
+function hideDragPreviewOverlay(overlay = document.getElementById('drag-preview')) {
+    dragPreviewVisible = false;
+    if (!overlay) return;
+    // Instant hide: a valid (filled) band must not fade dark over the board.
+    overlay.style.transition = 'none';
+    overlay.classList.remove('is-visible');
+    overlay.hidden = true;
+    overlay.removeAttribute('data-state');
+    void overlay.offsetWidth;
+    overlay.style.transition = '';
+}
+
+/**
+ * Soft ease-in on cells when a rectangle is first committed.
+ * @param {import('./game.js').Rectangle} rect
+ */
+function animateRectangleAppear(rect) {
+    for (let r = rect.row; r < rect.row + rect.height; r++) {
+        for (let c = rect.col; c < rect.col + rect.width; c++) {
+            const cell = document.querySelector(
+                `#game-grid .grid-cell[data-row="${r}"][data-col="${c}"]`
+            );
+            if (!cell) continue;
+            cell.classList.remove('rect-appear');
+            void cell.offsetWidth;
+            cell.classList.add('rect-appear');
+            cell.addEventListener(
+                'animationend',
+                () => cell.classList.remove('rect-appear'),
+                { once: true }
+            );
+        }
+    }
 }
 
 /**
@@ -160,7 +348,6 @@ export function paintCellStates(gameState) {
 function handleCellClick(cell, gameState, puzzle) {
     const row = Number(cell.dataset.row);
     const col = Number(cell.dataset.col);
-    const clues = puzzle.clues;
     const pending = gameState.pendingSelection;
 
     // Re-click pending corner → cancel selection
@@ -176,41 +363,16 @@ function handleCellClick(cell, gameState, puzzle) {
 
         if (rectangleClicked) {
             gameState.rectangles = gameState.rectangles.filter((rect) => rect !== rectangleClicked);
+            commitBoardChange(gameState, puzzle);
         } else {
             gameState.pendingSelection = { row, col };
+            paintCellStates(gameState);
         }
-    } else {
-        // Second corner
-        const candidate = buildRectangle(pending, { row, col });
-        const overlapping = gameState.rectangles.filter((rect) =>
-            rectanglesOverlap(candidate, rect)
-        );
-
-        // Reject if the new region touches any validated (locked) rectangle
-        if (overlapping.some((rect) => rect.validated)) {
-            flashInvalidSelection(pending);
-            return;
-        }
-
-        // Remove overlapping invalid rectangles, then place the candidate
-        gameState.rectangles = gameState.rectangles.filter(
-            (rect) => !overlapping.includes(rect)
-        );
-
-        candidate.validated = validateRectangle(candidate, clues);
-        gameState.rectangles.push(candidate);
-        gameState.pendingSelection = null;
+        return;
     }
-    setActiveRectangles(gameState.rectangles);
-    paintCellStates(gameState);
-    if (validatePuzzle(gameState.rectangles, puzzle.rows * puzzle.cols)) {
-        pauseTimer();
-        document.getElementById('game-inactive-overlay').hidden = true;
-        clearActiveRectangles();
-        showWinOverlay();
-        document.getElementById('game-won-overlay').hidden = false;
-        setScoreText(getElapsedMs() / 1000);
-    }
+
+    // Second corner → shared placement
+    placeRectangle(pending, { row, col }, gameState, puzzle);
 }
 
 /**
@@ -267,23 +429,136 @@ export function updateBodyTheme(theme, button) {
 }
 
 /**
- * Briefly flash the pending corner red to signal an invalid second pick.
- * @param {{ row: number, col: number }} pending
+ * Briefly flash cells red to signal an invalid pick / drag commit.
+ * @param {{ row: number, col: number, width?: number, height?: number }} region
+ */
+function flashInvalidRegion(region) {
+    const width = region.width ?? 1;
+    const height = region.height ?? 1;
+
+    for (let r = region.row; r < region.row + height; r++) {
+        for (let c = region.col; c < region.col + width; c++) {
+            const cell = document.querySelector(
+                `#game-grid .grid-cell[data-row="${r}"][data-col="${c}"]`
+            );
+            if (!cell) continue;
+
+            cell.classList.remove(CellClass.INVALID);
+            void cell.offsetWidth;
+            cell.classList.add(CellClass.INVALID);
+            cell.addEventListener(
+                'animationend',
+                () => cell.classList.remove(CellClass.INVALID),
+                { once: true }
+            );
+        }
+    }
+}
+
+/**
+ * @param {CellPos} pending
  */
 function flashInvalidSelection(pending) {
-    const cell = document.querySelector(
-        `#game-grid .grid-cell[data-row="${pending.row}"][data-col="${pending.col}"]`
-    );
-    if (!cell) return;
+    flashInvalidRegion(pending);
+}
 
-    cell.classList.remove(CellClass.INVALID);
-    void cell.offsetWidth;
-    cell.classList.add(CellClass.INVALID);
-    cell.addEventListener(
-        'animationend',
-        () => cell.classList.remove(CellClass.INVALID),
-        { once: true }
+/**
+ * Shared place path for corners second-click and drag-commit.
+ * @param {CellPos} start
+ * @param {CellPos} end
+ * @param {GameState} gameState
+ * @param {Puzzle} puzzle
+ * @returns {boolean}
+ */
+function placeRectangle(start, end, gameState, puzzle) {
+    const candidate = buildRectangle(start, end);
+    const overlapping = gameState.rectangles.filter((rect) =>
+        rectanglesOverlap(candidate, rect)
     );
+
+    if (overlapping.some((rect) => rect.validated)) {
+        // Reject silently — preview state already signals conflict while dragging.
+        paintCellStates(gameState);
+        return false;
+    }
+
+    gameState.rectangles = gameState.rectangles.filter(
+        (rect) => !overlapping.includes(rect)
+    );
+
+    candidate.validated = validateRectangle(candidate, puzzle.clues);
+    gameState.rectangles.push(candidate);
+    gameState.pendingSelection = null;
+    commitBoardChange(gameState, puzzle);
+    animateRectangleAppear(candidate);
+    return true;
+}
+
+/**
+ * @param {GameState} gameState
+ * @param {Puzzle} puzzle
+ */
+function commitBoardChange(gameState, puzzle) {
+    setActiveRectangles(gameState.rectangles);
+    paintCellStates(gameState);
+    if (validatePuzzle(gameState.rectangles, puzzle.rows * puzzle.cols)) {
+        pauseTimer();
+        document.getElementById('game-inactive-overlay').hidden = true;
+        clearActiveRectangles();
+        showWinOverlay();
+        document.getElementById('game-won-overlay').hidden = false;
+        setScoreText(getElapsedMs() / 1000);
+    }
+}
+
+/**
+ * @returns {string}
+ */
+function currentSelectionMode() {
+    const el = document.getElementById('selection-mode-switch');
+    return el?.dataset.mode || getSelectionMode();
+}
+
+/**
+ * @returns {boolean}
+ */
+function selectionAllowsCorners() {
+    const mode = currentSelectionMode();
+    return mode === SelectionMode.CORNERS || mode === SelectionMode.BOTH;
+}
+
+/**
+ * @returns {boolean}
+ */
+function selectionAllowsDrag() {
+    const mode = currentSelectionMode();
+    return mode === SelectionMode.DRAG || mode === SelectionMode.BOTH;
+}
+
+/**
+ * @param {number} clientX
+ * @param {number} clientY
+ * @returns {HTMLElement | null}
+ */
+function cellFromPoint(clientX, clientY) {
+    const el = document.elementFromPoint(clientX, clientY);
+    return el?.closest?.('.grid-cell') ?? null;
+}
+
+/**
+ * @param {HTMLElement} cell
+ * @returns {CellPos}
+ */
+function coordsFromCell(cell) {
+    return {
+        row: Number(cell.dataset.row),
+        col: Number(cell.dataset.col),
+    };
+}
+
+function clearActiveDrag() {
+    activeDrag = null;
+    hideDragPreviewOverlay();
 }
 
 export async function handleDifficultyChange(difficultyName, gameState) {
@@ -416,12 +691,162 @@ export function handleGameWonOverlayClick(gameState) {
 
 export function handleSelectionModeSwitchClick(selectionModeSwitch, gameState) {
     const mode = selectionModeSwitch.dataset.mode;
-    const newMode = mode === SelectionMode.CORNERS ? SelectionMode.BOTH : (mode === SelectionMode.BOTH ? SelectionMode.DRAG : SelectionMode.CORNERS);
+    const newMode =
+        mode === SelectionMode.CORNERS
+            ? SelectionMode.BOTH
+            : mode === SelectionMode.BOTH
+              ? SelectionMode.DRAG
+              : SelectionMode.CORNERS;
     selectionModeSwitch.dataset.mode = newMode;
     setSelectionMode(newMode);
+    clearActiveDrag();
     if (gameState.pendingSelection && newMode === SelectionMode.DRAG) {
         flashInvalidSelection(gameState.pendingSelection);
         gameState.pendingSelection = null;
     }
     paintCellStates(gameState);
 }
+
+/**
+ * @param {PointerEvent} event
+ * @param {ActiveDrag} drag
+ * @returns {boolean} true if this event crossed the drag threshold
+ */
+function updateDragFromEvent(event, drag) {
+    const dx = event.clientX - drag.startClientX;
+    const dy = event.clientY - drag.startClientY;
+    if (Math.hypot(dx, dy) >= DRAG_THRESHOLD_PX) {
+        drag.didDrag = true;
+    }
+
+    const cell = cellFromPoint(event.clientX, event.clientY);
+    if (!cell) return drag.didDrag;
+
+    const coords = coordsFromCell(cell);
+    if (
+        coords.row !== drag.origin.row ||
+        coords.col !== drag.origin.col
+    ) {
+        drag.didDrag = true;
+    }
+
+    if (
+        coords.row !== drag.current.row ||
+        coords.col !== drag.current.col
+    ) {
+        drag.current = coords;
+    }
+
+    return drag.didDrag;
+}
+
+/**
+ * @param {PointerEvent} event
+ * @param {GameState} gameState
+ */
+export function handlePointerDown(event, gameState) {
+    if (!selectionAllowsDrag()) return;
+    if (event.button !== 0) return;
+
+    const cell =
+        event.target.closest?.('.grid-cell') ??
+        cellFromPoint(event.clientX, event.clientY);
+    if (!cell) return;
+
+    const coords = coordsFromCell(cell);
+    activeDrag = {
+        origin: coords,
+        current: coords,
+        pointerId: event.pointerId,
+        didDrag: false,
+        startClientX: event.clientX,
+        startClientY: event.clientY,
+    };
+
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    // No paint until the pointer actually moves — avoid 1×1 tap flash.
+}
+
+/**
+ * @param {PointerEvent} event
+ * @param {GameState} gameState
+ */
+export function handlePointerMove(event, gameState) {
+    if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+
+    const wasDragging = activeDrag.didDrag;
+    const prevRow = activeDrag.current.row;
+    const prevCol = activeDrag.current.col;
+    updateDragFromEvent(event, activeDrag);
+
+    if (
+        !activeDrag.didDrag ||
+        (wasDragging &&
+            activeDrag.current.row === prevRow &&
+            activeDrag.current.col === prevCol)
+    ) {
+        return;
+    }
+
+    paintCellStates(gameState);
+}
+
+/**
+ * @param {PointerEvent} event
+ * @param {GameState} gameState
+ * @param {Puzzle} puzzle
+ */
+export function handlePointerUp(event, gameState, puzzle) {
+    if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+
+    updateDragFromEvent(event, activeDrag);
+
+    const { origin, current, didDrag } = activeDrag;
+    clearActiveDrag();
+
+    if (event.currentTarget?.hasPointerCapture?.(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    // In both / corners-capable modes, leave tap / delete / first-corner to click.
+    if (!didDrag && selectionAllowsCorners()) {
+        paintCellStates(gameState);
+        return;
+    }
+
+    // Drag-only tap: remove existing rectangle, never place a 1×1.
+    if (!didDrag) {
+        const rectangleClicked = findRectangleAt(origin, gameState.rectangles);
+        if (rectangleClicked) {
+            gameState.rectangles = gameState.rectangles.filter(
+                (rect) => rect !== rectangleClicked
+            );
+            commitBoardChange(gameState, puzzle);
+        } else {
+            paintCellStates(gameState);
+        }
+        return;
+    }
+
+    // Real drag: commit through the shared placement path.
+    // Swallow the synthetic click that follows a drag, then clear the flag.
+    suppressClickAfterDrag = true;
+    placeRectangle(origin, current, gameState, puzzle);
+    setTimeout(() => {
+        suppressClickAfterDrag = false;
+    }, 50);
+}
+
+/**
+ * @param {PointerEvent} event
+ * @param {GameState} gameState
+ */
+export function handlePointerCancel(event, gameState) {
+    if (!activeDrag || event.pointerId !== activeDrag.pointerId) return;
+    clearActiveDrag();
+    if (event.currentTarget?.hasPointerCapture?.(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    paintCellStates(gameState);
+}
+
