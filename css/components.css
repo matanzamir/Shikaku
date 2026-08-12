@@ -39,8 +39,9 @@
     user-select: none;
 }
 
-/* Live drag selection rubber-band (eases between cells instead of snapping).
-   Sibling of #game-grid inside #game-block so it never joins the cell grid. */
+/* Live drag + place/remove band (eases between cells instead of snapping).
+   Sibling of #game-grid inside #game-block so it never joins the cell grid.
+   Fills stay fully opaque so hairline grid never reads through the band. */
 #drag-preview {
     position: absolute;
     left: 0;
@@ -52,9 +53,10 @@
     z-index: 2;
     border-radius: var(--grid-corner-radius);
     border: var(--rect-border-width) solid var(--primary-color);
-    background-color: rgba(var(--primary-rgb), 0.1);
+    background-color: var(--cell-background-color);
     opacity: 0;
-    transform: translate(0, 0);
+    transform: translate(0, 0) scale(1);
+    transform-origin: center center;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -63,7 +65,7 @@
     color: var(--primary-deep-color);
     line-height: 1;
     /* Geometry eases only while the band is shown; hide is forced instant in JS
-       so a filled/"valid" preview never fades to dark over the board. */
+       so a filled/"valid" preview never fades dark over the board. */
     transition:
         transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
         width 0.2s cubic-bezier(0.22, 1, 0.36, 1),
@@ -74,24 +76,23 @@
 }
 
 #drag-preview.is-visible {
-    opacity: 1;
+    opacity: 0.67;
 }
 
 #drag-preview[data-state="valid"] {
-    /* Tint only — keep semi-transparent so clue numbers stay readable. */
-    background-color: rgba(var(--primary-rgb), 0.7);
+    background-color: var(--primary-color);
     border-color: var(--primary-deep-color);
     color: var(--on-primary-color);
 }
 
 #drag-preview[data-state="blocked"] {
-    background-color: rgba(200, 50, 70, 0.16);
+    background-color: color-mix(in srgb, rgb(200, 50, 70) 18%, var(--cell-background-color));
     border-color: rgb(200, 50, 70);
     color: rgb(160, 40, 55);
 }
 
 #drag-preview[data-state="outline"] {
-    background-color: rgba(var(--primary-rgb), 0.1);
+    background-color: var(--cell-background-color);
     border-color: var(--primary-color);
 }
 
@@ -107,11 +108,9 @@
     font-size: var(--cell-font-size);
     line-height: 1;
     color: var(--surface-text-color);
-    /* Only ease fill/text — margin/border geometry must snap so the dark
-       page backdrop never shows through shrinking cell gaps. */
-    transition:
-        background-color 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-        color 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    /* Fill/text and geometry all snap. Smooth place/remove lives on
+       #drag-preview (rectangle-level) so per-cell scale never opens
+       gaps that flash the hairline grid. */
 }
 
 .grid-cell--corner-tl {

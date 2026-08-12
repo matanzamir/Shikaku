@@ -26,7 +26,7 @@ function mostlySameRatio(rectangles, size) {
 function mostlySameDirection (rectangles, size) {
     const cols = rectangles.filter(r => r.height > r.width && r.height / r.width >= 2);
     const rows = rectangles.filter(r => r.width > r.height && r.width / r.height >= 2);
-    return cols.length / rectangles.length > 0.85 || rows.length / rectangles.length > 0.85;
+    return cols.length / rectangles.length > 0.6 || rows.length / rectangles.length > 0.6;
 }
 
 function dominoFlood(rectangles, size) {

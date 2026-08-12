@@ -61,12 +61,27 @@ let suppressClickAfterDrag = false;
 let dragPreviewVisible = false;
 
 /**
+ * When true, paintCellStates leaves #drag-preview alone so place/remove
+ * can hold a solid cover while cell classes swap underneath.
+ * @type {boolean}
+ */
+let dragPreviewLocked = false;
+
+/** @type {ReturnType<typeof setTimeout> | null} */
+let rectOverlayAnimTimer = null;
+
+/** Ease used for place/remove rectangle-level motion. */
+const RECT_OVERLAY_EASE = '0.22s cubic-bezier(0.22, 1, 0.36, 1)';
+
+/**
  * @param {Puzzle} puzzle
  * @param {GameState} gameState
  */
 export function createGameGrid(puzzle, gameState) {
     const gameGrid = document.getElementById('game-grid');
 
+    cancelRectOverlayAnim();
+    hideDragPreviewOverlay();
     gameGrid.innerHTML = '';
     activePuzzleClues = puzzle.clues;
 
@@ -166,6 +181,8 @@ function resetBoard(gameState) {
     gameState.rectangles = [];
     gameState.pendingSelection = null;
     clearActiveDrag();
+    cancelRectOverlayAnim();
+    hideDragPreviewOverlay();
     clearActiveRectangles();
     hideWinOverlay();
     document.getElementById('game-won-overlay').hidden = true;
@@ -217,8 +234,7 @@ export function paintCellStates(gameState) {
             validateRectangle(preview, activePuzzleClues);
     }
 
-    syncDragPreviewOverlay(preview, previewBlocked, previewValid);
-
+    // Paint cells first so a solid fill exists under the band before drag hide.
     cells.forEach((cell) => {
         const row = Number(cell.dataset.row);
         const col = Number(cell.dataset.col);
@@ -236,6 +252,169 @@ export function paintCellStates(gameState) {
         cell.classList.toggle(CellClass.PREVIEW_BLOCKED, false);
         cell.classList.toggle(CellClass.SELECTED, isPendingCorner);
     });
+
+    // Place/remove anim owns the overlay; leave it covering cells mid-swap.
+    if (!dragPreviewLocked) {
+        syncDragPreviewOverlay(preview, previewBlocked, previewValid);
+    }
+}
+
+/**
+ * @typedef {{ left: number, top: number, width: number, height: number }} OverlayBounds
+ */
+
+/**
+ * Absolute bounds of a rectangle relative to #game-block's padding box.
+ * @param {{ row: number, col: number, width: number, height: number }} rect
+ * @returns {OverlayBounds | null}
+ */
+function measureRectOverlayBounds(rect) {
+    const block = document.getElementById('game-block');
+    const topLeft = document.querySelector(
+        `#game-grid .grid-cell[data-row="${rect.row}"][data-col="${rect.col}"]`
+    );
+    const bottomRight = document.querySelector(
+        `#game-grid .grid-cell[data-row="${rect.row + rect.height - 1}"][data-col="${rect.col + rect.width - 1}"]`
+    );
+    if (!block || !topLeft || !bottomRight) return null;
+
+    const blockRect = block.getBoundingClientRect();
+    const blockStyle = getComputedStyle(block);
+    const originX = blockRect.left + (parseFloat(blockStyle.borderLeftWidth) || 0);
+    const originY = blockRect.top + (parseFloat(blockStyle.borderTopWidth) || 0);
+    const a = topLeft.getBoundingClientRect();
+    const b = bottomRight.getBoundingClientRect();
+
+    return {
+        left: a.left - originX,
+        top: a.top - originY,
+        width: b.right - a.left,
+        height: b.bottom - a.top,
+    };
+}
+
+/**
+ * @param {OverlayBounds} bounds
+ * @param {number} [scale=1]
+ * @returns {string}
+ */
+function overlayTransform(bounds, scale = 1) {
+    return `translate(${bounds.left}px, ${bounds.top}px) scale(${scale})`;
+}
+
+/**
+ * Show the band over a rect without geometry ease (place/remove cover).
+ * @param {{ row: number, col: number, width: number, height: number }} rect
+ * @param {'valid' | 'outline' | 'blocked'} state
+ * @param {{ text?: string, scale?: number }} [options]
+ * @returns {boolean}
+ */
+function showRectOverlayInstant(rect, state, options = {}) {
+    const overlay = document.getElementById('drag-preview');
+    const bounds = measureRectOverlayBounds(rect);
+    if (!overlay || !bounds) return false;
+
+    const scale = options.scale ?? 1;
+    overlay.style.transition = 'none';
+    overlay.hidden = false;
+    overlay.dataset.state = state;
+    overlay.textContent = options.text ?? '';
+    overlay.style.width = `${bounds.width}px`;
+    overlay.style.height = `${bounds.height}px`;
+    overlay.style.transform = overlayTransform(bounds, scale);
+    overlay.classList.add('is-visible');
+    void overlay.offsetWidth;
+    overlay.style.transition = '';
+    dragPreviewVisible = true;
+    return true;
+}
+
+/**
+ * Cancel any in-flight place/remove overlay animation.
+ */
+function cancelRectOverlayAnim() {
+    if (rectOverlayAnimTimer !== null) {
+        clearTimeout(rectOverlayAnimTimer);
+        rectOverlayAnimTimer = null;
+    }
+    dragPreviewLocked = false;
+}
+
+/**
+ * Corners / cold place: rectangle-level scale-in cover, then reveal cells.
+ * Drag commits skip this — they hand off in paintCellStates already.
+ * @param {import('./game.js').Rectangle} rect
+ */
+function animateRectanglePlace(rect) {
+    cancelRectOverlayAnim();
+    dragPreviewLocked = true;
+
+    const bounds = measureRectOverlayBounds(rect);
+    const overlay = document.getElementById('drag-preview');
+    const state = rect.validated ? 'valid' : 'outline';
+
+    if (!overlay || !bounds) {
+        dragPreviewLocked = false;
+        hideDragPreviewOverlay();
+        return;
+    }
+
+    // Rectangle-level scale-in (not per-cell — that opens hairline gaps).
+    showRectOverlayInstant(rect, state, { text: '', scale: 0.96 });
+
+    requestAnimationFrame(() => {
+        if (!dragPreviewLocked) return;
+        overlay.style.transition = `transform ${RECT_OVERLAY_EASE}`;
+        overlay.style.transform = overlayTransform(bounds, 1);
+    });
+
+    rectOverlayAnimTimer = setTimeout(() => {
+        if (!dragPreviewLocked) return;
+        dragPreviewLocked = false;
+        rectOverlayAnimTimer = null;
+        hideDragPreviewOverlay(overlay);
+    }, 60);
+}
+
+/**
+ * Cover the rect solid, clear cells under the band, then scale out.
+ * @param {import('./game.js').Rectangle} rect
+ * @param {GameState} gameState
+ * @param {Puzzle} puzzle
+ */
+function removeRectangleAnimated(rect, gameState, puzzle) {
+    cancelRectOverlayAnim();
+    dragPreviewLocked = true;
+
+    const bounds = measureRectOverlayBounds(rect);
+    const overlay = document.getElementById('drag-preview');
+    const state = rect.validated ? 'valid' : 'outline';
+    const shown = showRectOverlayInstant(rect, state, { text: '', scale: 1 });
+
+    gameState.rectangles = gameState.rectangles.filter((r) => r !== rect);
+    commitBoardChange(gameState, puzzle);
+
+    if (!shown || !overlay || !bounds) {
+        dragPreviewLocked = false;
+        hideDragPreviewOverlay();
+        return;
+    }
+
+    requestAnimationFrame(() => {
+        if (!dragPreviewLocked) return;
+        // Stay fully opaque — only scale — so empty grid never fades through.
+        overlay.style.transition = `transform ${RECT_OVERLAY_EASE}`;
+        overlay.style.transform = overlayTransform(bounds, 0.94);
+    });
+
+    const finish = () => {
+        if (!dragPreviewLocked) return;
+        dragPreviewLocked = false;
+        rectOverlayAnimTimer = null;
+        hideDragPreviewOverlay(overlay);
+    };
+
+    rectOverlayAnimTimer = setTimeout(finish, 240);
 }
 
 /**
@@ -247,37 +426,18 @@ export function paintCellStates(gameState) {
  */
 function syncDragPreviewOverlay(preview, blocked, valid) {
     const overlay = document.getElementById('drag-preview');
-    const block = document.getElementById('game-block');
-    if (!overlay || !block) return;
+    if (!overlay) return;
 
     if (!preview) {
         hideDragPreviewOverlay(overlay);
         return;
     }
 
-    const topLeft = document.querySelector(
-        `#game-grid .grid-cell[data-row="${preview.row}"][data-col="${preview.col}"]`
-    );
-    const bottomRight = document.querySelector(
-        `#game-grid .grid-cell[data-row="${preview.row + preview.height - 1}"][data-col="${preview.col + preview.width - 1}"]`
-    );
-    if (!topLeft || !bottomRight) {
+    const bounds = measureRectOverlayBounds(preview);
+    if (!bounds) {
         hideDragPreviewOverlay(overlay);
         return;
     }
-
-    // Absolute coords are relative to #game-block's padding box.
-    const blockRect = block.getBoundingClientRect();
-    const blockStyle = getComputedStyle(block);
-    const originX = blockRect.left + (parseFloat(blockStyle.borderLeftWidth) || 0);
-    const originY = blockRect.top + (parseFloat(blockStyle.borderTopWidth) || 0);
-
-    const a = topLeft.getBoundingClientRect();
-    const b = bottomRight.getBoundingClientRect();
-    const left = a.left - originX;
-    const top = a.top - originY;
-    const width = b.right - a.left;
-    const height = b.bottom - a.top;
 
     const state = blocked ? 'blocked' : valid ? 'valid' : 'outline';
     const wasHidden = !dragPreviewVisible;
@@ -290,9 +450,9 @@ function syncDragPreviewOverlay(preview, blocked, valid) {
     overlay.hidden = false;
     overlay.dataset.state = state;
     overlay.textContent = String(preview.width * preview.height);
-    overlay.style.width = `${width}px`;
-    overlay.style.height = `${height}px`;
-    overlay.style.transform = `translate(${left}px, ${top}px)`;
+    overlay.style.width = `${bounds.width}px`;
+    overlay.style.height = `${bounds.height}px`;
+    overlay.style.transform = overlayTransform(bounds, 1);
     overlay.classList.add('is-visible');
 
     if (wasHidden) {
@@ -315,31 +475,9 @@ function hideDragPreviewOverlay(overlay = document.getElementById('drag-preview'
     overlay.hidden = true;
     overlay.removeAttribute('data-state');
     overlay.textContent = '';
+    overlay.style.transform = '';
     void overlay.offsetWidth;
     overlay.style.transition = '';
-}
-
-/**
- * Soft ease-in on cells when a rectangle is first committed.
- * @param {import('./game.js').Rectangle} rect
- */
-function animateRectangleAppear(rect) {
-    for (let r = rect.row; r < rect.row + rect.height; r++) {
-        for (let c = rect.col; c < rect.col + rect.width; c++) {
-            const cell = document.querySelector(
-                `#game-grid .grid-cell[data-row="${r}"][data-col="${c}"]`
-            );
-            if (!cell) continue;
-            cell.classList.remove('rect-appear');
-            void cell.offsetWidth;
-            cell.classList.add('rect-appear');
-            cell.addEventListener(
-                'animationend',
-                () => cell.classList.remove('rect-appear'),
-                { once: true }
-            );
-        }
-    }
 }
 
 /**
@@ -364,8 +502,7 @@ function handleCellClick(cell, gameState, puzzle) {
         const rectangleClicked = findRectangleAt({ row, col }, gameState.rectangles);
 
         if (rectangleClicked) {
-            gameState.rectangles = gameState.rectangles.filter((rect) => rect !== rectangleClicked);
-            commitBoardChange(gameState, puzzle);
+            removeRectangleAnimated(rectangleClicked, gameState, puzzle);
         } else {
             gameState.pendingSelection = { row, col };
             paintCellStates(gameState);
@@ -491,8 +628,14 @@ function placeRectangle(start, end, gameState, puzzle) {
     candidate.validated = validateRectangle(candidate, puzzle.clues);
     gameState.rectangles.push(candidate);
     gameState.pendingSelection = null;
+
+    // Drag band still up → paintCellStates paints cells then drops the cover
+    // in the same turn (instant). Corners have no band → scale-in after paint.
+    const fromDrag = dragPreviewVisible;
     commitBoardChange(gameState, puzzle);
-    animateRectangleAppear(candidate);
+    if (!fromDrag) {
+        animateRectanglePlace(candidate);
+    }
     return true;
 }
 
@@ -560,7 +703,6 @@ function coordsFromCell(cell) {
 
 function clearActiveDrag() {
     activeDrag = null;
-    hideDragPreviewOverlay();
 }
 
 export async function handleDifficultyChange(difficultyName, gameState) {
@@ -822,10 +964,7 @@ export function handlePointerUp(event, gameState, puzzle) {
     if (!didDrag) {
         const rectangleClicked = findRectangleAt(origin, gameState.rectangles);
         if (rectangleClicked) {
-            gameState.rectangles = gameState.rectangles.filter(
-                (rect) => rect !== rectangleClicked
-            );
-            commitBoardChange(gameState, puzzle);
+            removeRectangleAnimated(rectangleClicked, gameState, puzzle);
         } else {
             paintCellStates(gameState);
         }

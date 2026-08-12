@@ -149,7 +149,10 @@ function getPreviousQuery() {
 }
 
 /**
- * Parse URL query. Invalid values restore the previous query instead of forcing today/Easy.
+ * Parse URL query.
+ * Invalid values restore the previous query instead of forcing today/Easy.
+ * On load, a valid but non-today `date` snaps to today + Easy (refresh / stale link).
+ * When `date` is already today, difficulty from the query is kept.
  * @returns {{ date: string, difficulty: string, wasInvalid: boolean }}
  */
 export function resolveQuery() {
@@ -162,9 +165,19 @@ export function resolveQuery() {
         return { date, difficulty, wasInvalid: true };
     }
 
+    const today = toDateKey();
+    const date = parseQueryDate(urlParams);
+    let difficulty = parseQueryDifficulty(urlParams);
+
+    if (date !== today) {
+        difficulty = Difficulty.EASY.name;
+        redirectToQuery(today, difficulty);
+        return { date: today, difficulty, wasInvalid: false };
+    }
+
     return {
-        date: parseQueryDate(urlParams),
-        difficulty: parseQueryDifficulty(urlParams),
+        date,
+        difficulty,
         wasInvalid: false,
     };
 }

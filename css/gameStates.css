@@ -59,23 +59,6 @@
     border-bottom-right-radius: var(--grid-corner-radius);
 }
 
-/* Soft settle when a rectangle is committed onto the board.
-   Keep cells fully opaque — semi-transparency reveals the page gradient
-   (reads as a black/dark flash), especially on remove / re-paint. */
-@keyframes rect-appear {
-    0% {
-        transform: scale(0.96);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-.rect-appear {
-    animation: rect-appear 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-    z-index: 1;
-}
-
 @keyframes flash-invalid {
     0%,
     100% {
