@@ -8,6 +8,7 @@ import {
     addGameInactiveOverlayEventListener,
     addGameWonOverlayEventListener,
     addSelectionModeSwitchEventListener,
+    addReturnToTodayEventListener,
 } from './eventListeners.js';
 import { updateBodyTheme, createGameGrid, paintCellStates, setDifficultySelectOptions } from './ui.js';
 import { getTheme, 
@@ -51,4 +52,5 @@ async function addEventListeners(gameState) {
     addGameInactiveOverlayEventListener();
     addGameWonOverlayEventListener(gameState);
     addSelectionModeSwitchEventListener(gameState);
+    addReturnToTodayEventListener();
 }

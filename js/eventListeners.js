@@ -10,6 +10,9 @@ import {
 } from './ui.js';
 import { handleTimerClick, handleTimerVisibilityChange } from './timer.js';
 import { handleInstructionsButtonClick, handleSlideLeftButtonClick, handleSlideRightButtonClick } from './drawer.js';
+import { syncUrlForDate } from './formValidation.js';
+import { getPlayDateKey } from './storage.js';
+import { toDateKey } from './rngCreator.js';
 
 export function addDrawerEventListener() {
     const drawerButton = document.getElementById('drawer-button');
@@ -112,5 +115,17 @@ export function addSelectionModeSwitchEventListener(gameState) {
     const selectionModeSwitch = document.getElementById('selection-mode-switch');
     selectionModeSwitch.addEventListener('click', () => {
         handleSelectionModeSwitchClick(selectionModeSwitch, gameState);
+    });
+}
+
+export function addReturnToTodayEventListener() {
+    const returnToTodayButton = document.getElementById('return-to-today');
+    document.documentElement.toggleAttribute(
+        'data-archive-day',
+        getPlayDateKey() !== toDateKey(),
+    );
+    returnToTodayButton.addEventListener('click', () => {
+        syncUrlForDate(toDateKey(), 'replace');
+        window.location.reload();
     });
 }

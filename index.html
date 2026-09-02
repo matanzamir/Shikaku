@@ -5,6 +5,21 @@
         <script>
             document.documentElement.dataset.theme =
                 localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
+
+            // Show "Return to Today" on first paint when ?date= is an archive day
+            // (same early-boot pattern as theme — avoids waiting for module init).
+            (function () {
+                const date = new URLSearchParams(location.search).get('date');
+                if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+                const now = new Date();
+                const today =
+                    String(now.getFullYear()).padStart(4, '0') + '-' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(now.getDate()).padStart(2, '0');
+                if (date !== today) {
+                    document.documentElement.dataset.archiveDay = '';
+                }
+            })();
         </script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,6 +43,7 @@
                     <div class="selection-mode-thumb"></div>
                 </div>
             </div>
+            <button id="return-to-today" class="button" type="button"><span>Return to Today</span></button>
         </div>
         <div id="main-container">
             <header class="top-bar">
