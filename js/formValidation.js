@@ -1,6 +1,6 @@
 import { toDateKey } from './rngCreator.js';
 import { Difficulty } from './difficulties.js';
-import { getDifficulty, getPlayDateKey } from './storage.js';
+import { getDifficulty, getPlayDateKey, setDifficulty } from './storage.js';
 
 /** Earliest local puzzle day (YYYY-MM-DD). */
 export const MIN_DATE_KEY = '2026-08-03';
@@ -97,12 +97,6 @@ function hasInvalidQueryValues(urlParams) {
     if (rawDate !== null && !isValidDateKey(toDateKey(rawDate))) {
         return true;
     }
-
-    const rawDifficulty = urlParams.get('difficulty');
-    if (rawDifficulty !== null && !isKnownDifficulty(rawDifficulty)) {
-        return true;
-    }
-
     return false;
 }
 
@@ -118,25 +112,71 @@ export function parseQueryDate(urlParams) {
 }
 
 /**
- * Read difficulty from query params. Missing or unknown → Easy.
+ * Legacy `?difficulty=` links: persist once, then strip from the URL.
  * @param {URLSearchParams} urlParams
- * @returns {string} Difficulty name (Easy / Medium / Hard)
  */
-export function parseQueryDifficulty(urlParams) {
+function migrateDifficultyFromQuery(urlParams) {
     const raw = urlParams.get('difficulty');
-    return isKnownDifficulty(raw) ? raw : Difficulty.EASY.name;
+    if (raw !== null && isKnownDifficulty(raw)) {
+        setDifficulty(raw);
+    }
+}
+
+function stripDifficultyFromUrl() {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has('difficulty')) {
+        return;
+    }
+    url.searchParams.delete('difficulty');
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
 }
 
 /**
- * Rewrite the query in place — no navigation, so the board and timer survive.
  * @param {string} date YYYY-MM-DD
- * @param {string} difficulty Difficulty name
+ * @returns {string}
  */
-export function redirectToQuery(date, difficulty) {
+function difficultyForDate(date) {
+    if (date === toDateKey()) {
+        return Difficulty.EASY.name;
+    }
+    return getDifficulty().name;
+}
+
+/**
+ * @param {string} date YYYY-MM-DD
+ * @returns {string}
+ */
+export function playUrlForDate(date) {
     const url = new URL(window.location.href);
-    url.searchParams.set('date', date);
-    url.searchParams.set('difficulty', difficulty);
-    history.replaceState(null, '', url);
+    url.searchParams.delete('difficulty');
+    if (date === toDateKey()) {
+        url.searchParams.delete('date');
+    } else {
+        url.searchParams.set('date', date);
+    }
+    return url.pathname + url.search + url.hash;
+}
+
+/**
+ * @param {string} date YYYY-MM-DD
+ * @param {'push' | 'replace'} [method='replace']
+ */
+export function syncUrlForDate(date, method = 'replace') {
+    const target = playUrlForDate(date);
+    if (method === 'push') {
+        history.pushState(null, '', target);
+    } else {
+        history.replaceState(null, '', target);
+    }
+}
+
+/**
+ * Rewrite the URL for the active play date — no navigation, so the board survives.
+ * Today uses the bare index URL; archive days use `?date=`. Difficulty is never in the URL.
+ * @param {string} date YYYY-MM-DD
+ */
+export function redirectToQuery(date) {
+    syncUrlForDate(date, 'replace');
 }
 
 /**
@@ -146,7 +186,7 @@ export function redirectToQuery(date, difficulty) {
 function getPreviousQuery() {
     const previousDate = getPlayDateKey();
     const date = isValidDateKey(previousDate) ? previousDate : toDateKey();
-    return { date, difficulty: getDifficulty().name };
+    return { date, difficulty: difficultyForDate(date) };
 }
 
 /**
@@ -164,10 +204,11 @@ function isPageReload() {
 
 /**
  * Parse URL query.
- * Invalid values restore the previous query instead of forcing today/Easy.
+ * Date comes from `?date=` (missing → today); difficulty comes from localStorage
+ * on archive days and is always Easy when loading today.
+ * Invalid date values restore the previous date from storage.
  * Changing `?date=` (a new navigation) loads that archive puzzle.
- * Reloading while `date` is not today snaps to today + Easy.
- * When `date` is already today, difficulty from the query is kept.
+ * Reloading while `date` is not today snaps to today on Easy.
  *
  * The reload snap deliberately leaves the query alone and reports it as
  * `snappedFrom`: unsaved progress may still have to be confirmed first, and the
@@ -181,26 +222,31 @@ function isPageReload() {
  */
 export function resolveQuery() {
     const urlParams = new URLSearchParams(window.location.search);
+    migrateDifficultyFromQuery(urlParams);
+    stripDifficultyFromUrl();
+
     const wasInvalid = hasInvalidQueryValues(urlParams);
 
     if (wasInvalid) {
         const { date, difficulty } = getPreviousQuery();
-        redirectToQuery(date, difficulty);
+        redirectToQuery(date);
         return { date, difficulty, wasInvalid: true, snappedFrom: null };
     }
 
     const today = toDateKey();
     const date = parseQueryDate(urlParams);
-    const difficulty = parseQueryDifficulty(urlParams);
+    const difficulty = difficultyForDate(date);
 
     if (date !== today && isPageReload()) {
         return {
             date: today,
             difficulty: Difficulty.EASY.name,
             wasInvalid: false,
-            snappedFrom: { date, difficulty },
+            snappedFrom: { date, difficulty: difficultyForDate(date) },
         };
     }
+
+    redirectToQuery(date);
 
     return {
         date,

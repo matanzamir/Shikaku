@@ -1,6 +1,6 @@
 import { createPuzzle, createGameState } from './game.js';
 import { init } from './init.js';
-import { resolveQuery, redirectToQuery } from './formValidation.js';
+import { resolveQuery, redirectToQuery, playUrlForDate } from './formValidation.js';
 import { generatePuzzle } from './puzzleGenerator.js';
 import { Difficulty } from './difficulties.js';
 import {
@@ -42,7 +42,7 @@ if (target !== null) {
 async function resolvePlayTarget() {
     if (await confirmDateChangeProgress(date)) {
         if (snappedFrom !== null) {
-            redirectToQuery(date, difficulty);
+            redirectToQuery(date);
         }
         return { date, difficulty };
     }
@@ -52,14 +52,11 @@ async function resolvePlayTarget() {
 
     // A deferred reload snap never moved the query, so that day is still loadable in place.
     if (snappedFrom !== null) {
-        redirectToQuery(progressDate, previousDifficulty);
+        redirectToQuery(progressDate);
         return { date: progressDate, difficulty: previousDifficulty };
     }
 
-    const url = new URL(window.location.href);
-    url.searchParams.set('date', progressDate);
-    url.searchParams.set('difficulty', previousDifficulty);
-    window.location.replace(url.toString());
+    window.location.replace(playUrlForDate(progressDate));
     return null;
 }
 

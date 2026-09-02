@@ -7,6 +7,7 @@ import {
     rectanglesOverlap,
     validateRectangle,
     validatePuzzle,
+    cellIsInsideRectangle,
 } from './game.js';
 import { resumeTimer, getElapsedMs, startTimer, pauseTimer } from './timer.js';
 import { 
@@ -26,6 +27,7 @@ import {
 import { Difficulty } from './difficulties.js';
 import { Message } from './messages.js';
 import { generatePuzzle } from './puzzleGenerator.js';
+import { syncUrlForDate } from './formValidation.js';
 
 /**
  * @typedef {import('./game.js').Puzzle} Puzzle
@@ -229,9 +231,12 @@ export function paintCellStates(gameState) {
     let previewBlocked = false;
     let previewValid = false;
     if (preview) {
-        previewBlocked = gameState.rectangles.some(
-            (rect) => rect.validated && rectanglesOverlap(preview, rect)
-        );
+        previewBlocked =
+            gameState.rectangles.some(
+                (rect) => rect.validated && rectanglesOverlap(preview, rect)
+            ) ||
+            (activePuzzleClues !== null &&
+                !activePuzzleClues.some((clue) => cellIsInsideRectangle(clue, preview)));
         previewValid =
             !previewBlocked &&
             activePuzzleClues !== null &&
@@ -619,7 +624,10 @@ function placeRectangle(start, end, gameState, puzzle) {
         rectanglesOverlap(candidate, rect)
     );
 
-    if (overlapping.some((rect) => rect.validated)) {
+    if (
+        overlapping.some((rect) => rect.validated) ||
+        !puzzle.clues.some((clue) => cellIsInsideRectangle(clue, candidate))
+    ) {
         // Reject silently — preview state already signals conflict while dragging.
         paintCellStates(gameState);
         return false;
@@ -736,7 +744,7 @@ export async function handleDifficultyChange(difficultyName, gameState) {
 }
 
 /**
- * Update the URL and rebuild the board for the new difficulty without a full reload.
+ * Rebuild the board for the new difficulty without a full reload.
  * `pushState` only changes the address bar — the grid must be regenerated here.
  * @param {string} difficultyName
  * @param {GameState} gameState
@@ -745,10 +753,7 @@ function loadCorrectPuzzle(difficultyName, gameState) {
     const difficultyConfig = Difficulty[difficultyName.toUpperCase()] ?? Difficulty.EASY;
     const date = getPlayDateKey();
 
-    const url = new URL(window.location.href);
-    url.searchParams.set('difficulty', difficultyConfig.name);
-    url.searchParams.set('date', date);
-    window.history.pushState({}, '', url);
+    syncUrlForDate(date, 'push');
 
     const clues = generatePuzzle(difficultyConfig, date);
     const puzzle = createPuzzle(difficultyConfig.size, difficultyConfig.size, clues);

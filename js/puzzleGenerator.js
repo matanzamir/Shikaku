@@ -1,4 +1,4 @@
-import { createSeededRng } from './rngCreator.js';
+import { createSeededRng, toDateKey } from './rngCreator.js';
 import { hasUniqueSolution } from './puzzleValidator.js';
 import { isBoring } from './boredomCheck.js';
 import { shufflePartition } from './partitionShuffle.js';
@@ -16,14 +16,41 @@ import { shufflePartition } from './partitionShuffle.js';
  */
 const MAX_GENERATION_ATTEMPTS = 500;
 
+/** @type {Map<string, Clue[]>} */
+const puzzleCache = new Map();
+
+/**
+ * @param {Difficulty[keyof Difficulty]} difficulty
+ * @param {Date | string} date
+ * @returns {string}
+ */
+function cacheKey(difficulty, date) {
+    return `${toDateKey(date)}:${difficulty.name}`;
+}
+
+/**
+ * Drop all cached puzzles (mainly for tests).
+ */
+export function clearPuzzleCache() {
+    puzzleCache.clear();
+}
+
 /**
  * Generate a puzzle of the given size.
  * @param {Difficulty[keyof Difficulty]} difficulty
- * @param {Date} date
+ * @param {Date | string} date
  * @returns {Clue[]} clues
  */
 export function generatePuzzle(difficulty, date) {
-    return generateBoard(difficulty, date).clues;
+    const key = cacheKey(difficulty, date);
+    const cached = puzzleCache.get(key);
+    if (cached) {
+        return cached;
+    }
+
+    const clues = generateBoard(difficulty, date).clues;
+    puzzleCache.set(key, clues);
+    return clues;
 }
 
 /**
