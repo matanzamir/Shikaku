@@ -1,0 +1,136 @@
+Measuring the current generator: 300 boards per difficulty, dates from 2026-01-01.
+
+======================================================================
+Easy  (7x7, maxArea 10)
+======================================================================
+  boards measured: 300/300
+  generation: 102 ms total, 0.3 ms/board
+  partitions tried per board: mean 7.01, median 5, p90 16, max 44
+    thrown out as boring: 856, thrown out as non-unique: 946
+
+  SLICING STRUCTURE  (recursive: keep cutting at fault lines)
+    fully guillotine (board comes apart into single pieces): 100.0%
+    slicing depth: mean 5.32, max 8
+    largest interlocked block, as share of board: mean 0.0%, max 0.0%
+    total interlocked area: mean 0.0%
+
+  BOARD-SPANNING FAULT LINES  (edge-to-edge, uncrossed)
+    boards with at least one: 100.0%
+    count per board: mean 1.95, median 2, max 4
+    of those, in the middle third: mean 0.72
+    "four big rectangles" signature: 13.0%
+    boards with a piece spanning the full board: 34.0%, mean board area in such pieces: 5.9%, max 57.1%
+
+    spanning fault lines per board:
+          1 | ############ 30.0% (90)
+          2 | ################### 47.7% (143)
+          3 | ######## 20.0% (60)
+          4 | # 2.3% (7)
+
+  pieces per board: mean 11.7, min 7, max 17
+  piece areas:
+          2 | ########## 24.0% (841)
+          3 | ######## 18.9% (662)
+          4 | ######## 19.9% (700)
+          5 | ## 6.0% (209)
+          6 | ######### 21.8% (766)
+          7 | # 3.5% (123)
+          8 | ## 4.0% (142)
+          9 | # 1.9% (66)
+
+======================================================================
+Medium  (10x10, maxArea 16)
+======================================================================
+  boards measured: 300/300
+  generation: 292 ms total, 1.0 ms/board
+  partitions tried per board: mean 11.41, median 8, p90 26, max 75
+    thrown out as boring: 1226, thrown out as non-unique: 1897
+
+  SLICING STRUCTURE  (recursive: keep cutting at fault lines)
+    fully guillotine (board comes apart into single pieces): 100.0%
+    slicing depth: mean 6.71, max 10
+    largest interlocked block, as share of board: mean 0.0%, max 0.0%
+    total interlocked area: mean 0.0%
+
+  BOARD-SPANNING FAULT LINES  (edge-to-edge, uncrossed)
+    boards with at least one: 100.0%
+    count per board: mean 1.95, median 2, max 4
+    of those, in the middle third: mean 0.72
+    "four big rectangles" signature: 15.3%
+    boards with a piece spanning the full board: 20.3%, mean board area in such pieces: 2.2%, max 20.0%
+
+    spanning fault lines per board:
+          1 | ########### 27.7% (83)
+          2 | ##################### 51.7% (155)
+          3 | ####### 18.3% (55)
+          4 | # 2.3% (7)
+
+  pieces per board: mean 19.2, min 13, max 28
+  piece areas:
+          2 | ####### 17.9% (1034)
+          3 | ####### 17.4% (1002)
+          4 | ###### 15.7% (904)
+          5 | ### 6.9% (400)
+          6 | ####### 17.6% (1016)
+          7 | # 2.1% (119)
+          8 | ### 7.8% (450)
+          9 | ## 5.5% (320)
+         10 | ## 4.5% (261)
+         12 | # 3.6% (210)
+         14 | # 0.4% (24)
+         15 | # 0.5% (29)
+
+======================================================================
+Hard  (15x15, maxArea 30)
+======================================================================
+  boards measured: 300/300
+  generation: 6525 ms total, 21.8 ms/board
+  partitions tried per board: mean 15.80, median 11, p90 33, max 146
+    thrown out as boring: 811, thrown out as non-unique: 3630
+
+  SLICING STRUCTURE  (recursive: keep cutting at fault lines)
+    fully guillotine (board comes apart into single pieces): 100.0%
+    slicing depth: mean 8.11, max 12
+    largest interlocked block, as share of board: mean 0.0%, max 0.0%
+    total interlocked area: mean 0.0%
+
+  BOARD-SPANNING FAULT LINES  (edge-to-edge, uncrossed)
+    boards with at least one: 100.0%
+    count per board: mean 1.99, median 2, max 5
+    of those, in the middle third: mean 0.96
+    "four big rectangles" signature: 25.7%
+    boards with a piece spanning the full board: 14.7%, mean board area in such pieces: 1.0%, max 13.3%
+
+    spanning fault lines per board:
+          1 | ############ 31.0% (93)
+          2 | ################## 44.3% (133)
+          3 | ######## 21.0% (63)
+          4 | # 2.3% (7)
+          5 | # 1.3% (4)
+
+  pieces per board: mean 30.2, min 20, max 43
+  piece areas:
+          2 | ###### 14.6% (1324)
+          3 | ##### 12.3% (1119)
+          4 | #### 11.2% (1012)
+          5 | ## 6.2% (558)
+          6 | ##### 12.3% (1111)
+          7 | # 2.6% (233)
+          8 | ### 7.9% (717)
+          9 | ## 5.7% (521)
+         10 | ## 5.6% (506)
+         11 | # 0.3% (24)
+         12 | ### 6.8% (620)
+         13 | # 0.2% (21)
+         14 | # 1.9% (170)
+         15 | # 3.7% (338)
+         16 | # 2.4% (217)
+         18 | # 2.0% (184)
+         20 | # 1.7% (157)
+         21 | # 0.8% (70)
+         22 | # 0.2% (17)
+         24 | # 0.8% (76)
+         25 | # 0.4% (36)
+         26 | # 0.1% (7)
+         27 | # 0.1% (10)
+         28 | # 0.2% (18)

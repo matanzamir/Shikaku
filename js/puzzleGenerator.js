@@ -1,6 +1,7 @@
 import { createSeededRng } from './rngCreator.js';
 import { hasUniqueSolution } from './puzzleValidator.js';
 import { isBoring } from './boredomCheck.js';
+import { shufflePartition } from './partitionShuffle.js';
 
 /**
  * @typedef {import('./game.js').Rectangle} Rectangle
@@ -9,26 +10,94 @@ import { isBoring } from './boredomCheck.js';
  */
 
 /**
+ * Ceiling on candidate boards per puzzle. The interest checks reject the large
+ * majority of candidates, so a seed that never satisfies all of them would
+ * otherwise spin forever and hang the page on load.
+ */
+const MAX_GENERATION_ATTEMPTS = 500;
+
+/**
  * Generate a puzzle of the given size.
  * @param {Difficulty[keyof Difficulty]} difficulty
  * @param {Date} date
  * @returns {Clue[]} clues
  */
 export function generatePuzzle(difficulty, date) {
+    return generateBoard(difficulty, date).clues;
+}
+
+/**
+ * Generate a puzzle and hand back the solution it was cut from.
+ *
+ * partitionRecursion cuts the board guillotine-style, which leaves its cuts
+ * plainly visible in the finished puzzle, so shufflePartition rebuilds small
+ * regions of that partition until the board interlocks instead.
+ *
+ * @param {Difficulty[keyof Difficulty]} difficulty
+ * @param {Date} date
+ * @returns {{clues: Clue[], rectangles: Rectangle[], attempts: number}}
+ */
+export function generateBoard(difficulty, date) {
     const rand = createSeededRng(date, difficulty.name);
-    let validated = false
-    let clues = []
-    while (!validated) {
-        const rectangles = partitionRecursion({width: difficulty.size, height: difficulty.size, maxArea: difficulty.maxRectangleSize}, rand, {row: 0, col: 0})
-        clues = cluePlacement(rectangles, rand)
-        validated = hasUniqueSolution(clues, {width: difficulty.size, height: difficulty.size}) && !isBoring(rectangles, difficulty.size)
+    const size = { width: difficulty.size, height: difficulty.size };
+    /** Solvable but dull board, kept in case no candidate is ever both. */
+    let playable = null;
+    let lastResort = null;
+
+    for (let attempt = 1; attempt <= MAX_GENERATION_ATTEMPTS; attempt++) {
+        const partition = partitionRecursion(
+            { width: difficulty.size, height: difficulty.size, maxArea: difficulty.maxRectangleSize },
+            rand,
+            { row: 0, col: 0 }
+        );
+        const rectangles = shufflePartition(partition, {
+            size: difficulty.size,
+            maxArea: difficulty.maxRectangleSize,
+            rand,
+            repartition: partitionRecursion,
+        });
+        const clues = cluePlacement(rectangles, rand);
+        lastResort = { clues, rectangles, attempts: attempt };
+
+        const interesting = !isBoring(rectangles, difficulty.size);
+        // Once a fallback exists, a dull board is not worth the uniqueness check.
+        if (!interesting && playable !== null) {
+            continue;
+        }
+        if (!hasUniqueSolution(clues, size)) {
+            continue;
+        }
+        if (interesting) {
+            return { clues, rectangles, attempts: attempt };
+        }
+        playable = { clues, rectangles, attempts: attempt };
     }
-    return clues
+
+    return playable ?? lastResort;
 }
 
 const MAX_SPLIT_ATTEMPTS = 10;
 /** No 1×1 (or other area-1) rectangles in generated partitions. */
 const MIN_RECTANGLE_AREA = 2;
+/** Regions this small are never cut again, which keeps 2s and 3s uncommon. */
+const ALWAYS_KEEP_AREA = 6;
+
+/**
+ * Odds of leaving a region whole. Certain at ALWAYS_KEEP_AREA and falling to
+ * zero at maxArea, so pieces gather around the middle of the allowed range. A
+ * flat probability instead piled them up at both extremes: regions kept being
+ * cut down to 2s and 3s, while whatever stopped early stayed near maxArea.
+ * @param {number} area
+ * @param {number} maxArea
+ * @returns {number}
+ */
+function keepWholeChance(area, maxArea) {
+    if (area <= ALWAYS_KEEP_AREA) {
+        return 0.85 - (area / 100);
+    }
+    const spread = (area - ALWAYS_KEEP_AREA) / (maxArea - ALWAYS_KEEP_AREA);
+    return 1 - Math.sqrt(Math.min(1, spread));
+}
 
 /**
  * @param {{width: number, height: number, maxArea: number}} size
@@ -84,13 +153,16 @@ function pickLegalCut(axisLength, crossAxisLength, rand) {
  */
 export function partitionRecursion(size, rand, position) {
     const area = size.width * size.height;
+    // Cut across the long axis, so an elongated region gets squarer instead of
+    // shedding another parallel strip. Squares stay at even odds.
+    const horizontalSplitChance = (size.height * size.height) / (size.height * size.height + size.width * size.width);
     const canSplitHorizontal = legalCuts(size.height, size.width).length > 0;
     const canSplitVertical = legalCuts(size.width, size.height).length > 0;
     const canSplit = canSplitHorizontal || canSplitVertical;
     const mustSplit = area > size.maxArea;
 
     // Soft stop: keep as-is when area is valid and we are not forced to split.
-    if (!mustSplit && area >= MIN_RECTANGLE_AREA && (!canSplit || rand() < 0.35)) {
+    if (!mustSplit && area >= MIN_RECTANGLE_AREA && (!canSplit || rand() < keepWholeChance(area, size.maxArea))) {
         return asLeaf(size, position);
     }
 
@@ -100,7 +172,7 @@ export function partitionRecursion(size, rand, position) {
     }
 
     for (let attempt = 0; attempt < MAX_SPLIT_ATTEMPTS; attempt++) {
-        const splitHorizontal = canSplitHorizontal && (!canSplitVertical || rand() < 0.5);
+        const splitHorizontal = canSplitHorizontal && (!canSplitVertical || rand() < horizontalSplitChance);
 
         if (splitHorizontal) {
             const cut = pickLegalCut(size.height, size.width, rand);
