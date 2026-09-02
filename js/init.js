@@ -13,7 +13,8 @@ import { updateBodyTheme, createGameGrid, paintCellStates, setDifficultySelectOp
 import { getTheme, 
         getActiveRectangles, 
         showStoredScore, 
-        getSelectionMode } from './storage.js';
+        getSelectionMode,
+        getSavedElapsedMs } from './storage.js';
 
 export function init(puzzle, gameState) {
     const selectionModeSwitch = document.getElementById('selection-mode-switch');
@@ -36,7 +37,8 @@ export function init(puzzle, gameState) {
 
     showStoredScore();
 
-    startTimer();
+    // Resume the clock a reload interrupted; the board always boots paused.
+    startTimer(getSavedElapsedMs());
     addEventListeners(gameState);
 }
 

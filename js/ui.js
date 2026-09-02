@@ -21,6 +21,7 @@ import {
     getPlayDateKey,
     setSelectionMode,
     getSelectionMode,
+    clearSavedElapsedMs,
 } from './storage.js';
 import { Difficulty } from './difficulties.js';
 import { Message } from './messages.js';
@@ -37,13 +38,9 @@ import { generatePuzzle } from './puzzleGenerator.js';
  *   current: CellPos,
  *   pointerId: number,
  *   didDrag: boolean,
- *   startClientX: number,
- *   startClientY: number,
  * }} ActiveDrag
  */
 
-/** Pixel movement before a press counts as a drag (not a corner tap). */
-const DRAG_THRESHOLD_PX = 8;
 
 /** @type {AbortController | null} */
 let gridListenersAbort = null;
@@ -178,6 +175,8 @@ function bindGridListeners(gameGrid, gameState, puzzle) {
  * @param {GameState} gameState
  */
 function resetBoard(gameState) {
+    const wasWon = !document.getElementById('game-won-overlay').hidden;
+
     gameState.rectangles = [];
     gameState.pendingSelection = null;
     clearActiveDrag();
@@ -187,6 +186,11 @@ function resetBoard(gameState) {
     hideWinOverlay();
     document.getElementById('game-won-overlay').hidden = true;
     paintCellStates(gameState);
+
+    if (wasWon) {
+        startTimer();
+        document.getElementById('game-inactive-overlay').hidden = false;
+    }
 }
 
 /**
@@ -653,6 +657,7 @@ function commitBoardChange(gameState, puzzle) {
         showWinOverlay();
         document.getElementById('game-won-overlay').hidden = false;
         setScoreText(getElapsedMs() / 1000);
+        clearSavedElapsedMs();
     }
 }
 
@@ -852,17 +857,13 @@ export function handleSelectionModeSwitchClick(selectionModeSwitch, gameState) {
 }
 
 /**
+ * A press counts as a drag only after the pointer enters another cell.
+ * In-cell jitter must not place a 1×1.
  * @param {PointerEvent} event
  * @param {ActiveDrag} drag
- * @returns {boolean} true if this event crossed the drag threshold
+ * @returns {boolean} true if this event left the origin cell
  */
 function updateDragFromEvent(event, drag) {
-    const dx = event.clientX - drag.startClientX;
-    const dy = event.clientY - drag.startClientY;
-    if (Math.hypot(dx, dy) >= DRAG_THRESHOLD_PX) {
-        drag.didDrag = true;
-    }
-
     const cell = cellFromPoint(event.clientX, event.clientY);
     if (!cell) return drag.didDrag;
 
@@ -905,8 +906,6 @@ export function handlePointerDown(event, gameState) {
         current: coords,
         pointerId: event.pointerId,
         didDrag: false,
-        startClientX: event.clientX,
-        startClientY: event.clientY,
     };
 
     event.currentTarget.setPointerCapture?.(event.pointerId);
@@ -968,6 +967,12 @@ export function handlePointerUp(event, gameState, puzzle) {
         } else {
             paintCellStates(gameState);
         }
+        return;
+    }
+
+    // Drag that ended on the start cell (press-release or drag-back) is not a rectangle.
+    if (origin.row === current.row && origin.col === current.col) {
+        paintCellStates(gameState);
         return;
     }
 

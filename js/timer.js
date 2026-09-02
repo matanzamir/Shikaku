@@ -1,3 +1,5 @@
+import { setSavedElapsedMs, clearSavedElapsedMs } from './storage.js';
+
 let startTime = 0;
 let pauseStartedAt = 0;
 let isPaused = false;
@@ -40,17 +42,31 @@ function clearTick() {
 
 function startTick() {
     clearTick();
-    intervalId = setInterval(render, 1000);
+    intervalId = setInterval(() => {
+        render();
+        setSavedElapsedMs(getElapsedMs());
+    }, 1000);
 }
 
-export function startTimer() {
+/**
+ * Begin a paused run at `offsetMs`, so a reload can pick the clock back up.
+ * @param {number} [offsetMs] elapsed ms to resume from; 0 starts a fresh puzzle
+ */
+export function startTimer(offsetMs = 0) {
     clearTick();
-    timerOffset = 0;
-    startTime = Date.now() - timerOffset;
+    const now = Date.now();
+    timerOffset = offsetMs;
+    startTime = now - timerOffset;
     isPaused = true;
-    pauseStartedAt = Date.now();
+    pauseStartedAt = now;
     pauseButton.textContent = '▷';
     render();
+
+    if (timerOffset === 0) {
+        clearSavedElapsedMs();
+    } else {
+        setSavedElapsedMs(timerOffset);
+    }
 }
 
 export function pauseTimer() {
@@ -62,6 +78,7 @@ export function pauseTimer() {
     pauseStartedAt = Date.now();
     clearTick();
     timerOffset = getElapsedMs();
+    setSavedElapsedMs(timerOffset);
     pauseButton.textContent = '▷';
     render();
     document.getElementById('game-inactive-overlay').hidden = false;

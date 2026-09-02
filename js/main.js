@@ -1,6 +1,6 @@
 import { createPuzzle, createGameState } from './game.js';
 import { init } from './init.js';
-import { resolveQuery } from './formValidation.js';
+import { resolveQuery, redirectToQuery } from './formValidation.js';
 import { generatePuzzle } from './puzzleGenerator.js';
 import { Difficulty } from './difficulties.js';
 import {
@@ -15,15 +15,16 @@ import {
 import { openAlertBox } from './ui.js';
 import { Message } from './messages.js';
 
-const { date, difficulty, wasInvalid } = resolveQuery();
-const difficultyConfig = Difficulty[difficulty.toUpperCase()] ?? Difficulty.EASY;
+const { date, difficulty, wasInvalid, snappedFrom } = resolveQuery();
 const previousDifficulty = getDifficulty().name;
+const target = await resolvePlayTarget();
 
-if (await confirmDateChangeProgress(date, previousDifficulty)) {
+if (target !== null) {
+    const difficultyConfig = Difficulty[target.difficulty.toUpperCase()] ?? Difficulty.EASY;
     setDifficulty(difficultyConfig.name);
-    setPlayDateKey(date);
+    setPlayDateKey(target.date);
 
-    const clues = generatePuzzle(difficultyConfig, date);
+    const clues = generatePuzzle(difficultyConfig, target.date);
     const puzzle = createPuzzle(difficultyConfig.size, difficultyConfig.size, clues);
     const gameState = createGameState();
     init(puzzle, gameState);
@@ -34,13 +35,41 @@ if (await confirmDateChangeProgress(date, previousDifficulty)) {
 }
 
 /**
- * If saved progress is for a different day, ask before discarding it.
- * Proceed → clear. Cancel → return to the progress day when known.
- * @param {string} newDateKey
- * @param {string} previousDifficulty difficulty from before this load's URL was applied
- * @returns {Promise<boolean>}
+ * Pick the puzzle this load ends up on, asking before any progress is dropped.
+ * The query follows that decision, so declining leaves the address bar untouched.
+ * @returns {Promise<{ date: string, difficulty: string } | null>} null while navigating away instead of booting
  */
-async function confirmDateChangeProgress(newDateKey, previousDifficulty) {
+async function resolvePlayTarget() {
+    if (await confirmDateChangeProgress(date)) {
+        if (snappedFrom !== null) {
+            redirectToQuery(date, difficulty);
+        }
+        return { date, difficulty };
+    }
+
+    // Declined: keep playing the day the progress belongs to.
+    const progressDate = getProgressDateKey();
+
+    // A deferred reload snap never moved the query, so that day is still loadable in place.
+    if (snappedFrom !== null) {
+        redirectToQuery(progressDate, previousDifficulty);
+        return { date: progressDate, difficulty: previousDifficulty };
+    }
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('date', progressDate);
+    url.searchParams.set('difficulty', previousDifficulty);
+    window.location.replace(url.toString());
+    return null;
+}
+
+/**
+ * If saved progress is for a different day, ask before discarding it.
+ * Proceed → clear.
+ * @param {string} newDateKey
+ * @returns {Promise<boolean>} false when the player kept the in-progress day
+ */
+async function confirmDateChangeProgress(newDateKey) {
     if (getActiveRectangles().length === 0) {
         return true;
     }
@@ -58,12 +87,7 @@ async function confirmDateChangeProgress(newDateKey, previousDifficulty) {
     const answer = await openAlertBox(Message.UNSAVED);
     if (answer) {
         clearActiveRectangles();
-        return true;
     }
 
-    const url = new URL(window.location.href);
-    url.searchParams.set('date', progressDate);
-    url.searchParams.set('difficulty', previousDifficulty);
-    window.location.replace(url.toString());
-    return false;
+    return answer;
 }

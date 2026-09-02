@@ -80,10 +80,19 @@ function coversOtherClue(rect, clue, clues) {
 }
 
 /**
+ * Work budget for a single count, measured in rectangle-placement tests. A few
+ * clue sets in every thousand send the search exponential; without a ceiling
+ * one of them can lock the page for minutes. Hitting the ceiling reports the
+ * puzzle as non-unique so the generator simply moves on to the next candidate.
+ * The count is deterministic, so every machine rejects the same clue sets.
+ */
+const MAX_SEARCH_STEPS = 300000;
+
+/**
  * @param {Clue[]} clues
  * @param {{width: number, height: number}} size
  * @param {number} limit
- * @returns {number}
+ * @returns {number} solutions found, or limit when the search budget ran out
  */
 export function countSolutions(clues, size, limit = 2) {
     if (clues.length === 0) {
@@ -100,12 +109,15 @@ export function countSolutions(clues, size, limit = 2) {
     const occupied = new Uint8Array(cellCount);
     const assigned = new Uint8Array(clues.length);
     const cols = size.width;
+    let steps = 0;
+    let outOfBudget = false;
 
     /**
      * @param {Rectangle} rect
      * @returns {boolean}
      */
     function fits(rect) {
+        steps++;
         for (let r = rect.row; r < rect.row + rect.height; r++) {
             const rowBase = r * cols;
             for (let c = rect.col; c < rect.col + rect.width; c++) {
@@ -164,7 +176,11 @@ export function countSolutions(clues, size, limit = 2) {
     let solutions = 0;
 
     function search(placed) {
-        if (solutions >= limit) {
+        if (solutions >= limit || outOfBudget) {
+            return;
+        }
+        if (steps > MAX_SEARCH_STEPS) {
+            outOfBudget = true;
             return;
         }
         if (placed === clues.length) {
@@ -187,7 +203,7 @@ export function countSolutions(clues, size, limit = 2) {
             mark(rect, 1);
             search(placed + 1);
             mark(rect, 0);
-            if (solutions >= limit) {
+            if (solutions >= limit || outOfBudget) {
                 break;
             }
         }
@@ -195,7 +211,7 @@ export function countSolutions(clues, size, limit = 2) {
     }
 
     search(0);
-    return solutions;
+    return outOfBudget ? limit : solutions;
 }
 
 /**

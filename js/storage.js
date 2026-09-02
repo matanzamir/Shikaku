@@ -107,6 +107,50 @@ export function getPlayDateKey() {
     return playDateKey;
 }
 
+/** Elapsed timer ms of the board in progress, tagged `{ date, difficulty, ms }`. */
+const ELAPSED_MS_KEY = 'elapsedMs';
+
+/**
+ * Elapsed ms to resume on load, or 0 when the saved time belongs to another puzzle.
+ * @returns {number}
+ */
+export function getSavedElapsedMs() {
+    const raw = localStorage.getItem(ELAPSED_MS_KEY);
+    if (!raw) {
+        return 0;
+    }
+
+    try {
+        const saved = JSON.parse(raw);
+        if (saved?.date !== getPlayDateKey() || saved?.difficulty !== getDifficulty().name) {
+            return 0;
+        }
+
+        const ms = Number(saved.ms);
+        return Number.isFinite(ms) && ms > 0 ? ms : 0;
+    } catch {
+        return 0;
+    }
+}
+
+/**
+ * @param {number} elapsedMs
+ */
+export function setSavedElapsedMs(elapsedMs) {
+    localStorage.setItem(
+        ELAPSED_MS_KEY,
+        JSON.stringify({
+            date: getPlayDateKey(),
+            difficulty: getDifficulty().name,
+            ms: Math.max(0, Math.round(elapsedMs)),
+        })
+    );
+}
+
+export function clearSavedElapsedMs() {
+    localStorage.removeItem(ELAPSED_MS_KEY);
+}
+
 /** dateKey → { difficultyName → best seconds } */
 const CLEARED_PUZZLES_KEY = 'clearedPuzzles';
 

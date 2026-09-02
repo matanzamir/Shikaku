@@ -128,10 +128,11 @@ export function parseQueryDifficulty(urlParams) {
 }
 
 /**
+ * Rewrite the query in place — no navigation, so the board and timer survive.
  * @param {string} date YYYY-MM-DD
  * @param {string} difficulty Difficulty name
  */
-function redirectToQuery(date, difficulty) {
+export function redirectToQuery(date, difficulty) {
     const url = new URL(window.location.href);
     url.searchParams.set('date', date);
     url.searchParams.set('difficulty', difficulty);
@@ -149,11 +150,34 @@ function getPreviousQuery() {
 }
 
 /**
+ * True only for F5 / reload-button / same-URL Enter — not for editing `?date=`.
+ * @returns {boolean}
+ */
+function isPageReload() {
+    const nav = performance.getEntriesByType('navigation')[0];
+    if (nav) {
+        return nav.type === 'reload';
+    }
+
+    return performance.navigation?.type === 1;
+}
+
+/**
  * Parse URL query.
  * Invalid values restore the previous query instead of forcing today/Easy.
- * On load, a valid but non-today `date` snaps to today + Easy (refresh / stale link).
+ * Changing `?date=` (a new navigation) loads that archive puzzle.
+ * Reloading while `date` is not today snaps to today + Easy.
  * When `date` is already today, difficulty from the query is kept.
- * @returns {{ date: string, difficulty: string, wasInvalid: boolean }}
+ *
+ * The reload snap deliberately leaves the query alone and reports it as
+ * `snappedFrom`: unsaved progress may still have to be confirmed first, and the
+ * address bar must not move until that is answered.
+ * @returns {{
+ *   date: string,
+ *   difficulty: string,
+ *   wasInvalid: boolean,
+ *   snappedFrom: { date: string, difficulty: string } | null,
+ * }}
  */
 export function resolveQuery() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -162,22 +186,26 @@ export function resolveQuery() {
     if (wasInvalid) {
         const { date, difficulty } = getPreviousQuery();
         redirectToQuery(date, difficulty);
-        return { date, difficulty, wasInvalid: true };
+        return { date, difficulty, wasInvalid: true, snappedFrom: null };
     }
 
     const today = toDateKey();
     const date = parseQueryDate(urlParams);
-    let difficulty = parseQueryDifficulty(urlParams);
+    const difficulty = parseQueryDifficulty(urlParams);
 
-    if (date !== today) {
-        difficulty = Difficulty.EASY.name;
-        redirectToQuery(today, difficulty);
-        return { date: today, difficulty, wasInvalid: false };
+    if (date !== today && isPageReload()) {
+        return {
+            date: today,
+            difficulty: Difficulty.EASY.name,
+            wasInvalid: false,
+            snappedFrom: { date, difficulty },
+        };
     }
 
     return {
         date,
         difficulty,
         wasInvalid: false,
+        snappedFrom: null,
     };
 }
