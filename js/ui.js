@@ -938,6 +938,12 @@ export function handlePointerMove(event, gameState) {
         return;
     }
 
+    // Drag takes over: drop any pending corner so .selected margin/hit-testing
+    // can't stall the gesture, and release won't be treated as a second click.
+    if (!wasDragging && gameState.pendingSelection) {
+        gameState.pendingSelection = null;
+    }
+
     paintCellStates(gameState);
 }
 
@@ -977,12 +983,20 @@ export function handlePointerUp(event, gameState, puzzle) {
 
     // Drag that ended on the start cell (press-release or drag-back) is not a rectangle.
     if (origin.row === current.row && origin.col === current.col) {
+        gameState.pendingSelection = null;
+        suppressClickAfterDrag = true;
         paintCellStates(gameState);
+        setTimeout(() => {
+            suppressClickAfterDrag = false;
+        }, 50);
         return;
     }
 
     // Real drag: commit through the shared placement path.
     // Swallow the synthetic click that follows a drag, then clear the flag.
+    // Pending corner (if any) is already cleared when the drag started; clear
+    // again for fast flicks that only resolve on pointerup.
+    gameState.pendingSelection = null;
     suppressClickAfterDrag = true;
     placeRectangle(origin, current, gameState, puzzle);
     setTimeout(() => {
