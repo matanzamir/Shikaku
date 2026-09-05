@@ -40,7 +40,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 0.2rem var(--page-gap) 0;
+    padding: calc(var(--page-gap) + var(--top-bar-extra)) var(--page-gap) 0;
     box-sizing: border-box;
     gap: 0;
 }
@@ -53,11 +53,11 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 10px;
+    gap: calc(var(--u) * 0.625);
 }
 
 .button {
-    height: 46px;
+    height: var(--button-size);
     border-radius: 999px;
     border: 1.5px solid var(--surface-border-strong-color);
     background: var(--board-background-color);
@@ -66,7 +66,7 @@ body {
     overflow: hidden;
     white-space: nowrap;
     font-family: 'Inter', sans-serif;
-    font-size: 0.875rem;
+    font-size: var(--button-font-size);
     font-weight: 600;
     letter-spacing: 0.01em;
     color: transparent;
@@ -88,15 +88,15 @@ body {
    Label text ("Dark Mode"/"Light Mode") is set by ui.js to the theme
    that would apply if pressed. Icons are sun (::before) + moon (::after). */
 #light-dark-button {
-    width: 46px;
-    padding: 0 46px 0 0;
+    width: var(--button-size);
+    padding: 0 var(--button-size) 0 0;
 }
 
 #light-dark-button:hover,
 #light-dark-button:focus-visible {
-    width: 8.5rem;
+    width: calc(var(--u) * 8.5);
     border-radius: 999px;
-    padding-left: 1rem;
+    padding-left: var(--u);
     color: var(--surface-text-color);
     outline: none;
 }
@@ -106,10 +106,10 @@ body {
     content: "";
     position: absolute;
     top: 50%;
-    right: 13px;
-    width: 20px;
-    height: 20px;
-    margin-top: -10px;
+    right: calc(var(--u) * 0.8125);
+    width: var(--icon-size);
+    height: var(--icon-size);
+    margin-top: calc(var(--icon-size) / -2);
     background-color: var(--primary-color);
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
@@ -152,7 +152,7 @@ html[data-theme="dark"] #light-dark-button::after {
    Hidden unless html[data-archive-day] (set in head from ?date=, synced in JS). */
 #return-to-today {
     display: none;
-    grid-template-columns: 0fr 46px;
+    grid-template-columns: 0fr var(--button-size);
     width: max-content;
     padding: 0;
     align-items: center;
@@ -175,9 +175,9 @@ html[data-archive-day] #return-to-today {
 
 #return-to-today:hover,
 #return-to-today:focus-visible {
-    grid-template-columns: 1fr 46px;
+    grid-template-columns: 1fr var(--button-size);
     border-radius: 999px;
-    padding-left: 1rem;
+    padding-left: var(--u);
     color: var(--surface-text-color);
     outline: none;
 }
@@ -186,10 +186,10 @@ html[data-archive-day] #return-to-today {
     content: "";
     position: absolute;
     top: 50%;
-    right: 13px;
-    width: 20px;
-    height: 20px;
-    margin-top: -10px;
+    right: calc(var(--u) * 0.8125);
+    width: var(--icon-size);
+    height: var(--icon-size);
+    margin-top: calc(var(--icon-size) / -2);
     background-color: var(--primary-color);
     -webkit-mask-image: url("../assets/icons/return-to-today.svg");
     mask-image: url("../assets/icons/return-to-today.svg");
@@ -206,8 +206,8 @@ html[data-archive-day] #return-to-today {
    Collapsed = track only; hover expands left and reveals current mode label.
    Expanded width is a real length (per mode) so hover AND click width changes ease. */
 #selection-mode-switch {
-    --selection-inset: 2px;
-    --selection-track-width: 72px;
+    --selection-inset: calc(var(--u) * 0.125);
+    --selection-track-width: calc(var(--u) * 4.5);
     /* Approximate label measure; overridden per data-mode */
     --selection-label-width: 2.75em;
     /* border-box: track + equal insets + outer 1.5px border on each side */
@@ -217,7 +217,7 @@ html[data-archive-day] #return-to-today {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.5rem;
+    gap: calc(var(--u) * 0.5);
     cursor: pointer;
     overflow: hidden;
     transition:
@@ -242,14 +242,14 @@ html[data-archive-day] #return-to-today {
 #selection-mode-switch:focus-visible {
     /* left pad + gap + label + track + right inset + outer borders */
     width: calc(
-        1rem
-        + 0.5rem
+        var(--u)
+        + var(--u) * 0.5
         + var(--selection-label-width)
         + var(--selection-track-width)
         + var(--selection-inset)
         + 3px
     );
-    padding-left: 1rem;
+    padding-left: var(--u);
     color: var(--surface-text-color);
     outline: none;
 }
@@ -304,10 +304,10 @@ html[data-archive-day] #return-to-today {
     position: absolute;
     top: 50%;
     /* default: drag (matches HTML + storage default; mode rules below override) */
-    left: 37px;
-    width: 30px;
-    height: 30px;
-    margin-top: -15px;
+    left: calc(var(--u) * 2.3125);
+    width: calc(var(--u) * 1.875);
+    height: calc(var(--u) * 1.875);
+    margin-top: calc(var(--u) * -0.9375);
     border-radius: 50%;
     background: var(--primary-color);
     box-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.35);
@@ -324,8 +324,8 @@ html[data-archive-day] #return-to-today {
     position: absolute;
     inset: 0;
     margin: auto;
-    width: 16px;
-    height: 16px;
+    width: var(--u);
+    height: var(--u);
     background-color: var(--on-primary-color);
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
@@ -338,9 +338,9 @@ html[data-archive-day] #return-to-today {
     transition: opacity 0.2s ease;
 }
 
-/* 72px track, 30px thumb: left / center / right */
+/* 4.5u track, 1.875u thumb: left / center / right */
 #selection-mode-switch[data-mode="corners"] .selection-mode-thumb {
-    left: 2px;
+    left: calc(var(--u) * 0.125);
 }
 
 #selection-mode-switch[data-mode="corners"] .selection-mode-thumb::before {
@@ -349,7 +349,7 @@ html[data-archive-day] #return-to-today {
 }
 
 #selection-mode-switch[data-mode="both"] .selection-mode-thumb {
-    left: 20px;
+    left: calc(var(--u) * 1.25);
 }
 
 #selection-mode-switch[data-mode="both"] .selection-mode-thumb::before {
@@ -358,7 +358,7 @@ html[data-archive-day] #return-to-today {
 }
 
 #selection-mode-switch[data-mode="drag"] .selection-mode-thumb {
-    left: 37px;
+    left: calc(var(--u) * 2.3125);
 }
 
 #selection-mode-switch[data-mode="drag"] .selection-mode-thumb::before {
@@ -384,10 +384,10 @@ html[data-archive-day] #return-to-today {
 }
 
 #date {
-    margin-top: 5px;
+    margin-top: calc(var(--u) * 0.3125);
     padding: 0;
     font-family: 'Inter', sans-serif;
-    font-size: 1rem;
+    font-size: var(--date-font-size);
     font-weight: 500;
     letter-spacing: 0.06em;
     line-height: 1.1;
@@ -402,7 +402,7 @@ html[data-archive-day] #return-to-today {
     width: 100%;
     display: flex;
     flex-direction: column;
-    padding: 0.35rem var(--page-gap) var(--board-outer-gap);
+    padding: calc(var(--u) * 0.35) var(--page-gap) var(--board-outer-gap);
     box-sizing: border-box;
 }
 
@@ -418,7 +418,8 @@ html[data-archive-day] #return-to-today {
     outline: none;
 }
 
-/* Board stays centered; score sits in the free space to its left */
+/* Board stays centered; on a laptop the score sits in the free space to its
+   left. Tall (or very narrow) screens drop it under the board instead. */
 #board-stage {
     position: relative;
     display: flex;
@@ -438,11 +439,11 @@ html[data-archive-day] #return-to-today {
     top: 50%;
     transform: translateY(-50%);
     margin: 0;
-    padding: 0 0.5rem;
+    padding: 0 calc(var(--u) * 0.5);
     text-align: center;
     white-space: pre-line;
     font-family: 'Inter', sans-serif;
-    font-size: clamp(1rem, 2.2vw, 1.35rem);
+    font-size: clamp(0.875rem, 1.7vw, calc(var(--u) * 1.1));
     font-weight: 500;
     line-height: 1.35;
     color: var(--text-color);
@@ -453,16 +454,12 @@ html[data-archive-day] #return-to-today {
     pointer-events: none;
 }
 
-@media (max-width: 720px) {
+/* Narrow phones have no side gutter. Tall desktops have spare height, so the
+   board can shrink and the score can sit underneath. Laptops (short + wide)
+   keep the side placement so the square doesn't lose more vertical room. */
+@media (max-width: 720px), (min-width: 721px) and (min-height: 900px) {
     :root {
-        --layout-chrome: calc(
-            var(--page-gap) * 1.25 +
-            var(--section-gap) * 2.25 +
-            var(--header-font-size) * 1 +
-            1.1rem +
-            var(--control-bar-height) +
-            var(--board-outer-gap) * 2
-        );
+        --score-slot: calc(var(--score-gap) + var(--u) * 1.5);
     }
 
     #score {
@@ -473,12 +470,13 @@ html[data-archive-day] #return-to-today {
         top: auto;
         text-align: center;
         max-width: var(--board-width);
+        max-height: none;
         order: 1;
     }
 
     #board-stage {
         flex-direction: column;
-        gap: 0.75rem;
+        gap: var(--score-gap);
     }
 }
 
@@ -490,15 +488,15 @@ html[data-archive-day] #return-to-today {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 22px;
+    gap: calc(var(--u) * 1.375);
     flex-wrap: wrap;
     box-sizing: border-box;
 }
 
 /* ---- reset button: circular icon button (mockup .btn-icon) ---- */
 #reset-board-button {
-    width: 46px;
-    height: 46px;
+    width: var(--button-size);
+    height: var(--button-size);
     padding: 0;
     border-radius: 50%;
     border: 1.5px solid var(--surface-border-strong-color);
@@ -512,16 +510,16 @@ html[data-archive-day] #return-to-today {
 }
 
 #reset-board-button svg {
-    width: 20px;
-    height: 20px;
+    width: var(--icon-size);
+    height: var(--icon-size);
 }
 
 /* ---- timer: pill chip (mockup .timer-chip) ---- */
 #timer {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 8px 8px 18px;
+    gap: calc(var(--u) * 0.75);
+    padding: calc(var(--u) * 0.5) calc(var(--u) * 0.5) calc(var(--u) * 0.5) calc(var(--u) * 1.125);
     border-radius: 999px;
     border: 1.5px solid var(--surface-border-strong-color);
     background: var(--board-background-color);
@@ -532,20 +530,20 @@ html[data-archive-day] #return-to-today {
 #seconds {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: calc(var(--u) * 1.1);
     letter-spacing: 0.03em;
     color: var(--surface-text-color);
 }
 
 #pause-button {
-    width: 34px;
-    height: 34px;
+    width: calc(var(--u) * 2.125);
+    height: calc(var(--u) * 2.125);
     padding: 0;
     border: none;
     border-radius: 50%;
     background: var(--primary-color);
     color: var(--on-primary-color);
-    font-size: 0.9rem;
+    font-size: calc(var(--u) * 0.9);
     line-height: 1;
     display: flex;
     align-items: center;
@@ -559,8 +557,8 @@ html[data-archive-day] #return-to-today {
    per data-difficulty when unique icons exist). */
 .difficulty-pill {
     position: relative;
-    width: 46px;
-    height: 46px;
+    width: var(--button-size);
+    height: var(--button-size);
 }
 
 #difficulty-button {
@@ -578,8 +576,8 @@ html[data-archive-day] #return-to-today {
 }
 
 .difficulty-shape[data-difficulty="easy"] {
-    width: 15px;
-    height: 15px;
+    width: calc(var(--u) * 0.9375);
+    height: calc(var(--u) * 0.9375);
     display: inline-block;
     background-color: green;
     
@@ -594,18 +592,18 @@ html[data-archive-day] #return-to-today {
 }
 
 .difficulty-shape[data-difficulty="medium"] {
-    width: 11px;
-    height: 11px;
-    border-radius: 2px;
+    width: calc(var(--u) * 0.6875);
+    height: calc(var(--u) * 0.6875);
+    border-radius: calc(var(--u) * 0.125);
     background: #007fff;
     flex: 0 0 auto;
     pointer-events: none;
 }
 
 .difficulty-shape[data-difficulty="hard"] {
-    width: 11px;
-    height: 11px;
-    border-radius: 2px;
+    width: calc(var(--u) * 0.6875);
+    height: calc(var(--u) * 0.6875);
+    border-radius: calc(var(--u) * 0.125);
     background: var(--primary-color);
     transform: rotate(45deg);
     flex: 0 0 auto;
@@ -614,15 +612,15 @@ html[data-archive-day] #return-to-today {
 
 #difficulty-menu {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + var(--u) * 0.5);
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
-    padding: 6px;
+    padding: calc(var(--u) * 0.375);
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: calc(var(--u) * 0.375);
     border-radius: 999px;
     border: 1.5px solid var(--surface-border-strong-color);
     background: var(--board-background-color);
@@ -635,8 +633,8 @@ html[data-archive-day] #return-to-today {
 }
 
 .difficulty-option {
-    width: 34px;
-    height: 34px;
+    width: calc(var(--u) * 2.125);
+    height: calc(var(--u) * 2.125);
     padding: 0;
     border-radius: 50%;
     border: 1.5px solid var(--surface-border-color);

@@ -44,52 +44,90 @@
     --primary-rgb: 122, 51, 80;                  /* raw triplet for rgba() tinting; matches --primary-color */
     --shadow-tight: 0 4px 10px rgba(96, 25, 58, 0.14); /* small shadow for pill/icon buttons */
 
+    /* fluid scale
+       --u is the base unit every fixed size is expressed in. It sits at exactly
+       1rem for laptop-sized viewports and anything smaller (so those layouts
+       stay pixel-identical), and only grows once *both* axes are roomier than
+       that reference — min() keeps a wide-but-short or tall-but-narrow window
+       from inflating the UI. --grow is how far past the reference we are (0 on
+       a laptop), so `calc(<laptop value> + var(--grow) * k)` gives an element
+       extra presence on a big screen without touching the laptop rendering. */
+    --u: clamp(1rem, min(1.05vw, 2vh), 1.5rem);
+    --grow: calc(var(--u) - 1rem);
+
+    /* shared chrome sizes (46px / 20px / 0.875rem at the laptop reference) */
+    --button-size: calc(var(--u) * 2.875);
+    /* No extra --grow term here: the expanded pill widths are multiples of --u
+       (and the switch labels are in em), so the label only stays inside its
+       pill if the text scales by exactly the same factor. */
+    --button-font-size: calc(var(--u) * 0.875);
+    --icon-size: calc(var(--u) * 1.25);
+
     /* layout
        --grid-size is unitless (set from JS). Larger grids slightly compress
        chrome so the board square gains a little room without redesign. */
     --grid-size: 7;
     --chrome-compress: clamp(0.88, calc(1.12 - (var(--grid-size) * 0.018)), 1);
-    --header-font-size: calc(clamp(1.75rem, 4vw + 0.5rem, 3.75rem) * var(--chrome-compress));
-    --page-gap: clamp(1rem, 2.5vh, 1.5rem);
-    --section-gap: calc(clamp(1rem, 3vh, 2.5rem) * var(--chrome-compress));
-    --board-outer-gap: calc(clamp(1.5rem, 4vh, 2.5rem) * var(--chrome-compress));
-    --control-bar-height: 2.5rem;
+    /* Headline stays at the laptop size on every viewport (only grid-density
+       compress still applies). */
+    --header-font-size: calc(5rem * var(--chrome-compress));
+    --date-font-size: var(--u);
+    /* Breathing room above the title; 0 extra on a laptop, grows with the page. */
+    --top-bar-extra: calc(var(--grow) * 3);
+    --page-gap: calc(clamp(1rem, 2.5vh, 1.5rem) + var(--grow) * 1.2);
+    --section-gap: calc((clamp(1rem, 3vh, 2.5rem) + var(--grow) * 1.4) * var(--chrome-compress));
+    --board-outer-gap: calc((clamp(1.5rem, 4vh, 2.5rem) + var(--grow) * 1.6) * var(--chrome-compress));
+    --control-bar-height: calc(var(--u) * 2.5);
+    /* Score sits beside the board on a laptop (no vertical cost). Tall/narrow
+       layouts switch it underneath and set --score-slot so the board shrinks
+       to leave a line for it. --board-air is extra unused height on large
+       screens so the square doesn't keep eating the leftover viewport. */
+    --score-slot: 0px;
+    --score-gap: calc(var(--u) * 1.75);
+    --board-air: calc(var(--grow) * 12);
+    /* Board is whatever height the chrome leaves over, so growing the chrome
+       above is also what keeps the board from ballooning on a big screen. */
     --layout-chrome: calc(
-        var(--page-gap) * 1.25 +
+        var(--page-gap) * 2.25 +
         var(--section-gap) * 1.5 +
         var(--header-font-size) * 1 +
-        1.1rem +
+        var(--u) * 1.1 +
+        var(--top-bar-extra) +
         var(--control-bar-height) +
-        var(--board-outer-gap) * 2
+        var(--board-outer-gap) * 2 +
+        var(--score-slot)
     );
 
     /* board
        Outer radius + frame gap both track cell density. Grid radius is
        outer − gap so the board and grid curves stay concentric (parallel). */
     --board-box-shadow: 0px 0px 10px 0px var(--shadow-color);
-    --board-width: min(100vw, calc(100dvh - var(--layout-chrome)));
-    --board-max-height: calc(100dvh - var(--layout-chrome));
+    --board-width: min(100vw, calc(100dvh - var(--layout-chrome) - var(--board-air)));
+    --board-max-height: calc(100dvh - var(--layout-chrome) - var(--board-air));
     --board-border-width: 1.5px;
     /* rough cell before frame (avoids circular deps with padding) */
     --cell-size-raw: calc(var(--board-width) / var(--grid-size));
-    --board-inner-padding: clamp(4px, calc(var(--cell-size-raw) * 0.16), 10px);
-    --board-border-radius: clamp(10px, calc(var(--cell-size-raw) * 0.52), 24px);
+    --board-inner-padding: clamp(calc(var(--u) * 0.25), calc(var(--cell-size-raw) * 0.16), calc(var(--u) * 0.625));
+    --board-border-radius: clamp(calc(var(--u) * 0.625), calc(var(--cell-size-raw) * 0.52), calc(var(--u) * 1.5));
     /* Concentric frame: inner curve tracks outer by the same inset as the padding */
     --grid-corner-radius: max(0px, calc(var(--board-border-radius) - var(--board-inner-padding)));
     /* drawer/modals keep a stable curve (not density-linked) */
-    --surface-radius: 22px;
+    --surface-radius: calc(var(--u) * 1.375);
 
-    /* drawer */
-    --drawer-width: min(80vw, 18rem);
+    /* drawer — width stays ~19% of the page instead of capping at 18rem */
+    --drawer-width: min(80vw, calc(var(--u) * 18 + var(--grow) * 4));
 
     /* grid — shrinks into the board padding; cell size accounts for the frame */
     --cell-size: calc(
         (var(--board-width) - 2 * var(--board-inner-padding) - 2 * var(--board-border-width))
         / var(--grid-size)
     );
-    --cell-font-size: clamp(0.5rem, calc(var(--cell-size) * 0.42), 1.3rem);
-    --rect-edge-inset: clamp(1px, calc(var(--cell-size) * 0.1), 4px);
-    --rect-border-width: clamp(1px, calc(var(--cell-size) * 0.055), 2px);
+    /* Clue text is cap-bound at every size, so the cap is what sets the
+       text-to-cell ratio — scaling it with the page keeps clues legible
+       inside the larger cells of a big display. */
+    --cell-font-size: clamp(0.5rem, calc(var(--cell-size) * 0.42), calc(var(--u) * 1.3 + var(--grow) * 0.8));
+    --rect-edge-inset: clamp(1px, calc(var(--cell-size) * 0.1), calc(var(--u) * 0.25));
+    --rect-border-width: clamp(1px, calc(var(--cell-size) * 0.055), calc(var(--u) * 0.125));
 }
 
 html {

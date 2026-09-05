@@ -203,7 +203,7 @@
     flex-direction: column;
     align-items: center;
     gap: var(--page-gap);
-    max-width: min(80vw, 22rem);
+    max-width: min(80vw, calc(var(--u) * 22));
 }
 
 #message {
@@ -211,17 +211,18 @@
     text-align: center;
     color: var(--on-primary-color);
     font-family: 'Inter', sans-serif;
+    font-size: calc(var(--u) * 1.17);
 }
 
 .modal-buttons {
     display: flex;
-    gap: 12px;
+    gap: calc(var(--u) * 0.75);
 }
 
 .modal-buttons button {
-    padding: 10px 22px;
+    padding: calc(var(--u) * 0.625) calc(var(--u) * 1.375);
     border-radius: 999px;
-    font: 600 14px 'Inter', sans-serif;
+    font: 600 calc(var(--u) * 0.875) 'Inter', sans-serif;
     cursor: pointer;
     border: 1.5px solid var(--surface-border-strong-color);
 }
