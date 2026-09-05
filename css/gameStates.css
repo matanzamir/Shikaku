@@ -66,8 +66,8 @@
         border-color: var(--primary-color);
     }
     50% {
-        background-color: rgba(200, 50, 70, 0.45);
-        border-color: rgb(200, 50, 70);
+        background-color: color-mix(in srgb, var(--danger-color) 45%, transparent);
+        border-color: var(--danger-color);
     }
 }
 
@@ -78,7 +78,7 @@
 /* Rectangle confirmed correct (locked): mockup's "valid" treatment —
    filled solid + solid border in the deeper accent shade. */
 .validated {
-    background-color: var(--primary-color);
+    background-color: var(--validated-fill-color);
     color: var(--on-primary-color);
 }
 
@@ -98,34 +98,36 @@
     border-right-color: var(--primary-deep-color);
 }
 
-/* Pending first-corner selection: dashed outline + faint tint. */
+/* Pending first-corner selection: dashed outline + faint tint, in the
+   secondary (gold) accent — visually distinct from the primary (rose) fill
+   used once a rectangle is validated, and from the danger-red invalid flash. */
 .selected {
     margin: var(--rect-edge-inset);
-    border: var(--rect-border-width) dashed var(--primary-color);
+    border: var(--rect-border-width) dashed var(--secondary-color);
     border-radius: var(--grid-corner-radius);
-    background-color: rgba(var(--primary-rgb), 0.12);
+    background-color: rgba(var(--secondary-rgb), 0.18);
 }
 
 /* Legacy cell-level drag preview blocked look (overlay is primary now). */
 .rectangle.preview-blocked {
-    background-color: rgba(200, 50, 70, 0.12);
+    background-color: color-mix(in srgb, var(--danger-color) 12%, transparent);
     color: var(--surface-text-color);
 }
 
 .rectangle.preview-blocked.edge-top {
-    border-top-color: rgb(200, 50, 70);
+    border-top-color: var(--danger-color);
 }
 
 .rectangle.preview-blocked.edge-bottom {
-    border-bottom-color: rgb(200, 50, 70);
+    border-bottom-color: var(--danger-color);
 }
 
 .rectangle.preview-blocked.edge-left {
-    border-left-color: rgb(200, 50, 70);
+    border-left-color: var(--danger-color);
 }
 
 .rectangle.preview-blocked.edge-right {
-    border-right-color: rgb(200, 50, 70);
+    border-right-color: var(--danger-color);
 }
 
 

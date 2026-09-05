@@ -13,10 +13,11 @@ select {
 body {
     margin: 0;
     height: 100dvh;
-    /* dark-mode/light-mode aware radial backdrop, replaces the old 2-stop linear gradient */
+    /* dark-mode/light-mode aware backdrop wash — soft two-stop gradient that
+       shifts gently between themes without touching the accent colors */
     background: linear-gradient(to bottom,
-        var(--secondary-color),
-        var(--primary-color));
+        var(--bg-top-color),
+        var(--bg-bottom-color));
     font-family: 'Inter', sans-serif;
     display: flex;
     flex-direction: column;
@@ -295,7 +296,7 @@ html[data-archive-day] #return-to-today {
     width: var(--selection-track-width);
     height: calc(100% - 2 * var(--selection-inset));
     border-radius: 999px;
-    border: 1.5px solid var(--secondary-color);
+    border: 1.5px solid var(--surface-border-strong-color);
     box-sizing: border-box;
     align-self: center;
 }
@@ -524,6 +525,10 @@ html[data-archive-day] #return-to-today {
     border: 1.5px solid var(--surface-border-strong-color);
     background: var(--board-background-color);
     box-shadow: var(--shadow-tight);
+    /* #minutes/#seconds set their own color, but the bare ":" text node
+       between them isn't wrapped in an element — it inherits from here.
+       Without this it defaults to black and disappears on the dark card. */
+    color: var(--surface-text-color);
 }
 
 #minutes,

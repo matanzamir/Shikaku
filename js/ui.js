@@ -809,8 +809,10 @@ function refreshDifficultyMenu() {
 
 export function openAlertBox(message) {
     const alertBox = document.getElementById('alert-box');
+    const alertBackdrop = document.getElementById('alert-backdrop');
     document.getElementById('message').textContent = message;
     message === Message.INVALID_QUERY ? document.getElementById('cancel-btn').hidden = true : document.getElementById('cancel-btn').hidden = false;
+    alertBackdrop.hidden = false;
     alertBox.hidden = false;
 
     return new Promise((resolve) => {
@@ -819,6 +821,7 @@ export function openAlertBox(message) {
 
         const cleanup = (result) => {
             alertBox.hidden = true;
+            alertBackdrop.hidden = true;
             okBtn.removeEventListener('click', onOk);
             cancelBtn.removeEventListener('click', onCancel);
             resolve(result);

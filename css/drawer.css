@@ -100,11 +100,13 @@
     max-height: 50%;
     aspect-ratio: 1 / 1;
     position: relative;
-    border: 1.5px solid var(--surface-border-color);
+    border: 1.5px solid var(--instructions-border-color);
     border-radius: var(--surface-radius);
     box-sizing: border-box;
     overflow: hidden;
-    background-color: var(--cell-background-color);
+    /* stays a fixed light card in both themes — matches the (light) source
+       screenshots shown inside it */
+    background-color: var(--instructions-surface-color);
 }
 
 #instructions-loader {
@@ -127,7 +129,8 @@
 #instructions-loader h3 {
     margin: 0;
     text-align: center;
-    color: var(--surface-text-color);
+    /* fixed dark text — the instructions card behind it stays light in both themes */
+    color: var(--instructions-text-color);
     font-family: 'Inter', sans-serif;
     font-size: calc(var(--u) * 1.17);
 }

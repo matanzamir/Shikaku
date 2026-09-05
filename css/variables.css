@@ -7,7 +7,7 @@
 @property --secondary-color {
     syntax: '<color>';
     inherits: true;
-    initial-value: rgb(217, 160, 188);
+    initial-value: rgb(212, 168, 96);
 }
 
 @property --board-background-color {
@@ -22,11 +22,78 @@
     initial-value: rgb(0, 0, 0);
 }
 
+/* Registered so these theme-dependent surface tokens can also cross-fade
+   smoothly (via --theme-transition) instead of snapping when the theme flips. */
+@property --cell-background-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(244, 232, 236);
+}
+
+@property --surface-border-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(227, 199, 208);
+}
+
+@property --surface-border-strong-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(215, 171, 187);
+}
+
+@property --surface-text-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(42, 24, 38);
+}
+
+@property --muted-text-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(122, 85, 104);
+}
+
+@property --primary-deep-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(90, 35, 57);
+}
+
+@property --on-primary-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(251, 241, 244);
+}
+
+@property --validated-fill-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(182, 73, 126);
+}
+
+/* Ambient page backdrop — decoupled from --primary/--secondary-color (those
+   stay fixed brand accents used on buttons/board) so the backdrop can shift
+   gently between themes without dragging every accent color along with it. */
+@property --bg-top-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(217, 160, 188);
+}
+
+@property --bg-bottom-color {
+    syntax: '<color>';
+    inherits: true;
+    initial-value: rgb(182, 73, 126);
+}
+
 :root {
 
     /* colors and fonts */
     --primary-color: rgb(182, 73, 126);
-    --secondary-color: rgb(217, 160, 188);
+    /* soft warm gold — complements the rose primary; used for the
+       pending/unconfirmed ("selected") rectangle state */
+    --secondary-color: rgb(212, 168, 96);
     --board-background-color: rgb(255, 255, 240);
     --shadow-color: rgb(0, 0, 0);
     --font-family: "Bungee Shade", monospace;
@@ -42,7 +109,23 @@
     --grid-line-color: rgb(233, 214, 222);       /* hairline between empty cells */
     --muted-text-color: rgb(122, 85, 104);       /* secondary/soft text (icons, captions) */
     --primary-rgb: 122, 51, 80;                  /* raw triplet for rgba() tinting; matches --primary-color */
+    --secondary-rgb: 212, 168, 96;                /* raw triplet for rgba() tinting; matches --secondary-color */
     --shadow-tight: 0 4px 10px rgba(96, 25, 58, 0.14); /* small shadow for pill/icon buttons */
+
+    /* ambient page backdrop (gradient behind everything); overridden per theme below */
+    --bg-top-color: rgb(217, 160, 188);
+    --bg-bottom-color: rgb(182, 73, 126);
+
+    /* validated (confirmed-correct) rectangle fill — decoupled from
+       --primary-color so it can be tuned independently per theme without
+       also recoloring every button/icon that uses the primary accent */
+    --validated-fill-color: rgb(182, 73, 126);
+
+    /* instructions slideshow intentionally stays a fixed light card in both
+       themes (matches the source screenshots, which are light) */
+    --instructions-surface-color: rgb(244, 232, 236);
+    --instructions-text-color: rgb(42, 24, 38);
+    --instructions-border-color: rgb(227, 199, 208);
 
     /* fluid scale
        --u is the base unit every fixed size is expressed in. It sits at exactly
@@ -135,27 +218,79 @@ html {
         --primary-color var(--theme-transition),
         --secondary-color var(--theme-transition),
         --board-background-color var(--theme-transition),
-        --shadow-color var(--theme-transition);
+        --shadow-color var(--theme-transition),
+        --cell-background-color var(--theme-transition),
+        --surface-border-color var(--theme-transition),
+        --surface-border-strong-color var(--theme-transition),
+        --surface-text-color var(--theme-transition),
+        --muted-text-color var(--theme-transition),
+        --primary-deep-color var(--theme-transition),
+        --on-primary-color var(--theme-transition),
+        --bg-top-color var(--theme-transition),
+        --bg-bottom-color var(--theme-transition);
 }
 
 html[data-theme="light"] {
     /* accent stays constant across themes; only the ambient backdrop shifts */
     --primary-color: rgb(182, 73, 126);
-    --secondary-color: rgb(217, 160, 188);
+    --secondary-color: rgb(212, 168, 96);
+    --secondary-rgb: 212, 168, 96;
     --board-background-color: rgb(251, 244, 242);
     --shadow-color: rgba(96, 25, 58, 0.16);
     --board-box-shadow: 0 14px 30px var(--shadow-color);
     --text-color: rgb(42, 24, 38);
 
     --title-accent-color: rgb(122, 51, 80);
+    --danger-color: rgb(200, 50, 70);
+    --danger-text-color: rgb(160, 40, 55);
+
+    /* same soft pastel wash the page has always used */
+    --bg-top-color: rgb(217, 160, 188);
+    --bg-bottom-color: rgb(182, 73, 126);
+
+    --validated-fill-color: rgb(182, 73, 126);
 }
 
 html[data-theme="dark"] {
-    --text-color: rgb(245, 235, 240);
-    --primary-color: rgb(130, 48, 92);
-    --secondary-color: rgb(54, 18, 36);
-    --board-background-color: rgb(248, 243, 240);
-    --shadow-color: rgba(0, 0, 0, 0.45);
-    --board-box-shadow: 0 14px 30px var(--shadow-color);
-    --title-accent-color: rgb(224, 148, 179);
+    /* Same rosy hue family as the light backdrop, just deepened and muted —
+       a soft, quiet dark rather than a jump to near-black/neon. */
+    --text-color: rgb(240, 230, 238);
+    --primary-color: rgb(206, 96, 148);
+    /* same warm gold accent, muted slightly to match the deeper dark palette */
+    --secondary-color: rgb(196, 148, 92);
+    --secondary-rgb: 196, 148, 92;
+    --shadow-color: rgba(0, 0, 0, 0.6);
+    --board-box-shadow: 0 14px 34px var(--shadow-color);
+    --title-accent-color: rgb(230, 172, 198);
+
+    /* muted, dusty mauve → soft plum-rose: noticeably darker than the light
+       wash but keeps the same gentle two-stop feel, no harsh jump */
+    --bg-top-color: rgb(44, 32, 42);
+    --bg-bottom-color: rgb(120, 62, 92);
+
+    /* surfaces: board/buttons/drawer/menus now sit on a dark plum panel
+       instead of reusing the light theme's near-white card color */
+    --board-background-color: rgb(30, 21, 28);
+    --cell-background-color: rgb(42, 29, 39);
+    --grid-line-color: rgb(62, 45, 56);
+    --surface-border-color: rgb(70, 50, 62);
+    --surface-border-strong-color: rgb(96, 68, 84);
+    --surface-text-color: rgb(238, 226, 233);
+    --muted-text-color: rgb(186, 156, 171);
+    /* validated-rectangle border: a muted rose lift on top of the deep
+       burgundy fill below, rather than the bright pink used to (fine when
+       paired with the old, lighter fill, but too jarring against this one) */
+    --primary-deep-color: rgb(198, 128, 156);
+    --on-primary-color: rgb(250, 240, 246);
+    --primary-rgb: 206, 96, 148;
+    /* validated fill: a deep burgundy-wine, darker still than before and in
+       the same hue family as the backdrop's --bg-bottom-color, so a
+       confirmed rectangle reads as a calm, receding "shadow" of the page
+       behind it — clearly darker/richer than the empty-cell fill (so it
+       stays distinct from an unvalidated rectangle) but far quieter than
+       the bright pink used for buttons/icons */
+    --validated-fill-color: rgb(88, 46, 68);
+    /* lighter than the light-theme reds so it still reads on a dark cell */
+    --danger-color: rgb(224, 96, 112);
+    --danger-text-color: rgb(255, 178, 186);
 }
