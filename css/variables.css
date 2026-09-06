@@ -151,9 +151,16 @@
        chrome so the board square gains a little room without redesign. */
     --grid-size: 7;
     --chrome-compress: clamp(0.88, calc(1.12 - (var(--grid-size) * 0.018)), 1);
-    /* Headline stays at the laptop size on every viewport (only grid-density
-       compress still applies). */
-    --header-font-size: calc(5rem * var(--chrome-compress));
+    /* Headline is a true constant: it must look identical on every viewport
+       AND on every difficulty, so it's decoupled from --chrome-compress (the
+       grid-density term above) entirely — it no longer shrinks on harder
+       difficulties. 3.75rem matches the size the old viewport-driven formula
+       (clamp(1.75rem, 4vw + 0.5rem, 3.75rem)) actually rendered at on any
+       laptop/desktop width, since typical screens already hit that 3.75rem
+       cap. Keeping that same value here means the headline still reads at
+       its familiar size while leaving more of the limited viewport height
+       for the board, especially on short/laptop screens at dense difficulties. */
+    --header-font-size: 3.75rem;
     --date-font-size: var(--u);
     /* Breathing room above the title; 0 extra on a laptop, grows with the page. */
     --top-bar-extra: calc(var(--grow) * 3);
