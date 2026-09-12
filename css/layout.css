@@ -13,7 +13,7 @@ select {
 body {
     margin: 0;
     height: 100dvh;
-    /* dark-mode/light-mode aware backdrop wash — soft two-stop gradient that
+    /* dark-mode/light-mode aware backdrop wash — soft two-stop gradient tha
        shifts gently between themes without touching the accent colors */
     background: linear-gradient(to bottom,
         var(--bg-top-color),
@@ -585,11 +585,9 @@ html[data-archive-day] #return-to-today {
     height: calc(var(--u) * 0.9375);
     display: inline-block;
     background-color: green;
-    
     /* Use the SVG as a stencil mask */
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='12' height='10' viewBox='0 0 12 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.84261 0.966004L0.656931 7.59332C0.236382 8.25919 0.714864 9.12732 1.50242 9.12732H5.68809H9.87377C10.6613 9.12732 11.1398 8.25919 10.7193 7.59332L6.53358 0.966006C6.14116 0.344664 5.23503 0.344662 4.84261 0.966004Z' fill='black'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg width='12' height='10' viewBox='0 0 12 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.84261 0.966004L0.656931 7.59332C0.236382 8.25919 0.714864 9.12732 1.50242 9.12732H5.68809H9.87377C10.6613 9.12732 11.1398 8.25919 10.7193 7.59332L6.53358 0.966006C6.14116 0.344664 5.23503 0.344662 4.84261 0.966004Z' fill='black'/%3E%3C/svg%3E");
-    
     -webkit-mask-size: contain;
     mask-size: contain;
     -webkit-mask-repeat: no-repeat;

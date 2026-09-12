@@ -258,7 +258,6 @@ export function paintCellStates(gameState) {
         cell.classList.toggle(CellClass.EDGE_BOTTOM, Boolean(visual?.edgeBottom));
         cell.classList.toggle(CellClass.EDGE_LEFT, Boolean(visual?.edgeLeft));
         cell.classList.toggle(CellClass.EDGE_RIGHT, Boolean(visual?.edgeRight));
-        cell.classList.toggle(CellClass.PREVIEW_BLOCKED, false);
         cell.classList.toggle(CellClass.SELECTED, isPendingCorner);
     });
 

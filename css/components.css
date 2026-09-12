@@ -168,25 +168,6 @@
     }
 }
 
-@keyframes win-gif-pop {
-    0% {
-        opacity: 0;
-        transform: scale(0.92);
-    }
-    18% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    82% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.96);
-    }
-}
-
 /* Soft, quiet scrim behind the alert box — sits on its own fixed layer
    (the box can't host it via a pseudo-element since its centering
    `transform` would turn it into the containing block for fixed children). */

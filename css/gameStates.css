@@ -108,26 +108,4 @@
     background-color: rgba(var(--secondary-rgb), 0.18);
 }
 
-/* Legacy cell-level drag preview blocked look (overlay is primary now). */
-.rectangle.preview-blocked {
-    background-color: color-mix(in srgb, var(--danger-color) 12%, transparent);
-    color: var(--surface-text-color);
-}
-
-.rectangle.preview-blocked.edge-top {
-    border-top-color: var(--danger-color);
-}
-
-.rectangle.preview-blocked.edge-bottom {
-    border-bottom-color: var(--danger-color);
-}
-
-.rectangle.preview-blocked.edge-left {
-    border-left-color: var(--danger-color);
-}
-
-.rectangle.preview-blocked.edge-right {
-    border-right-color: var(--danger-color);
-}
-
 

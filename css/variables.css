@@ -48,12 +48,6 @@
     initial-value: rgb(42, 24, 38);
 }
 
-@property --muted-text-color {
-    syntax: '<color>';
-    inherits: true;
-    initial-value: rgb(122, 85, 104);
-}
-
 @property --primary-deep-color {
     syntax: '<color>';
     inherits: true;
@@ -96,7 +90,6 @@
     --secondary-color: rgb(212, 168, 96);
     --board-background-color: rgb(255, 255, 240);
     --shadow-color: rgb(0, 0, 0);
-    --font-family: "Bungee Shade", monospace;
     --theme-transition: 1.2s ease-in-out;
 
     /* === shikaku-light-v3 design tokens (theme-agnostic) === */
@@ -107,7 +100,6 @@
     --surface-border-strong-color: rgb(215, 171, 187); /* pill/icon-button border */
     --cell-background-color: rgb(244, 232, 236); /* empty grid-cell fill */
     --grid-line-color: rgb(233, 214, 222);       /* hairline between empty cells */
-    --muted-text-color: rgb(122, 85, 104);       /* secondary/soft text (icons, captions) */
     --primary-rgb: 122, 51, 80;                  /* raw triplet for rgba() tinting; matches --primary-color */
     --secondary-rgb: 212, 168, 96;                /* raw triplet for rgba() tinting; matches --secondary-color */
     --shadow-tight: 0 4px 10px rgba(96, 25, 58, 0.14); /* small shadow for pill/icon buttons */
@@ -230,7 +222,6 @@ html {
         --surface-border-color var(--theme-transition),
         --surface-border-strong-color var(--theme-transition),
         --surface-text-color var(--theme-transition),
-        --muted-text-color var(--theme-transition),
         --primary-deep-color var(--theme-transition),
         --on-primary-color var(--theme-transition),
         --bg-top-color var(--theme-transition),
@@ -283,7 +274,6 @@ html[data-theme="dark"] {
     --surface-border-color: rgb(70, 50, 62);
     --surface-border-strong-color: rgb(96, 68, 84);
     --surface-text-color: rgb(238, 226, 233);
-    --muted-text-color: rgb(186, 156, 171);
     /* validated-rectangle border: a muted rose lift on top of the deep
        burgundy fill below, rather than the bright pink used to (fine when
        paired with the old, lighter fill, but too jarring against this one) */
