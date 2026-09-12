@@ -9,7 +9,7 @@
     z-index: 2;
     transform: translateX(100%);
     transition: transform 0.5s ease-in-out;
-    padding: 20px;
+    padding: calc(var(--u) * 1.25);
     box-shadow: var(--board-box-shadow);
     border-top-left-radius: var(--surface-radius);
     border-bottom-left-radius: var(--surface-radius);
@@ -46,8 +46,8 @@
     z-index: 2;
     /* tuck right edge under the drawer so the tab color runs into the panel */
     transform: translate(-103%, -50%);
-    width: 25px;
-    height: min(30vh, 15rem);
+    width: calc(var(--u) * 1.5625);
+    height: min(30vh, calc(var(--u) * 15));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -85,7 +85,7 @@
 .drawer-button {
     position: relative;
     z-index: 1;
-    font-size: 1rem;
+    font-size: var(--u);
     line-height: 1;
     color: var(--primary-color);
     font-weight: 600;
@@ -100,11 +100,13 @@
     max-height: 50%;
     aspect-ratio: 1 / 1;
     position: relative;
-    border: 1.5px solid var(--surface-border-color);
+    border: 1.5px solid var(--instructions-border-color);
     border-radius: var(--surface-radius);
     box-sizing: border-box;
     overflow: hidden;
-    background-color: var(--cell-background-color);
+    /* stays a fixed light card in both themes — matches the (light) source
+       screenshots shown inside it */
+    background-color: var(--instructions-surface-color);
 }
 
 #instructions-loader {
@@ -114,8 +116,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1.25rem;
-    padding: 1rem;
+    gap: calc(var(--u) * 1.25);
+    padding: var(--u);
     box-sizing: border-box;
 }
 
@@ -127,23 +129,25 @@
 #instructions-loader h3 {
     margin: 0;
     text-align: center;
-    color: var(--surface-text-color);
+    /* fixed dark text — the instructions card behind it stays light in both themes */
+    color: var(--instructions-text-color);
     font-family: 'Inter', sans-serif;
+    font-size: calc(var(--u) * 1.17);
 }
 
 #instructions-loader button {
-    padding: 10px 22px;
+    padding: calc(var(--u) * 0.625) calc(var(--u) * 1.375);
     border-radius: 999px;
     border: 1.5px solid var(--surface-border-strong-color);
     background: var(--board-background-color);
     color: var(--primary-color);
-    font: 600 14px 'Inter', sans-serif;
+    font: 600 calc(var(--u) * 0.875) 'Inter', sans-serif;
     cursor: pointer;
     box-shadow: var(--shadow-tight);
 }
 
 #instructions-content {
-    --slide-inset: 0.75rem;
+    --slide-inset: calc(var(--u) * 0.75);
     position: absolute;
     inset: 0;
     display: flex;
@@ -195,9 +199,9 @@
     background: transparent;
     border: none;
     padding: 0;
-    font-size: 1.5rem;
+    font-size: calc(var(--u) * 1.5);
     line-height: 1;
-    color: var(--board-border-color, var(--primary-color));
+    color: var(--primary-color);
     cursor: pointer;
     opacity: 0;
     pointer-events: none;
@@ -226,17 +230,17 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 0.4rem;
+    gap: calc(var(--u) * 0.4);
     flex-shrink: 0;
-    margin-top: 0.5rem;
+    margin-top: calc(var(--u) * 0.5);
     z-index: 2;
 }
 
 .slide-dot {
-    width: 0.45rem;
-    height: 0.45rem;
+    width: calc(var(--u) * 0.45);
+    height: calc(var(--u) * 0.45);
     border-radius: 50%;
-    background-color: var(--board-border-color, var(--primary-color));
+    background-color: var(--primary-color);
     opacity: 0.3;
     transition: opacity 0.2s ease;
 }

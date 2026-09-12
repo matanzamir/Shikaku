@@ -7,13 +7,14 @@ import {
     rectanglesOverlap,
     validateRectangle,
     validatePuzzle,
+    cellIsInsideRectangle,
 } from './game.js';
 import { resumeTimer, getElapsedMs, startTimer, pauseTimer } from './timer.js';
-import { 
-    setTheme, 
-    setActiveRectangles, 
-    clearActiveRectangles, 
-    getDifficulty, 
+import {
+    setTheme,
+    setActiveRectangles,
+    clearActiveRectangles,
+    getDifficulty,
     setDifficulty,
     getActiveRectangles,
     setScoreText,
@@ -26,6 +27,7 @@ import {
 import { Difficulty } from './difficulties.js';
 import { Message } from './messages.js';
 import { generatePuzzle } from './puzzleGenerator.js';
+import { syncUrlForDate } from './formValidation.js';
 
 /**
  * @typedef {import('./game.js').Puzzle} Puzzle
@@ -229,9 +231,12 @@ export function paintCellStates(gameState) {
     let previewBlocked = false;
     let previewValid = false;
     if (preview) {
-        previewBlocked = gameState.rectangles.some(
-            (rect) => rect.validated && rectanglesOverlap(preview, rect)
-        );
+        previewBlocked =
+            gameState.rectangles.some(
+                (rect) => rect.validated && rectanglesOverlap(preview, rect)
+            ) ||
+            (activePuzzleClues !== null &&
+                !activePuzzleClues.some((clue) => cellIsInsideRectangle(clue, preview)));
         previewValid =
             !previewBlocked &&
             activePuzzleClues !== null &&
@@ -253,7 +258,6 @@ export function paintCellStates(gameState) {
         cell.classList.toggle(CellClass.EDGE_BOTTOM, Boolean(visual?.edgeBottom));
         cell.classList.toggle(CellClass.EDGE_LEFT, Boolean(visual?.edgeLeft));
         cell.classList.toggle(CellClass.EDGE_RIGHT, Boolean(visual?.edgeRight));
-        cell.classList.toggle(CellClass.PREVIEW_BLOCKED, false);
         cell.classList.toggle(CellClass.SELECTED, isPendingCorner);
     });
 
@@ -619,7 +623,10 @@ function placeRectangle(start, end, gameState, puzzle) {
         rectanglesOverlap(candidate, rect)
     );
 
-    if (overlapping.some((rect) => rect.validated)) {
+    if (
+        overlapping.some((rect) => rect.validated) ||
+        !puzzle.clues.some((clue) => cellIsInsideRectangle(clue, candidate))
+    ) {
         // Reject silently — preview state already signals conflict while dragging.
         paintCellStates(gameState);
         return false;
@@ -736,7 +743,7 @@ export async function handleDifficultyChange(difficultyName, gameState) {
 }
 
 /**
- * Update the URL and rebuild the board for the new difficulty without a full reload.
+ * Rebuild the board for the new difficulty without a full reload.
  * `pushState` only changes the address bar — the grid must be regenerated here.
  * @param {string} difficultyName
  * @param {GameState} gameState
@@ -745,10 +752,7 @@ function loadCorrectPuzzle(difficultyName, gameState) {
     const difficultyConfig = Difficulty[difficultyName.toUpperCase()] ?? Difficulty.EASY;
     const date = getPlayDateKey();
 
-    const url = new URL(window.location.href);
-    url.searchParams.set('difficulty', difficultyConfig.name);
-    url.searchParams.set('date', date);
-    window.history.pushState({}, '', url);
+    syncUrlForDate(date, 'push');
 
     const clues = generatePuzzle(difficultyConfig, date);
     const puzzle = createPuzzle(difficultyConfig.size, difficultyConfig.size, clues);
@@ -804,8 +808,10 @@ function refreshDifficultyMenu() {
 
 export function openAlertBox(message) {
     const alertBox = document.getElementById('alert-box');
+    const alertBackdrop = document.getElementById('alert-backdrop');
     document.getElementById('message').textContent = message;
     message === Message.INVALID_QUERY ? document.getElementById('cancel-btn').hidden = true : document.getElementById('cancel-btn').hidden = false;
+    alertBackdrop.hidden = false;
     alertBox.hidden = false;
 
     return new Promise((resolve) => {
@@ -814,6 +820,7 @@ export function openAlertBox(message) {
 
         const cleanup = (result) => {
             alertBox.hidden = true;
+            alertBackdrop.hidden = true;
             okBtn.removeEventListener('click', onOk);
             cancelBtn.removeEventListener('click', onCancel);
             resolve(result);
@@ -933,6 +940,12 @@ export function handlePointerMove(event, gameState) {
         return;
     }
 
+    // Drag takes over: drop any pending corner so .selected margin/hit-testing
+    // can't stall the gesture, and release won't be treated as a second click.
+    if (!wasDragging && gameState.pendingSelection) {
+        gameState.pendingSelection = null;
+    }
+
     paintCellStates(gameState);
 }
 
@@ -972,12 +985,20 @@ export function handlePointerUp(event, gameState, puzzle) {
 
     // Drag that ended on the start cell (press-release or drag-back) is not a rectangle.
     if (origin.row === current.row && origin.col === current.col) {
+        gameState.pendingSelection = null;
+        suppressClickAfterDrag = true;
         paintCellStates(gameState);
+        setTimeout(() => {
+            suppressClickAfterDrag = false;
+        }, 50);
         return;
     }
 
     // Real drag: commit through the shared placement path.
     // Swallow the synthetic click that follows a drag, then clear the flag.
+    // Pending corner (if any) is already cleared when the drag started; clear
+    // again for fast flicks that only resolve on pointerup.
+    gameState.pendingSelection = null;
     suppressClickAfterDrag = true;
     placeRectangle(origin, current, gameState, puzzle);
     setTimeout(() => {

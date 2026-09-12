@@ -119,21 +119,6 @@ export function sliceBlock(rectangles, block, depth = 0) {
 }
 
 /**
- * @param {Rectangle[]} rectangles
- * @param {number} size
- * @returns {{guillotine: boolean, depth: number, stuck: {block: Block, pieces: number}[], largestStuckArea: number, stuckArea: number}}
- */
-export function analyseSlicing(rectangles, size) {
-    const result = sliceBlock(rectangles, wholeBoard(size));
-    const areas = result.stuck.map((s) => s.block.width * s.block.height);
-    return {
-        ...result,
-        largestStuckArea: areas.length ? Math.max(...areas) : 0,
-        stuckArea: areas.reduce((sum, area) => sum + area, 0),
-    };
-}
-
-/**
  * True when the board comes apart into single rectangles by straight cuts alone,
  * i.e. every cut the generator made is still readable off the finished board.
  * @param {Rectangle[]} rectangles
@@ -245,34 +230,4 @@ export function rectanglesTouch(a, b) {
     const rowsOverlap = a.row < b.row + b.height && b.row < a.row + a.height;
     return (colsOverlap && (a.row + a.height === b.row || b.row + b.height === a.row))
         || (rowsOverlap && (a.col + a.width === b.col || b.col + b.width === a.col));
-}
-
-/**
- * Check that a rectangle list really is a partition of the board, so a bug
- * cannot quietly masquerade as an interesting layout.
- * @param {Rectangle[]} rectangles
- * @param {number} size
- * @returns {string | null} description of the first problem found, or null
- */
-export function validateTiling(rectangles, size) {
-    const cover = new Int32Array(size * size);
-
-    for (const r of rectangles) {
-        if (r.row < 0 || r.col < 0 || r.row + r.height > size || r.col + r.width > size) {
-            return `rectangle out of bounds: ${JSON.stringify(r)}`;
-        }
-        for (let row = r.row; row < r.row + r.height; row++) {
-            for (let col = r.col; col < r.col + r.width; col++) {
-                cover[row * size + col]++;
-            }
-        }
-    }
-
-    for (let i = 0; i < cover.length; i++) {
-        if (cover[i] !== 1) {
-            return `cell (${Math.floor(i / size)},${i % size}) covered ${cover[i]} times`;
-        }
-    }
-
-    return null;
 }

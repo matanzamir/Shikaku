@@ -8,8 +8,6 @@ export const CellClass = Object.freeze({
     SELECTED: 'selected',
     VALIDATED: 'validated',
     INVALID: 'invalid',
-    /** Drag preview intersects a locked (validated) rectangle. */
-    PREVIEW_BLOCKED: 'preview-blocked',
     // Purely visual hooks (see paintCellStates): mark which sides of a
     // covered cell sit on its rectangle's true outer edge, so CSS can
     // draw a border/rounded-corner only there and stay flush elsewhere.
