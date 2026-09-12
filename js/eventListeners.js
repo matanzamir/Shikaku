@@ -33,7 +33,7 @@ export function addTimerEventListener() {
     pauseButton.addEventListener('click', () => {
         handleTimerClick();
     });
-    
+
     document.addEventListener('visibilitychange', () => {
         handleTimerVisibilityChange();
     });

@@ -1,4 +1,3 @@
-
 export function handleDrawerClick(drawerButton) {
     const drawer = drawerButton.parentElement;
     const label = drawerButton.querySelector('.drawer-button');

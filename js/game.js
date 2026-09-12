@@ -107,14 +107,3 @@ export function validatePuzzle(rectangles, size) {
     const allValidated = rectangles.every((rectangle) => rectangle.validated);
     return sumOfAreas === size && allValidated;
 }
-
-/** Hand-crafted dev puzzle until Phase 3 generator is ready. */
-export const SAMPLE_PUZZLE = createPuzzle(5, 5, [
-    { row: 0, col: 0, value: 4 },
-    { row: 0, col: 3, value: 2 },
-    { row: 2, col: 1, value: 6 },
-    { row: 3, col: 3, value: 4 },
-    { row: 4, col: 0, value: 3 },
-    { row: 1, col: 4, value: 4 },
-    { row: 4, col: 4, value: 2 },
-]);

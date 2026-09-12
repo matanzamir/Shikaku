@@ -29,13 +29,6 @@ function cacheKey(difficulty, date) {
 }
 
 /**
- * Drop all cached puzzles (mainly for tests).
- */
-export function clearPuzzleCache() {
-    puzzleCache.clear();
-}
-
-/**
  * Generate a puzzle of the given size.
  * @param {Difficulty[keyof Difficulty]} difficulty
  * @param {Date | string} date

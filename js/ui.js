@@ -10,11 +10,11 @@ import {
     cellIsInsideRectangle,
 } from './game.js';
 import { resumeTimer, getElapsedMs, startTimer, pauseTimer } from './timer.js';
-import { 
-    setTheme, 
-    setActiveRectangles, 
-    clearActiveRectangles, 
-    getDifficulty, 
+import {
+    setTheme,
+    setActiveRectangles,
+    clearActiveRectangles,
+    getDifficulty,
     setDifficulty,
     getActiveRectangles,
     setScoreText,

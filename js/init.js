@@ -1,8 +1,8 @@
 import { startTimer } from './timer.js';
-import { 
-    addDrawerEventListener, 
-    addLightDarkEventListener, 
-    addTimerEventListener, 
+import {
+    addDrawerEventListener,
+    addLightDarkEventListener,
+    addTimerEventListener,
     addDifficultySelectEventListener,
     addInstructionsButtonEventListener,
     addGameInactiveOverlayEventListener,
@@ -11,12 +11,20 @@ import {
     addReturnToTodayEventListener,
 } from './eventListeners.js';
 import { updateBodyTheme, createGameGrid, paintCellStates, setDifficultySelectOptions } from './ui.js';
-import { getTheme, 
-        getActiveRectangles, 
-        showStoredScore, 
-        getSelectionMode,
-        getSavedElapsedMs } from './storage.js';
+import {
+    getTheme,
+    getActiveRectangles,
+    showStoredScore,
+    getSelectionMode,
+    getSavedElapsedMs,
+} from './storage.js';
 
+/**
+ * Boot the board for a freshly loaded puzzle: restore theme/selection-mode
+ * chrome, paint the grid, resume the timer, and wire up every UI listener.
+ * @param {import('./game.js').Puzzle} puzzle
+ * @param {import('./game.js').GameState} gameState
+ */
 export function init(puzzle, gameState) {
     const selectionModeSwitch = document.getElementById('selection-mode-switch');
     const selectionMode = getSelectionMode();
@@ -30,7 +38,7 @@ export function init(puzzle, gameState) {
     updateBodyTheme(theme, document.getElementById('light-dark-button'));
 
     setDifficultySelectOptions();
-    
+
     createGameGrid(puzzle, gameState);
 
     gameState.rectangles = getActiveRectangles();
@@ -43,6 +51,9 @@ export function init(puzzle, gameState) {
     addEventListeners(gameState);
 }
 
+/**
+ * @param {import('./game.js').GameState} gameState
+ */
 async function addEventListeners(gameState) {
     addDrawerEventListener();
     addLightDarkEventListener();

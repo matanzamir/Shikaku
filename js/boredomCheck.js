@@ -7,12 +7,15 @@ import { isGuillotine, rectanglesTouch } from './faultLines.js';
  * puzzles feel like a few big rectangles chopped down. It only belongs here
  * because the shuffle can produce boards that pass it; a plain guillotine
  * partition fails it every single time.
+ * @param {Rectangle[]} rectangles
+ * @param {number} size
+ * @returns {boolean}
  */
 export function isBoring(rectangles, size) {
     const allRows = rectangles.every(r => r.height === 1 && r.width === size);
     const allCols = rectangles.every(r => r.width === 1 && r.height === size);
     return allRows || allCols || hasBoardSpanningPiece(rectangles, size) || mostlySameRatio(rectangles, size) || mostlySameDirection(rectangles, size) || dominoFlood(rectangles, size) || hasStripeWall(rectangles) || hasLopsidedHalf(rectangles, size) || isGuillotine(rectangles, size);
-  }
+}
 
 /**
  * A single piece reaching from one edge of the board to the opposite one draws
@@ -27,18 +30,36 @@ function hasBoardSpanningPiece(rectangles, size) {
     return rectangles.some((r) => r.width === size || r.height === size);
 }
 
+/**
+ * True when one rectangle shape (width x height) accounts for most of the board.
+ * @param {Rectangle[]} rectangles
+ * @param {number} size
+ * @returns {boolean}
+ */
 function mostlySameRatio(rectangles, size) {
     const keys = rectangles.map((r) => `${r.width}x${r.height}`);
     const dominant = Math.max(...[...keys.reduce((m, k) => m.set(k, (m.get(k) || 0) + 1), new Map()).values()]);
     return dominant / rectangles.length > 0.85;
 }
 
-function mostlySameDirection (rectangles, size) {
+/**
+ * True when most pieces are strips running the same way (all vertical or all horizontal).
+ * @param {Rectangle[]} rectangles
+ * @param {number} size
+ * @returns {boolean}
+ */
+function mostlySameDirection(rectangles, size) {
     const cols = rectangles.filter(r => stripDirection(r) === -1);
     const rows = rectangles.filter(r => stripDirection(r) === 1);
     return cols.length / rectangles.length > 0.6 || rows.length / rectangles.length > 0.6;
 }
 
+/**
+ * True when dominoes (area-2 pieces) cover more than half the board.
+ * @param {Rectangle[]} rectangles
+ * @param {number} size
+ * @returns {boolean}
+ */
 function dominoFlood(rectangles, size) {
     const dominos = rectangles.filter(r => r.width * r.height === 2);
     return (dominos.length * 2) / (size * size) > 0.5;
